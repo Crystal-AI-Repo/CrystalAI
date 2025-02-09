@@ -1,0 +1,19 @@
+server:
+  port: 5310
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health, info
+crystal:
+  dispatcher:
+    host: 127.0.0.1
+    port: 5210
+  ollama:
+    host: localhost
+    port: 11434
