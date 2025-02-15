@@ -22,6 +22,7 @@ class ProbeController(
     private val localIpAddress: String,
     @Value("\${server.port}")
     private val serverPort: Int,
+    private val nodeConfiguration: NodeConfiguration,
     private val ollamaFeignClient: OllamaClient
 ) {
     @GetMapping("/info")
@@ -31,6 +32,7 @@ class ProbeController(
             NodeProbeResult(
                 localIpAddress,
                 serverPort,
+                nodeConfiguration.isSsl,
                 ollamaModels = ollamaFeignClient.getOllamaModels().models
             )
         )

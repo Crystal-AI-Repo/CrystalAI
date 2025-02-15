@@ -16,9 +16,9 @@ class JacksonFeignDecoder(private val objectMapper: ObjectMapper) : Decoder {
         }
 
         val responseBody = InputStreamReader(response.body().asInputStream()).readText()
-        println("==> ${response.status()}: ${response.request()?.httpMethod()?.name} ${response.request()?.url()}")
-        println("Headers: ${response.request()?.headers()}")
-        println("==> $responseBody")
+        // println("==> ${response.status()}: ${response.request()?.httpMethod()?.name} ${response.request()?.url()}")
+        // println("Headers: ${response.request()?.headers()}")
+        // println("==> $responseBody")
         try {
             return objectMapper.readValue(responseBody, objectMapper.constructType(type))
         } catch (e: Exception) {

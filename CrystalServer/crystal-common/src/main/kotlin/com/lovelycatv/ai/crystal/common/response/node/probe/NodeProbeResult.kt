@@ -14,6 +14,8 @@ data class NodeProbeResult @JsonCreator constructor(
     val nodeIp: String,
     @JsonProperty("nodePort")
     val nodePort: Int,
+    @JsonProperty("ssl")
+    val ssl: Boolean,
     @JsonProperty("ollamaModels")
     val ollamaModels: List<OllamaModelMeta>
 )

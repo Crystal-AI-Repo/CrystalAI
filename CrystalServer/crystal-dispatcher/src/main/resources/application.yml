@@ -1,2 +1,7 @@
 server:
   port: 5210
+
+crystal:
+  node:
+    check-alive-cron: 0/5 * * * * ?
+    update-node-cron: 0/10 * * * * ?

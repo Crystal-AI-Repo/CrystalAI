@@ -11,6 +11,7 @@ management:
       exposure:
         include: health, info
 crystal:
+  ssl: false
   dispatcher:
     host: 127.0.0.1
     port: 5210

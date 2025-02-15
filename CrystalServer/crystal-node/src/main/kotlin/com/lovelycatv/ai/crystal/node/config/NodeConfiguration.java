@@ -20,6 +20,8 @@ public class NodeConfiguration {
     private NodeDispatcherConfiguration dispatcher = new NodeDispatcherConfiguration();
     private NodeOllamaConfiguration ollama = new NodeOllamaConfiguration();
 
+    private boolean ssl = false;
+
     @Bean
     public NodeDispatcherClient nodeDispatcherClient() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -42,11 +44,19 @@ public class NodeConfiguration {
         return ollama;
     }
 
+    public boolean isSsl() {
+        return ssl;
+    }
+
     public void setDispatcher(NodeDispatcherConfiguration dispatcher) {
         this.dispatcher = dispatcher;
     }
 
     public void setOllama(NodeOllamaConfiguration ollama) {
         this.ollama = ollama;
+    }
+
+    public void setSsl(boolean ssl) {
+        this.ssl = ssl;
     }
 }

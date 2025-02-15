@@ -1,0 +1,16 @@
+package com.lovelycatv.ai.crystal.common.util
+
+import com.fasterxml.jackson.databind.ObjectMapper
+
+/**
+ * @author lovelycat
+ * @since 2025-02-15 20:55
+ * @version 1.0
+ */
+class JacksonJSONExtensions private constructor()
+
+fun <T> T?.toJSONString(mapper: ObjectMapper = ObjectMapper()) = mapper.writeValueAsString(this)
+
+inline fun <C: CharSequence, reified T> C.toExplicitObject(mapper: ObjectMapper = ObjectMapper()): T {
+    return mapper.readValue(this.toString(), T::class.java)
+}

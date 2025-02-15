@@ -3,6 +3,8 @@ package com.lovelycatv.ai.crystal.common.client
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lovelycatv.ai.crystal.common.client.codec.JacksonFeignDecoder
 import com.lovelycatv.ai.crystal.common.client.codec.JacksonFeignEncoder
+import com.lovelycatv.ai.crystal.common.util.catchException
+import feign.Client
 import feign.Feign
 import feign.codec.Decoder
 import feign.codec.Encoder
@@ -23,12 +25,7 @@ inline fun <reified T> getFeignClient(
     feignDecoder: Decoder = JacksonFeignDecoder(decoderObjectMapper),
     processor: Feign.Builder.() -> Feign.Builder = { this }
 ): T {
-    return processor(
-        Feign.builder()
-            .encoder(feignEncoder)
-            .decoder(feignDecoder)
-            .contract(SpringMvcContract())
-    ).target(T::class.java, url)
+    return getFeignClient(T::class.java, url, encoderObjectMapper, decoderObjectMapper, feignEncoder, feignDecoder, processor)
 }
 
 inline fun <T> getFeignClient(
@@ -46,4 +43,16 @@ inline fun <T> getFeignClient(
             .decoder(feignDecoder)
             .contract(SpringMvcContract())
     ).target(clazz, url)
+}
+
+fun <C: IFeignClient, R> C.safeRequest(
+    onException: ((Exception) -> Unit)? = null,
+    returnOnException: R? = null,
+    fx: C.() -> R
+): R? {
+    return catchException(
+        printStackTrace = false,
+        onException = { onException?.invoke(it) },
+        returnOnException = returnOnException
+    ) { fx.invoke(this) }
 }

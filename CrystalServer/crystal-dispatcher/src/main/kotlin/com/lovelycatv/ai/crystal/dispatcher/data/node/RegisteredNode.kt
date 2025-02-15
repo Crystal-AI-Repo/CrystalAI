@@ -11,7 +11,13 @@ data class RegisteredNode(
     val nodeId: String,
     val host: String,
     val port: Int,
+    val ssl: Boolean,
+    val isAlive: Boolean,
     val registeredTimestamp: Long,
     val lastAliveTimestamp: Long,
+    val lastAliveCheckTimestamp: Long,
+    val lastUpdateTimestamp: Long,
     val ollamaModels: List<OllamaModelMeta>
-)
+) {
+    val requestUrl: String get() = "${if (ssl) "https" else "http"}://$host:$port"
+}
