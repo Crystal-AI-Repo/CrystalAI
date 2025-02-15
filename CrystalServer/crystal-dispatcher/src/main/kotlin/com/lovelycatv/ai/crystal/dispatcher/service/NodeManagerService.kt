@@ -11,4 +11,6 @@ interface NodeManagerService {
     fun registerNode(nodeHost: String, nodePort: Int, ssl: Boolean): NodeRegisterResult
 
     fun unregisterNode(nodeHost: String, nodePort: Int): Boolean
+
+    fun isNodeRegistered(nodeUUID: String): Boolean
 }

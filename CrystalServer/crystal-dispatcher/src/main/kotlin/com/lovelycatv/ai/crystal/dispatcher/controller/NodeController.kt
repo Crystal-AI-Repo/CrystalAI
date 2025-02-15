@@ -2,6 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.controller
 
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.dispatcher.service.NodeManagerService
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -47,5 +48,13 @@ class NodeController(
         } else {
             Result.badRequest("Node does not exist or had been unregistered")
         }
+    }
+
+    @GetMapping("/check")
+    fun nodeCheck(
+        @RequestParam("uuid")
+        uuid: String
+    ): Result<*> {
+        return Result.success("", nodeManagerService.isNodeRegistered(uuid))
     }
 }

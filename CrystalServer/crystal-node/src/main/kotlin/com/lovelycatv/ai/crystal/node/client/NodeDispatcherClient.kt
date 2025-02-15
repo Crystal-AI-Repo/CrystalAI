@@ -4,6 +4,7 @@ import com.lovelycatv.ai.crystal.common.client.IFeignClient
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.response.dispatcher.NodeRegisterResult
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -23,4 +24,7 @@ interface NodeDispatcherClient : IFeignClient {
         @RequestParam("ssl")
         ssl: Boolean,
     ): Result<NodeRegisterResult>
+
+    @GetMapping("/node/check")
+    fun checkNode(@RequestParam("uuid") uuid: String): Result<Boolean>
 }

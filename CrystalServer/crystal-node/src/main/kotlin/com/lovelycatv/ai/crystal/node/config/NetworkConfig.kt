@@ -1,5 +1,7 @@
 package com.lovelycatv.ai.crystal.node.config
 
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.net.InetAddress
@@ -11,6 +13,9 @@ import java.net.InetAddress
  */
 @Configuration
 class NetworkConfig {
+    @Value("\${server.port}")
+    var applicationPort: Int = 8080
+
     @Bean("localIpAddress")
     fun localIpAddress(): String {
         return InetAddress.getLocalHost().hostAddress

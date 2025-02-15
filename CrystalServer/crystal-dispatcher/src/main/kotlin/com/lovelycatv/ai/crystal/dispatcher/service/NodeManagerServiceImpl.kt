@@ -26,4 +26,9 @@ class NodeManagerServiceImpl(
     override fun unregisterNode(nodeHost: String, nodePort: Int): Boolean {
         return nodeManager.unregisterNode(nodeHost, nodePort)
     }
+
+    override fun isNodeRegistered(nodeUUID: String): Boolean {
+        val node = nodeManager.getRegisteredNode(nodeUUID)
+        return node != null && node.isAlive
+    }
 }

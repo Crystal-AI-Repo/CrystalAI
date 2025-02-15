@@ -22,8 +22,8 @@ public class NodeConfiguration {
 
     private boolean ssl = false;
 
-    @Bean
-    public NodeDispatcherClient nodeDispatcherClient() {
+    @Bean("dispatcherClient")
+    public NodeDispatcherClient dispatcherClient() {
         ObjectMapper objectMapper = new ObjectMapper();
         return FeignClientExtensionsKt.getFeignClient(
                 NodeDispatcherClient.class,
