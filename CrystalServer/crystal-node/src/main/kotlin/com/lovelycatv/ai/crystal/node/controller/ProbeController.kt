@@ -6,7 +6,6 @@ import com.lovelycatv.ai.crystal.common.response.node.probe.NodeProbeResult
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import jakarta.annotation.Resource
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -23,7 +22,6 @@ class ProbeController(
     private val localIpAddress: String,
     @Value("\${server.port}")
     private val serverPort: Int,
-    private val nodeConfiguration: NodeConfiguration,
     private val ollamaFeignClient: OllamaClient
 ) {
     @GetMapping("/info")

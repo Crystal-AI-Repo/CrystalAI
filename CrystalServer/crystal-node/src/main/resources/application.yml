@@ -14,6 +14,10 @@ crystal:
   dispatcher:
     host: 127.0.0.1
     port: 5210
+    ssl: false
   ollama:
     host: localhost
     port: 11434
+    ssl: false
+    default-model: gemma2:27b
+    default-temperature: 0.05

@@ -16,6 +16,6 @@ class OllamaConfig(
 ) {
     @Bean
     fun ollamaFeignClient(): OllamaClient {
-        return getFeignClient<OllamaClient>(nodeConfiguration.ollama.getBaseUrl(false))
+        return getFeignClient<OllamaClient>(nodeConfiguration.ollama.baseUrl)
     }
 }

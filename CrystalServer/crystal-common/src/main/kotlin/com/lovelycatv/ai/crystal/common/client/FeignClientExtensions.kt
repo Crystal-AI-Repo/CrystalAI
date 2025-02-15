@@ -30,3 +30,20 @@ inline fun <reified T> getFeignClient(
             .contract(SpringMvcContract())
     ).target(T::class.java, url)
 }
+
+inline fun <T> getFeignClient(
+    clazz: Class<T>,
+    url: String,
+    encoderObjectMapper: ObjectMapper = ObjectMapper(),
+    decoderObjectMapper: ObjectMapper = ObjectMapper(),
+    feignEncoder: Encoder = JacksonFeignEncoder(encoderObjectMapper),
+    feignDecoder: Decoder = JacksonFeignDecoder(decoderObjectMapper),
+    processor: Feign.Builder.() -> Feign.Builder = { this }
+): T {
+    return processor(
+        Feign.builder()
+            .encoder(feignEncoder)
+            .decoder(feignDecoder)
+            .contract(SpringMvcContract())
+    ).target(clazz, url)
+}
