@@ -15,6 +15,9 @@ management:
       exposure:
         include: health, info
 crystal:
+  # Only when the dispatcher is given the same secretKey will the node will respond properly.
+  secret-key: Q3J5c3RhbEFJTm9kZQ==
+  # Enable SSL
   ssl: false
   dispatcher:
     host: 127.0.0.1
@@ -23,6 +26,7 @@ crystal:
   ollama:
     host: localhost
     port: 11434
+    # Enable SSL
     ssl: false
     default-model: gemma2:27b
     default-temperature: 0.05

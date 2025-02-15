@@ -22,6 +22,8 @@ public class NodeConfiguration {
 
     private boolean ssl = false;
 
+    private String secretKey = "Q3J5c3RhbEFJTm9kZQ==";
+
     @Bean("dispatcherClient")
     public NodeDispatcherClient dispatcherClient() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -48,6 +50,10 @@ public class NodeConfiguration {
         return ssl;
     }
 
+    public String getSecretKey() {
+        return secretKey;
+    }
+
     public void setDispatcher(NodeDispatcherConfiguration dispatcher) {
         this.dispatcher = dispatcher;
     }
@@ -58,5 +64,9 @@ public class NodeConfiguration {
 
     public void setSsl(boolean ssl) {
         this.ssl = ssl;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
     }
 }

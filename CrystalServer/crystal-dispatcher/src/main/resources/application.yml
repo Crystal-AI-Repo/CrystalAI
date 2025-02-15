@@ -3,5 +3,13 @@ server:
 
 crystal:
   node:
+    # Cron Expression of "Check Node Alive Status"
     check-alive-cron: 0/5 * * * * ?
+    # Cron Expression of "Update Node Information"
     update-node-cron: 0/10 * * * * ?
+    # If a node is not assigned a secretKey, use the default-secret-key
+    default-secret-key: Q3J5c3RhbEFJTm9kZQ==
+    # Specify the secretKey for nodes
+    secret-keys:
+      - node-name: CrystalNode1
+        secret-key: Q3J5c3RhbEFJTm9kZQ==
