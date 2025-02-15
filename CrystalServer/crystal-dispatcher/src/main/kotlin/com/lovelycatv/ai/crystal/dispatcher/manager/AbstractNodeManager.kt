@@ -4,7 +4,6 @@ import com.lovelycatv.ai.crystal.common.client.NodeActuatorClient
 import com.lovelycatv.ai.crystal.common.client.getFeignClient
 import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.common.response.dispatcher.NodeRegisterResult
-import com.lovelycatv.ai.crystal.common.util.catchException
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.dispatcher.client.NodeProbeClient
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
@@ -79,6 +78,7 @@ abstract class AbstractNodeManager {
                         port = nodeInfo.nodePort,
                         ssl = nodeInfo.ssl,
                         nodeId = nodeId,
+                        nodeName = nodeInfo.nodeName,
                         isAlive = true,
                         registeredTimestamp = currentTimestamp,
                         lastAliveTimestamp = currentTimestamp,
@@ -88,7 +88,7 @@ abstract class AbstractNodeManager {
                     )
                 }
 
-                log.info("Node [{}:{}] (SSL: {}) is registered.", nodeHost, nodePort, ssl)
+                log.info("Node [{} / {}:{}] (SSL: {}) is registered.", nodeInfo.nodeName, nodeHost, nodePort, ssl)
 
                 NodeRegisterResult(success = true, uuid = nodeId)
             } else {

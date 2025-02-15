@@ -9,6 +9,7 @@ import com.lovelycatv.ai.crystal.common.response.ollama.OllamaModelMeta
  */
 data class RegisteredNode(
     val nodeId: String,
+    val nodeName: String,
     val host: String,
     val port: Int,
     val ssl: Boolean,

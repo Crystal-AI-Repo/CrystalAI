@@ -1,6 +1,10 @@
 server:
   port: 5310
 
+spring:
+  application:
+    name: CrystalNode1
+
 management:
   endpoint:
     health:

@@ -3,8 +3,8 @@ package com.lovelycatv.ai.crystal.node.controller
 import com.lovelycatv.ai.crystal.common.client.OllamaClient
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.response.node.probe.NodeProbeResult
+import com.lovelycatv.ai.crystal.node.config.NetworkConfig
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
-import jakarta.annotation.Resource
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -18,10 +18,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/probe")
 class ProbeController(
-    @Resource(name = "localIpAddress")
-    private val localIpAddress: String,
-    @Value("\${server.port}")
-    private val serverPort: Int,
+    @Value("\${spring.application.name}")
+    private val applicationName: String,
+    private val networkConfig: NetworkConfig,
     private val nodeConfiguration: NodeConfiguration,
     private val ollamaFeignClient: OllamaClient
 ) {
@@ -30,8 +29,9 @@ class ProbeController(
         return Result.success(
             "",
             NodeProbeResult(
-                localIpAddress,
-                serverPort,
+                applicationName,
+                networkConfig.localIpAddress(),
+                networkConfig.applicationPort,
                 nodeConfiguration.isSsl,
                 ollamaModels = ollamaFeignClient.getOllamaModels().models
             )

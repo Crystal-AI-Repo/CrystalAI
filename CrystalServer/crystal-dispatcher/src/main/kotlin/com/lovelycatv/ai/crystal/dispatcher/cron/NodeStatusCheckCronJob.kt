@@ -24,7 +24,8 @@ class NodeStatusCheckCronJob(
         nodeManager.allRegisteredNodes.forEach {
             if (!nodeManager.checkNodeStatus(it.nodeId)) {
                 log.warn(
-                    "Node [{}] is down, lastAliveTime: [{}] ({} seconds ago)",
+                    "Node [{} / {}] is down, lastAliveTime: [{}] ({} seconds ago)",
+                    it.nodeName,
                     it.requestUrl,
                     it.lastAliveTimestamp,
                     (System.currentTimeMillis() - it.lastAliveTimestamp) / 1000
@@ -38,7 +39,8 @@ class NodeStatusCheckCronJob(
         nodeManager.allRegisteredNodes.filter { it.isAlive }.forEach {
             if (!nodeManager.updateNodeInfo(it.nodeId)) {
                 log.warn(
-                    "Could not update information of node: [{}], lastUpdateTime: [{}] ({} seconds ago)",
+                    "Could not update information of node: [{} / {}], lastUpdateTime: [{}] ({} seconds ago)",
+                    it.nodeName,
                     it.requestUrl,
                     it.lastUpdateTimestamp,
                     (System.currentTimeMillis() - it.lastUpdateTimestamp) / 1000

@@ -10,6 +10,8 @@ import com.lovelycatv.ai.crystal.common.response.ollama.OllamaModelMeta
  * @version 1.0
  */
 data class NodeProbeResult @JsonCreator constructor(
+    @JsonProperty("nodeName")
+    val nodeName: String,
     @JsonProperty("nodeIp")
     val nodeIp: String,
     @JsonProperty("nodePort")
