@@ -2,7 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.service
 
 import com.lovelycatv.ai.crystal.common.client.getFeignClient
 import com.lovelycatv.ai.crystal.common.response.dispatcher.NodeRegisterResult
-import com.lovelycatv.ai.crystal.dispatcher.client.NodeActuatorClient
+import com.lovelycatv.ai.crystal.common.client.NodeActuatorClient
 import com.lovelycatv.ai.crystal.dispatcher.client.NodeProbeClient
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import org.springframework.stereotype.Component

@@ -1,9 +1,12 @@
 package com.lovelycatv.ai.crystal.common.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.lovelycatv.ai.crystal.common.client.codec.JacksonFeignDecoder
+import com.lovelycatv.ai.crystal.common.client.codec.JacksonFeignEncoder
 import feign.Feign
 import feign.codec.Decoder
 import feign.codec.Encoder
+import org.springframework.cloud.openfeign.support.SpringMvcContract
 
 /**
  * @author lovelycat
@@ -24,5 +27,6 @@ inline fun <reified T> getFeignClient(
         Feign.builder()
             .encoder(feignEncoder)
             .decoder(feignDecoder)
+            .contract(SpringMvcContract())
     ).target(T::class.java, url)
 }

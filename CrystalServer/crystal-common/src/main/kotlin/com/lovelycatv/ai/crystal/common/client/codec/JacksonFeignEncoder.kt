@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.common.client
+package com.lovelycatv.ai.crystal.common.client.codec
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper

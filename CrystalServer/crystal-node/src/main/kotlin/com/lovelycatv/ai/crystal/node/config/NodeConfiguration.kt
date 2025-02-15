@@ -1,6 +1,10 @@
 package com.lovelycatv.ai.crystal.node.config
 
+import com.lovelycatv.ai.crystal.common.client.getFeignClient
+import com.lovelycatv.ai.crystal.node.client.NodeDispatcherClient
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 /**
@@ -13,5 +17,10 @@ import org.springframework.context.annotation.Configuration
 data class NodeConfiguration(
     var dispatcher: NodeDispatcherConfiguration = NodeDispatcherConfiguration(),
     var ollama: NodeOllamaConfiguration = NodeOllamaConfiguration()
-)
+) {
+    @Bean
+    fun nodeDispatcherClient(): NodeDispatcherClient {
+        return getFeignClient<NodeDispatcherClient>(dispatcher.getBaseUrl(false))
+    }
+}
 

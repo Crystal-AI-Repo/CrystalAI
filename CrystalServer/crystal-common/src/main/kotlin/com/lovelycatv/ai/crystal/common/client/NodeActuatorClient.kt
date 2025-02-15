@@ -1,9 +1,10 @@
-package com.lovelycatv.ai.crystal.dispatcher.client
+package com.lovelycatv.ai.crystal.common.client
 
 import com.lovelycatv.ai.crystal.common.response.actuator.NodeHealthResponse
 import com.lovelycatv.ai.crystal.common.client.IFeignClient
 import feign.RequestLine
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.web.bind.annotation.GetMapping
 
 /**
  * @author lovelycat
@@ -12,6 +13,6 @@ import org.springframework.cloud.openfeign.FeignClient
  */
 @FeignClient(name = "nodeActuatorClient")
 interface NodeActuatorClient : IFeignClient {
-    @RequestLine("GET /actuator/health")
+    @GetMapping("/actuator/health")
     fun getHealthStatus(): NodeHealthResponse
 }

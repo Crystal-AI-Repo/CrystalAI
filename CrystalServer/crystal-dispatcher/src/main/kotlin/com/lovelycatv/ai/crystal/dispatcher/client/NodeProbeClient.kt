@@ -3,8 +3,8 @@ package com.lovelycatv.ai.crystal.dispatcher.client
 import com.lovelycatv.ai.crystal.common.client.IFeignClient
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.response.node.probe.NodeProbeResult
-import feign.RequestLine
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.web.bind.annotation.GetMapping
 
 /**
  * @author lovelycat
@@ -13,6 +13,6 @@ import org.springframework.cloud.openfeign.FeignClient
  */
 @FeignClient("nodeProbeClient")
 interface NodeProbeClient : IFeignClient {
-    @RequestLine("GET /probe/info")
+    @GetMapping("/probe/info")
     fun getNodeInfo(): Result<NodeProbeResult>
 }

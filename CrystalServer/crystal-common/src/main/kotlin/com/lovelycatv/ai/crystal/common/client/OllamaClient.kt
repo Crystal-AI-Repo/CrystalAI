@@ -1,11 +1,11 @@
 package com.lovelycatv.ai.crystal.common.client
 
 import com.lovelycatv.ai.crystal.common.response.ollama.OllamaModelsResponse
-import feign.RequestLine
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.web.bind.annotation.GetMapping
 
 @FeignClient("ollamaClient")
 interface OllamaClient : IFeignClient {
-    @RequestLine("GET /api/tags")
+    @GetMapping("/api/tags")
     fun getOllamaModels(): OllamaModelsResponse
 }
