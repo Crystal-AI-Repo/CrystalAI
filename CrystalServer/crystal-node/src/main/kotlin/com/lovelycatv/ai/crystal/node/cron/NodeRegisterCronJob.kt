@@ -8,7 +8,6 @@ import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.client.NodeDispatcherClient
 import com.lovelycatv.ai.crystal.node.config.NetworkConfig
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
-import jakarta.annotation.Resource
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -46,10 +45,11 @@ class NodeRegisterCronJob(
                 log.warn("Failed to register to dispatcher service. Response: {}", result?.toJSONString())
             } else {
                 val uuid = result.data!!.uuid!!
+                val communicationPort = result.data!!.communicationPort
                 log.info("Registered to dispatcher, uuid: [{}]", uuid)
 
                 // Update current node uuid
-                Global.nodeRegistered(uuid)
+                Global.nodeRegistered(uuid, communicationPort)
             }
         }
     }

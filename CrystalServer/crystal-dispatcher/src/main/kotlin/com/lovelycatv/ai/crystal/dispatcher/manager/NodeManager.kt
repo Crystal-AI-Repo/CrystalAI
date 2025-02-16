@@ -4,6 +4,7 @@ import com.lovelycatv.ai.crystal.common.client.NodeActuatorClient
 import com.lovelycatv.ai.crystal.common.client.getFeignClient
 import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.dispatcher.client.NodeProbeClient
+import com.lovelycatv.ai.crystal.dispatcher.config.DispatcherConfiguration
 import org.springframework.stereotype.Component
 
 /**
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Component
  * @version 1.0
  */
 @Component
-class NodeManager : AbstractNodeManager() {
+class NodeManager(
+    dispatcherConfiguration: DispatcherConfiguration
+) : AbstractNodeManager(dispatcherConfiguration) {
     /**
      * Check and update node alive status
      *

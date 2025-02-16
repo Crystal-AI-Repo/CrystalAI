@@ -1,6 +1,8 @@
-package com.lovelycatv.ai.crystal.node.data
+package com.lovelycatv.ai.crystal.common.data.message
 
-import org.springframework.core.io.ClassPathResource
+import com.alibaba.fastjson2.annotation.JSONField
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonTypeName
 import org.springframework.core.io.Resource
 
 /**
@@ -8,11 +10,15 @@ import org.springframework.core.io.Resource
  * @since 2025-02-15 16:35
  * @version 1.0
  */
-data class PromptMessage(
+@JsonTypeName("PROMPT")
+data class PromptMessage @JsonCreator constructor(
+    @JSONField(name = "role")
     val role: Role,
+    @JSONField(name = "message")
     val message: List<Content>,
+    @JSONField(name = "messageSeparator")
     val messageSeparator: CharSequence = " "
-) {
+) : AbstractMessage(Type.PROMPT) {
     class Builder {
         private var role: Role = Role.USER
         private var message: MutableList<Content> = mutableListOf()
@@ -47,8 +53,10 @@ data class PromptMessage(
         }
     }
 
-    data class Content(
+    data class Content @JsonCreator constructor(
+        @JSONField(name = "type")
         val type: Type,
+        @JSONField(name = "content")
         val content: Any
     ) {
         companion object {

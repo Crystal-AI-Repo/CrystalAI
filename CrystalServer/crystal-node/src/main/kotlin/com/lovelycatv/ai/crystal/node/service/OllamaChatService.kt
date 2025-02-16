@@ -1,8 +1,8 @@
 package com.lovelycatv.ai.crystal.node.service
 
 import com.lovelycatv.ai.crystal.common.util.divide
-import com.lovelycatv.ai.crystal.node.data.OllamaChatOptions
-import com.lovelycatv.ai.crystal.node.data.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedMessageType
 import org.springframework.ai.chat.messages.AssistantMessage
 import org.springframework.ai.chat.messages.SystemMessage
@@ -11,10 +11,8 @@ import org.springframework.ai.chat.model.ChatResponse
 import org.springframework.ai.chat.prompt.Prompt
 import org.springframework.ai.model.Media
 import org.springframework.ai.ollama.OllamaChatModel
-import org.springframework.ai.ollama.api.OllamaModel
 import org.springframework.ai.ollama.api.OllamaOptions
 import org.springframework.core.io.Resource
-import org.springframework.util.MimeType
 import reactor.core.publisher.Flux
 import java.net.URL
 

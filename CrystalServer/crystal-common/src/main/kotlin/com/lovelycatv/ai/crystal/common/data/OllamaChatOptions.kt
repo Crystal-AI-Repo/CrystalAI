@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.node.data
+package com.lovelycatv.ai.crystal.common.data
 
 data class OllamaChatOptions(
     val modelName: String?,

@@ -11,13 +11,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "crystal")
 public class DispatcherConfiguration {
-    private RegisteredNodeConfiguration registeredNodeConfiguration;
+    private RegisteredNodeConfiguration node;
+    private DispatcherServerConfiguration server;
 
-    public RegisteredNodeConfiguration getRegisteredNodeConfiguration() {
-        return registeredNodeConfiguration;
+    public RegisteredNodeConfiguration getNode() {
+        return node;
     }
 
-    public void setRegisteredNodeConfiguration(RegisteredNodeConfiguration registeredNodeConfiguration) {
-        this.registeredNodeConfiguration = registeredNodeConfiguration;
+    public DispatcherServerConfiguration getServer() {
+        return server;
+    }
+
+    public void setNode(RegisteredNodeConfiguration node) {
+        this.node = node;
+    }
+
+    public void setServer(DispatcherServerConfiguration server) {
+        this.server = server;
     }
 }

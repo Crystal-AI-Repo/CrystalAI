@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.dispatcher.data.node
 
 import com.lovelycatv.ai.crystal.common.response.ollama.OllamaModelMeta
+import io.netty.channel.Channel
 
 /**
  * @author lovelycat
@@ -18,7 +19,12 @@ data class RegisteredNode(
     val lastAliveTimestamp: Long,
     val lastAliveCheckTimestamp: Long,
     val lastUpdateTimestamp: Long,
-    val ollamaModels: List<OllamaModelMeta>
+    val ollamaModels: List<OllamaModelMeta>,
+    val channel: Channel? = null
 ) {
     val requestUrl: String get() = "${if (ssl) "https" else "http"}://$host:$port"
+
+    val isNettyClientConnected: Boolean get() = this.channel != null && this.channel.isActive
+
+    val nettyClientPort: Int? get() = channel?.remoteAddress()?.toString()?.split(":")?.get(1)?.trim()?.toInt()
 }

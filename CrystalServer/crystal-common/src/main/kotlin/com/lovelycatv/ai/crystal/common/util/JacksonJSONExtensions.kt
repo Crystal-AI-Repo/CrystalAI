@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.common.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
 /**
  * @author lovelycat
@@ -9,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
  */
 class JacksonJSONExtensions private constructor()
 
-fun <T> T?.toJSONString(mapper: ObjectMapper = ObjectMapper()) = mapper.writeValueAsString(this)
+fun <T> T?.toJSONString(mapper: ObjectMapper = ObjectMapper()) = mapper.registerKotlinModule().writeValueAsString(this)
 
 inline fun <C: CharSequence, reified T> C.toExplicitObject(mapper: ObjectMapper = ObjectMapper()): T {
-    return mapper.readValue(this.toString(), T::class.java)
+    return mapper.registerKotlinModule().readValue(this.toString(), T::class.java)
 }

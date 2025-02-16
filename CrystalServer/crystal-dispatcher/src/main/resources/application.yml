@@ -2,6 +2,9 @@ server:
   port: 5210
 
 crystal:
+  server:
+    # Netty Server Port for nodes
+    communication-port: 6210
   node:
     # Cron Expression of "Check Node Alive Status"
     check-alive-cron: 0/5 * * * * ?

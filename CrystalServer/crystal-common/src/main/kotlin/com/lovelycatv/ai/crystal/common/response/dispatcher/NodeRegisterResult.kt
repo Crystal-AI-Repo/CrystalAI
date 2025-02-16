@@ -9,5 +9,7 @@ data class NodeRegisterResult @JsonCreator constructor(
     @JsonProperty("message")
     val message: String = "",
     @JsonProperty("uuid")
-    val uuid: String? = null
+    val uuid: String? = null,
+    @JsonProperty("communicationPort")
+    val communicationPort: Int = -1
 )

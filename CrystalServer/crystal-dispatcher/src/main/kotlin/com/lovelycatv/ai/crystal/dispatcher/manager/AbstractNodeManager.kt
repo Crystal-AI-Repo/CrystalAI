@@ -6,7 +6,9 @@ import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.common.response.dispatcher.NodeRegisterResult
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.dispatcher.client.NodeProbeClient
+import com.lovelycatv.ai.crystal.dispatcher.config.DispatcherConfiguration
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
+import io.netty.channel.Channel
 import java.util.*
 
 /**
@@ -14,12 +16,25 @@ import java.util.*
  * @since 2025-02-15 18:23
  * @version 1.0
  */
-abstract class AbstractNodeManager {
+abstract class AbstractNodeManager(
+    private val dispatcherConfiguration: DispatcherConfiguration
+) {
     private val log = this.logger()
 
     protected val registeredNodes = mutableMapOf<String, RegisteredNode>()
 
     val allRegisteredNodes get() = this.registeredNodes.values
+
+    /**
+     * (NodeId, NettyClientPort)
+     */
+    val nettyClientPortMap get() = mapOf(*this.allRegisteredNodes.associateBy { it.nodeId }.mapNotNull {
+        val nettyClientPort = it.value.nettyClientPort
+        if (nettyClientPort != null)
+            it.key to nettyClientPort
+        else
+            it.key to null
+    }.toTypedArray())
 
     fun getRegisteredNode(nodeId: String): RegisteredNode? {
         return registeredNodes[nodeId]
@@ -33,6 +48,26 @@ abstract class AbstractNodeManager {
         val node = this.registeredNodes[nodeId] ?: return false
         this.registeredNodes[nodeId] = fx.invoke(node)
         return true
+    }
+
+    /**
+     * When a node is connected to the dispatcher netty server,
+     * the channel should be recorded in the [RegisteredNode].
+     * The new channel will overwrite the existing channel,
+     * if the channel is active, then the channel will be closed.
+     *
+     * @param nodeId NodeId
+     * @param channel Netty Client Channel
+     * @return Channel has been successfully set
+     */
+    fun setNodeNettyChannel(nodeId: String, channel: Channel?): Boolean {
+        return updateNode(nodeId) {
+            if (this.isNettyClientConnected) {
+                // Close the existing connection
+                this.channel?.close()
+            }
+            this.copy(channel = channel)
+        }
     }
 
     fun registerNode(nodeHost: String, nodePort: Int, ssl: Boolean): NodeRegisterResult {
@@ -90,7 +125,7 @@ abstract class AbstractNodeManager {
 
                 log.info("Node [{} / {}:{}] (SSL: {}) is registered.", nodeInfo.nodeName, nodeHost, nodePort, ssl)
 
-                NodeRegisterResult(success = true, uuid = nodeId)
+                NodeRegisterResult(success = true, uuid = nodeId, communicationPort = dispatcherConfiguration.server.communicationPort)
             } else {
                 log.info("Node [{}:{}] (SSL: {}) register failed. Reason: Could not fetch node information", nodeHost, nodePort, ssl)
 
