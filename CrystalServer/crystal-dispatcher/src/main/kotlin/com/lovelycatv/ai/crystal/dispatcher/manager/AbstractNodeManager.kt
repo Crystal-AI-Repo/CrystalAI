@@ -44,6 +44,10 @@ abstract class AbstractNodeManager(
         return registeredNodes.values.find { it.host == host && it.port == port }
     }
 
+    fun getRegisteredNodeByName(nodeName: String): RegisteredNode? {
+        return registeredNodes.values.find { it.nodeName == nodeName }
+    }
+
     protected fun updateNode(nodeId: String, fx: RegisteredNode.() -> RegisteredNode): Boolean {
         val node = this.registeredNodes[nodeId] ?: return false
         this.registeredNodes[nodeId] = fx.invoke(node)
@@ -89,7 +93,8 @@ abstract class AbstractNodeManager(
                         message = "Node returned error code: ${nodeInfoResult.code}, message: ${nodeInfoResult.message}"
                     )
 
-                val existingNode = this.getRegisteredNode(nodeInfo.nodeIp, nodeInfo.nodePort)
+                // Check whether the node id or name duplicated
+                val existingNode = this.getRegisteredNodeByName(nodeInfo.nodeName) ?: this.getRegisteredNode(nodeInfo.nodeIp, nodeInfo.nodePort)
 
                 // UUID of existing node. If does not exist, generate a random UUID
                 val nodeId = existingNode?.nodeId ?: UUID.randomUUID().toString()
