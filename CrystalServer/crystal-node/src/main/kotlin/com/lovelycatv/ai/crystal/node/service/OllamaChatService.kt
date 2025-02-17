@@ -1,7 +1,7 @@
 package com.lovelycatv.ai.crystal.node.service
 
 import com.lovelycatv.ai.crystal.common.util.divide
-import com.lovelycatv.ai.crystal.common.data.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedMessageType
 import org.springframework.ai.chat.messages.AssistantMessage

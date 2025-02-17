@@ -22,14 +22,18 @@ import com.lovelycatv.ai.crystal.common.data.message.auth.AuthorizeResponseMessa
     JsonSubTypes.Type(value = AuthorizeRequestMessage::class, name = "AUTHORIZE_REQUEST"),
     JsonSubTypes.Type(value = AuthorizeResponseMessage::class, name = "AUTHORIZE_RESPONSE"),
     JsonSubTypes.Type(value = ClientConnectedMessage::class, name = "CLIENT_CONNECTED"),
-    JsonSubTypes.Type(value = PromptMessage::class, name = "PROMPT")
+    JsonSubTypes.Type(value = PromptMessage::class, name = "PROMPT"),
+    JsonSubTypes.Type(value = OllamaChatOptions::class, name = "CHAT_OPTIONS")
 )
 abstract class AbstractMessage @JsonCreator constructor(
     @JSONField(name = "type")
-    val type: Type
+    val type: Type,
+    @JSONField(name = "order")
+    var order: Long = 0
 ) {
     enum class Type {
         PROMPT,
+        CHAT_OPTIONS,
         AUTHORIZE_REQUEST,
         AUTHORIZE_RESPONSE,
         CLIENT_CONNECTED

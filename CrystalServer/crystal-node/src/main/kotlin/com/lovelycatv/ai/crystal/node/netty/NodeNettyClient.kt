@@ -7,6 +7,7 @@ import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.exception.InvalidNodeIdException
 import com.lovelycatv.ai.crystal.node.netty.handler.NettyAuthorizationHandler
+import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.nio.NioEventLoopGroup
@@ -42,6 +43,7 @@ class NodeNettyClient(
                     ch.pipeline().addLast(FrameDecoder())
                     ch.pipeline().addLast(NettyMessageChainEncoder())
                     ch.pipeline().addLast(NettyMessageChainDecoder())
+                    ch.pipeline().addLast(NettyEmptyReceivedMessageHandler())
                     ch.pipeline().addLast(
                         NettyAuthorizationHandler(
                             currentNodeId = currentUUID,

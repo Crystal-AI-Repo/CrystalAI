@@ -3,6 +3,7 @@ package com.lovelycatv.ai.crystal.dispatcher.netty
 import com.lovelycatv.ai.crystal.common.netty.codec.FrameDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainEncoder
+import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
 import com.lovelycatv.ai.crystal.dispatcher.config.RegisteredNodeConfiguration
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
 import com.lovelycatv.ai.crystal.dispatcher.netty.handler.NettyClientConnectionHandler
@@ -34,6 +35,7 @@ class DispatcherNettyServer(
                     channel.pipeline().addLast(FrameDecoder())
                     channel.pipeline().addLast(NettyMessageChainEncoder())
                     channel.pipeline().addLast(NettyMessageChainDecoder())
+                    channel.pipeline().addLast(NettyEmptyReceivedMessageHandler())
                     channel.pipeline().addLast(
                         NettyClientConnectionHandler(
                             nodeManager = nodeManager,

@@ -31,12 +31,19 @@ data class MessageChain @JsonCreator constructor(
     @JsonIgnore
     fun isStream() = !this.streamId.isNullOrEmpty()
 
+    @JsonIgnore
+    fun reorderMessages(): List<AbstractMessage> {
+        return this.messages.sortedBy { it.order }
+    }
+
     class Builder {
         private val messages = mutableListOf<AbstractMessage>()
         private var sessionId: String = UUID.randomUUID().toString()
         private var streamId: String? = null
         private var token: String? = null
         private var timestamp: Long = System.currentTimeMillis()
+
+        private var tOrder: Long = 0L
 
         fun sessionId(sessionId: String = UUID.randomUUID().toString()): Builder {
             this.sessionId = sessionId
@@ -59,13 +66,22 @@ data class MessageChain @JsonCreator constructor(
         }
 
         fun addMessage(message: AbstractMessage): Builder {
-            messages.add(message)
+            messages.add(
+                message.apply {
+                    this.order = tOrder
+                    tOrder++
+                }
+            )
             return this
         }
 
-        fun removeFirstMessage() = messages.removeFirstOrNull().run { this }
+        fun removeFirstMessage() = messages.removeFirstOrNull().run {
+            this
+        }
 
-        fun removeLastMessage() = messages.removeLastOrNull().run { this }
+        fun removeLastMessage() = messages.removeLastOrNull().run {
+            this
+        }
 
         fun build() = MessageChain(messages, sessionId, streamId, token, timestamp)
     }
