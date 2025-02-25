@@ -22,6 +22,14 @@ data class MessageChain @JsonCreator constructor(
     @JSONField(name = "timestamp")
     val timestamp: Long = System.currentTimeMillis()
 ) {
+    /**
+     * If the first or several messages are processed by a pipeline,
+     * these messages should be removed and transfer the last messages to next pipeline
+     *
+     * @param count Messages to be removed from head.
+     * @return [MessageChain]
+     */
+    fun dropMessage(count: Int): MessageChain = this.copy(messages = this.messages.drop(count))
     @JsonIgnore
     fun isEmpty() = this.messages.isEmpty()
 

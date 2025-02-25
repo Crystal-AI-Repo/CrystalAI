@@ -46,9 +46,7 @@ class NettyClientConnectionHandler(
      * @throws Exception    is thrown if an error occurred
      */
     override fun channelRead0(ctx: ChannelHandlerContext, msg: MessageChain) {
-        if (msg.isEmpty()) {
-            ctx.fireChannelRead(msg)
-        } else if (msg.messages[0] is ClientConnectedMessage) {
+        if (msg.messages[0] is ClientConnectedMessage) {
             // Node connected confirmed
             val clientConnectedMessage = msg.messages[0] as ClientConnectedMessage
 
@@ -61,6 +59,8 @@ class NettyClientConnectionHandler(
             ctx.writeAndFlush(MessageChainBuilder {
                 this.addMessage(AuthorizeRequestMessage(nodeName = nodeName, secretKey = secretKey))
             })
+
+            ctx.fireChannelRead(msg.dropMessage(1))
         } else if (msg.messages[0] is AuthorizeResponseMessage) {
             // Node connected confirmed
             val authorizeResponseMessage = msg.messages[0] as AuthorizeResponseMessage
@@ -76,6 +76,8 @@ class NettyClientConnectionHandler(
             }
 
             nodeManager.setNodeNettyChannel(nodeId, ctx.channel())
+
+            ctx.fireChannelRead(msg.dropMessage(1))
         } else {
             ctx.fireChannelRead(msg)
         }

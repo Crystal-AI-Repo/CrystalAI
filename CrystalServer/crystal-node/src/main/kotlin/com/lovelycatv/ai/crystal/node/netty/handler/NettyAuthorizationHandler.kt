@@ -29,9 +29,7 @@ class NettyAuthorizationHandler(
      * @throws Exception    is thrown if an error occurred
      */
     override fun channelRead0(ctx: ChannelHandlerContext, msg: MessageChain) {
-        if (msg.isEmpty()) {
-            ctx.fireChannelRead(msg)
-        } else if (msg.messages[0] is AuthorizeRequestMessage) {
+        if (msg.messages[0] is AuthorizeRequestMessage) {
             val authorizeRequestMessage = msg.messages[0] as AuthorizeRequestMessage
             val nodeName = authorizeRequestMessage.nodeName
             val secretKey = authorizeRequestMessage.secretKey
@@ -59,6 +57,8 @@ class NettyAuthorizationHandler(
                     this.addMessage(AuthorizeResponseMessage.failed(currentNodeId, applicationName, "Wrong node name"))
                 })
             }
+
+            ctx.fireChannelRead(msg.dropMessage(1))
         } else {
             ctx.fireChannelRead(msg)
         }
