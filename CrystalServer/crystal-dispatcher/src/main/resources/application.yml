@@ -1,6 +1,13 @@
 server:
   port: 5210
 
+spring:
+  application:
+    name: CrystalDispatcher
+  web:
+    resources:
+      static-locations: classpath:static/,file:static/
+
 crystal:
   server:
     # Netty Server Port for nodes
