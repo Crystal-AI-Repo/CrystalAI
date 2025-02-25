@@ -1,5 +1,9 @@
 package com.lovelycatv.ai.crystal.node.client
 
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.NodeController.MAPPING
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.NodeController.NODE_CHECK
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.NodeController.NODE_REGISTER
+import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_FOR_DISPATCHER
 import com.lovelycatv.ai.crystal.common.client.IFeignClient
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.response.dispatcher.NodeRegisterResult
@@ -15,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam
  */
 @FeignClient(name = "nodeDispatcherClient")
 interface NodeDispatcherClient : IFeignClient {
-    @PostMapping("/node/register")
+    @PostMapping("$API_PREFIX_FOR_DISPATCHER$MAPPING$NODE_REGISTER")
     fun registerNode(
         @RequestParam("host")
         host: String,
@@ -25,6 +29,6 @@ interface NodeDispatcherClient : IFeignClient {
         ssl: Boolean,
     ): Result<NodeRegisterResult>
 
-    @GetMapping("/node/check")
+    @GetMapping("$API_PREFIX_FOR_DISPATCHER$MAPPING$NODE_CHECK")
     fun checkNode(@RequestParam("uuid") uuid: String): Result<Boolean>
 }

@@ -1,5 +1,8 @@
-package com.lovelycatv.ai.crystal.node.controller
+package com.lovelycatv.ai.crystal.node.controller.v1
 
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.NODE_INFO
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.MAPPING
+import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_VERSION_1
 import com.lovelycatv.ai.crystal.common.client.OllamaClient
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.response.node.probe.NodeProbeResult
@@ -16,16 +19,16 @@ import org.springframework.web.bind.annotation.RestController
  * @version 1.0
  */
 @RestController
-@RequestMapping("/probe")
-class ProbeController(
+@RequestMapping(API_PREFIX_VERSION_1 + MAPPING)
+class ProbeControllerV1(
     @Value("\${spring.application.name}")
     private val applicationName: String,
     private val networkConfig: NetworkConfig,
     private val nodeConfiguration: NodeConfiguration,
     private val ollamaFeignClient: OllamaClient
-) {
-    @GetMapping("/info")
-    fun nodeInfo(): Result<NodeProbeResult> {
+) : IProbeControllerV1 {
+    @GetMapping(NODE_INFO)
+    override fun nodeInfo(): Result<NodeProbeResult> {
         return Result.success(
             "",
             NodeProbeResult(

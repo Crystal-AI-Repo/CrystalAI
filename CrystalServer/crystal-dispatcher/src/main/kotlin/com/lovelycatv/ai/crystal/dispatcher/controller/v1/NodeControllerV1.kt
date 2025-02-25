@@ -1,5 +1,10 @@
-package com.lovelycatv.ai.crystal.dispatcher.controller
+package com.lovelycatv.ai.crystal.dispatcher.controller.v1
 
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.NodeController.MAPPING
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.NodeController.NODE_CHECK
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.NodeController.NODE_REGISTER
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.NodeController.NODE_UNREGISTER
+import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_VERSION_1
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.dispatcher.service.NodeManagerService
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController
  * @version 1.0
  */
 @RestController
-@RequestMapping("/node")
-class NodeController(
+@RequestMapping(API_PREFIX_VERSION_1 + MAPPING)
+class NodeControllerV1(
     private val nodeManagerService: NodeManagerService
-) {
-    @PostMapping("/register")
-    fun nodeRegister(
+) : INodeControllerV1 {
+    @PostMapping(NODE_REGISTER)
+    override fun nodeRegister(
         @RequestParam("host")
         nodeHost: String,
         @RequestParam("port")
@@ -36,8 +41,8 @@ class NodeController(
         }
     }
 
-    @PostMapping("/unregister")
-    fun nodeUnregister(
+    @PostMapping(NODE_UNREGISTER)
+    override fun nodeUnregister(
         @RequestParam("host")
         nodeHost: String,
         @RequestParam("port")
@@ -50,8 +55,8 @@ class NodeController(
         }
     }
 
-    @GetMapping("/check")
-    fun nodeCheck(
+    @GetMapping(NODE_CHECK)
+    override fun nodeCheck(
         @RequestParam("uuid")
         uuid: String
     ): Result<*> {
