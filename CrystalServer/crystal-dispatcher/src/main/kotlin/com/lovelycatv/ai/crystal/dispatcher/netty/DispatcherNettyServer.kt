@@ -7,6 +7,7 @@ import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageH
 import com.lovelycatv.ai.crystal.dispatcher.config.RegisteredNodeConfiguration
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
 import com.lovelycatv.ai.crystal.dispatcher.netty.handler.NettyClientConnectionHandler
+import com.lovelycatv.ai.crystal.dispatcher.netty.handler.NettyClientOllamaChatResponseHandler
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.nio.NioEventLoopGroup
@@ -45,6 +46,7 @@ class DispatcherNettyServer(
                             }
                         )
                     )
+                    channel.pipeline().addLast(NettyClientOllamaChatResponseHandler())
                 }
             })
     }

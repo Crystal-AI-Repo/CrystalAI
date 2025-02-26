@@ -5,6 +5,7 @@ import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
 import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.transferToNextPipeLineIfNotEmpty
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.data.toOllamaTask
@@ -36,7 +37,10 @@ class NettyOllamaChatMessageHandler(
             if (msg.messages.size >= 2) {
                 if (msg.messages[1] is PromptMessage) {
                     submitTask(msg)
-                    ctx.fireChannelRead(msg.copy(messages = msg.messages.filter { it !is OllamaChatOptions && it !is PromptMessage }))
+
+                    msg.dropMessages {
+                        it is OllamaChatOptions || it is PromptMessage
+                    }.transferToNextPipeLineIfNotEmpty(ctx)
                 } else {
                     // Message is invalid
                     log.warn("Invalid message received: " +
@@ -63,7 +67,10 @@ class NettyOllamaChatMessageHandler(
         } else if (msg.messages[0] is PromptMessage) {
             // No Ollama Chat Options, using default settings
             submitTask(msg)
-            ctx.fireChannelRead(msg.copy(messages = msg.messages.filter { it !is OllamaChatOptions && it !is PromptMessage }))
+
+            msg.dropMessages {
+                it is OllamaChatOptions || it is PromptMessage
+            }.transferToNextPipeLineIfNotEmpty(ctx)
         } else {
             ctx.fireChannelRead(msg)
         }

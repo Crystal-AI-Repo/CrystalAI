@@ -12,6 +12,7 @@ import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
  * @param expireTime Task max execution time.
  *                   If the execution time of the task exceeds expireTime,
  *                   the lock will automatically become available.
+ * @param priority Task has higher priority than others will be executed first.
  *
  * @author lovelycat
  * @since 2025-02-26 22:15
@@ -19,8 +20,9 @@ import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
  */
 data class OllamaTask(
     val originalMessageChain: MessageChain,
-    val expireTime: Long
-) {
+    val expireTime: Long,
+    val priority: Int
+) : Comparable<OllamaTask> {
     /**
      * SessionId in [MessageChain]
      */
@@ -32,11 +34,21 @@ data class OllamaTask(
 
     val prompts: List<PromptMessage> get() = this.originalMessageChain.messages
         .filterIsInstance<PromptMessage>()
+
+    /**
+     * Compares this object with the specified object for order. Returns zero if this object is equal
+     * to the specified [other] object, a negative number if it's less than [other], or a positive number
+     * if it's greater than [other].
+     */
+    override fun compareTo(other: OllamaTask): Int {
+        return this.priority - other.priority
+    }
 }
 
-fun MessageChain.toOllamaTask(expireTime: Long): OllamaTask {
+fun MessageChain.toOllamaTask(expireTime: Long, priority: Int = 0): OllamaTask {
     return OllamaTask(
         originalMessageChain = this,
-        expireTime = expireTime
+        expireTime = expireTime,
+        priority = priority
     )
 }

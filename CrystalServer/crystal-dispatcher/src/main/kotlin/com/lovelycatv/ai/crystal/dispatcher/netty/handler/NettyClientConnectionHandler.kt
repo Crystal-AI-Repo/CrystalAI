@@ -5,6 +5,9 @@ import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
 import com.lovelycatv.ai.crystal.common.data.message.auth.AuthorizeRequestMessage
 import com.lovelycatv.ai.crystal.common.data.message.auth.AuthorizeResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.transferToNextPipeLineIfNotEmpty
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
 import io.netty.channel.ChannelHandlerContext
@@ -62,7 +65,7 @@ class NettyClientConnectionHandler(
                 this.addMessage(AuthorizeRequestMessage(nodeName = nodeName, secretKey = secretKey))
             })
 
-            ctx.fireChannelRead(msg.dropMessage(1))
+            ctx.fireChannelRead(msg.dropMessages(1))
         } else if (msg.messages[0] is AuthorizeResponseMessage) {
             // Node connected confirmed
             val authorizeResponseMessage = msg.messages[0] as AuthorizeResponseMessage
@@ -79,7 +82,7 @@ class NettyClientConnectionHandler(
 
             nodeManager.setNodeNettyChannel(nodeId, ctx.channel())
 
-            ctx.fireChannelRead(msg.dropMessage(1))
+            msg.dropMessages(1).transferToNextPipeLineIfNotEmpty(ctx)
         } else {
             ctx.fireChannelRead(msg)
         }

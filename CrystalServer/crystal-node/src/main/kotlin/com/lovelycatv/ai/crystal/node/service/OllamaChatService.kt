@@ -27,7 +27,7 @@ abstract class OllamaChatService(
     abstract fun buildChatModel(): OllamaChatModel
 
     @Suppress("UNCHECKED_CAST")
-    fun streamGenerate(
+    suspend fun streamGenerate(
         content: List<PromptMessage>,
         options: OllamaChatOptions?,
         onNewTokenReceived: ((String) -> Unit)? = null,
@@ -52,11 +52,11 @@ abstract class OllamaChatService(
         }
     }
 
-    fun blockingGenerate(content: List<PromptMessage>, options: OllamaChatOptions?): ChatResponse {
+    suspend fun blockingGenerate(content: List<PromptMessage>, options: OllamaChatOptions?): ChatResponse {
         return this.generate(content, options, false) as ChatResponse
     }
 
-    private fun generate(content: List<PromptMessage>, options: OllamaChatOptions?, stream: Boolean): Any {
+    private suspend fun generate(content: List<PromptMessage>, options: OllamaChatOptions?, stream: Boolean): Any {
         if (this.defaultChatModel == null) {
             this.defaultChatModel = buildChatModel()
         }

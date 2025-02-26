@@ -4,6 +4,7 @@ import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
 import com.lovelycatv.ai.crystal.common.data.message.auth.AuthorizeRequestMessage
 import com.lovelycatv.ai.crystal.common.data.message.auth.AuthorizeResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.transferToNextPipeLineIfNotEmpty
 import com.lovelycatv.ai.crystal.common.util.logger
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
@@ -58,7 +59,7 @@ class NettyAuthorizationHandler(
                 })
             }
 
-            ctx.fireChannelRead(msg.dropMessage(1))
+            msg.dropMessages(1).transferToNextPipeLineIfNotEmpty(ctx)
         } else {
             ctx.fireChannelRead(msg)
         }

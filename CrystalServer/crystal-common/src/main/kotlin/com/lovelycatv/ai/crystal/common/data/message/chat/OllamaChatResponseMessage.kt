@@ -3,6 +3,7 @@ package com.lovelycatv.ai.crystal.common.data.message.chat
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
+import com.lovelycatv.ai.crystal.common.GlobalConstants
 import com.lovelycatv.ai.crystal.common.data.message.AbstractMessage
 
 /**
@@ -15,8 +16,8 @@ data class OllamaChatResponseMessage @JsonCreator constructor(
     @JsonProperty("success")
     val success: Boolean,
     @JsonProperty("message")
-    val message: String,
-    @JsonProperty("message")
+    val message: String?,
+    @JsonProperty("content")
     val content: String? = null,
     @JsonProperty("generatedTokens")
     val generatedTokens: Long = 0L,

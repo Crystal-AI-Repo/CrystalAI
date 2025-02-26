@@ -29,7 +29,14 @@ data class MessageChain @JsonCreator constructor(
      * @param count Messages to be removed from head.
      * @return [MessageChain]
      */
-    fun dropMessage(count: Int): MessageChain = this.copy(messages = this.messages.drop(count))
+    fun dropMessages(count: Int): MessageChain = this.copy(messages = this.messages.drop(count))
+
+    fun dropMessages(filter: (AbstractMessage) -> Boolean): MessageChain
+        = this.copy(messages = this.messages.filter { !filter.invoke(it) })
+
+    fun filterMessages(filter: (AbstractMessage) -> Boolean): MessageChain
+        = this.copy(messages = this.messages.filter { filter.invoke(it) })
+
     @JsonIgnore
     fun isEmpty() = this.messages.isEmpty()
 

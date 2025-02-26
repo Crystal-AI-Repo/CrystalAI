@@ -4,9 +4,14 @@ import com.lovelycatv.ai.crystal.common.data.message.ClientConnectedMessage
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
 import com.lovelycatv.ai.crystal.common.util.logger
+import com.lovelycatv.ai.crystal.common.util.toJSONString
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.Channel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.net.InetSocketAddress
+import kotlin.coroutines.resume
 
 /**
  * @author lovelycat
@@ -92,13 +97,32 @@ abstract class AbstractNodeNettyClient(
         return true to "Disconnected from dispatcher."
     }
 
-    fun sendMessage(message: MessageChain) {
-        this.channel?.writeAndFlush(message)
+    suspend fun sendMessage(message: MessageChain): Boolean {
+        println("Sending message: ${message.toJSONString()}")
+        return suspendCancellableCoroutine { continuation ->
+            if (this.channel != null) {
+                this.channel!!.writeAndFlush(message).addListener {
+                    try {
+                        if (it.isSuccess) {
+                            continuation.resume(true)
+                        } else {
+                            continuation.resume(false)
+                        }
+                    } catch (e: Exception) {
+                        log.error("Failed to send message to dispatcher", e)
+                        e.printStackTrace()
+                        continuation.resume(false)
+                    }
+                }
+            } else {
+                continuation.resume(false)
+            }
+        }
     }
 
-    fun sendMessage(messageBuilder: MessageChain.Builder.() -> Unit) {
+    suspend fun sendMessage(messageBuilder: MessageChain.Builder.() -> Unit) {
         val builder = MessageChain.Builder()
         messageBuilder.invoke(builder)
-        this.channel?.writeAndFlush(builder.build())
+        this.sendMessage(builder.build())
     }
 }
