@@ -11,5 +11,8 @@ export interface RegisteredNode {
     lastAliveTimestamp: number,
     lastAliveCheckTimestamp: number,
     lastUpdateTimestamp: number,
-    ollamaModels: OllamaModel[]
+    ollamaModels: OllamaModel[],
+    requestUrl: string,
+    nettyClientPort: number | null,
+    isNettyClientConnected: boolean
 }

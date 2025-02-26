@@ -1,12 +1,30 @@
 <script setup lang="ts">
 
-import {ref} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {Cpu, House} from "@element-plus/icons-vue";
 import {useI18n} from "vue-i18n";
+import router from "@/router";
 
 const isAsideMenuCollapsed = ref(false)
 
 const { t } = useI18n()
+
+/* Dynamic observer for activated menu item */
+const activeMenuItem = ref("/home")
+
+onMounted(() => {
+  autoUpdateActiveMenuItem()
+})
+
+watch(router.currentRoute, () => {
+  console.log(router.currentRoute.value)
+  autoUpdateActiveMenuItem()
+})
+
+function autoUpdateActiveMenuItem() {
+  console.log(router.currentRoute.value)
+  activeMenuItem.value = router.currentRoute.value.path
+}
 
 </script>
 
@@ -26,6 +44,7 @@ const { t } = useI18n()
       <div class="web-manager-aside">
         <el-menu
             class="height-100 menu"
+            :default-active="activeMenuItem"
             :collapse="isAsideMenuCollapsed"
             default-active="/home"
             router

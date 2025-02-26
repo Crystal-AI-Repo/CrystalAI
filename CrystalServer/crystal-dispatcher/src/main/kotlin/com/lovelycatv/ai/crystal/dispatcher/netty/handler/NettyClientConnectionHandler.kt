@@ -34,6 +34,8 @@ class NettyClientConnectionHandler(
         disconnectedNode?.let {
             val node = nodeManager.getRegisteredNode(it.first)
             log.info("Node [{} / {}] disconnected from netty server.", node?.nodeName, node?.requestUrl)
+            // Clear netty connection
+            nodeManager.setNodeNettyChannel(it.first, null)
         }
     }
 

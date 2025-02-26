@@ -28,7 +28,6 @@ p {
     height: 100vh;
 }
 
-
 .flex-grow-1 {
     flex-grow: 1;
 }
@@ -41,4 +40,29 @@ p {
 .flex-horizontal {
     display: flex;
     flex-direction: row;
+}
+
+.flex-center-vertically {
+    align-items: center;
+}
+
+.flex-center-horizontally {
+    justify-content: center;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 1fr);
+}
+
+.font-size-1-15rem {
+    font-size: 1.15rem;
+}
+
+.font-size-1-05rem {
+    font-size: 1.05rem;
+}
+
+.font-size-1rem {
+    font-size: 1rem;
 }
