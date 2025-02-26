@@ -35,4 +35,8 @@ object GlobalConstants {
         }
     }
 
+    object Flags {
+        const val STREAMING_MESSAGE_FINISHED = "EOF"
+    }
+
 }

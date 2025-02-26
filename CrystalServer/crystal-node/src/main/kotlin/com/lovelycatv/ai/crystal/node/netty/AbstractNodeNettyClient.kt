@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.node.netty
 
 import com.lovelycatv.ai.crystal.common.data.message.ClientConnectedMessage
+import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
 import com.lovelycatv.ai.crystal.common.util.logger
 import io.netty.bootstrap.Bootstrap
@@ -89,5 +90,15 @@ abstract class AbstractNodeNettyClient(
         this.tRequireManualDisconnect = true
         channel!!.close()
         return true to "Disconnected from dispatcher."
+    }
+
+    fun sendMessage(message: MessageChain) {
+        this.channel?.writeAndFlush(message)
+    }
+
+    fun sendMessage(messageBuilder: MessageChain.Builder.() -> Unit) {
+        val builder = MessageChain.Builder()
+        messageBuilder.invoke(builder)
+        this.channel?.writeAndFlush(builder.build())
     }
 }

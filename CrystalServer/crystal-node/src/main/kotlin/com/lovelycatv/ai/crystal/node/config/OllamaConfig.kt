@@ -2,6 +2,8 @@ package com.lovelycatv.ai.crystal.node.config
 
 import com.lovelycatv.ai.crystal.common.client.OllamaClient
 import com.lovelycatv.ai.crystal.common.client.getFeignClient
+import com.lovelycatv.ai.crystal.node.queue.InMemoryOllamaTaskQueue
+import com.lovelycatv.ai.crystal.node.queue.OllamaTaskQueue
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -17,5 +19,11 @@ class OllamaConfig(
     @Bean
     fun ollamaFeignClient(): OllamaClient {
         return getFeignClient<OllamaClient>(nodeConfiguration.ollama.baseUrl)
+    }
+
+
+    @Bean
+    fun ollamaTaskQueue(): OllamaTaskQueue {
+        return InMemoryOllamaTaskQueue()
     }
 }

@@ -17,6 +17,8 @@ public class NodeOllamaConfiguration {
     private String defaultModel = "gemma2:9b";
     private double defaultTemperature = 0.5;
 
+    private long maxExecutionTimeMillis = 16000;
+
     public String getBaseUrl() {
         return (this.ssl ? "https" : "http") + "://" + host + ":" + port;
     }
@@ -41,6 +43,10 @@ public class NodeOllamaConfiguration {
         return ssl;
     }
 
+    public long getMaxExecutionTimeMillis() {
+        return maxExecutionTimeMillis;
+    }
+
     public void setHost(String host) {
         this.host = host;
     }
@@ -59,5 +65,9 @@ public class NodeOllamaConfiguration {
 
     public void setDefaultTemperature(double defaultTemperature) {
         this.defaultTemperature = defaultTemperature;
+    }
+
+    public void setMaxExecutionTimeMillis(long maxExecutionTimeMillis) {
+        this.maxExecutionTimeMillis = maxExecutionTimeMillis;
     }
 }

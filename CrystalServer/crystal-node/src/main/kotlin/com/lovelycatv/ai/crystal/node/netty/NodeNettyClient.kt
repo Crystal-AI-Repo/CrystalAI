@@ -8,6 +8,8 @@ import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.exception.InvalidNodeIdException
 import com.lovelycatv.ai.crystal.node.netty.handler.NettyAuthorizationHandler
 import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
+import com.lovelycatv.ai.crystal.node.netty.handler.NettyOllamaChatMessageHandler
+import com.lovelycatv.ai.crystal.node.queue.OllamaTaskQueue
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.nio.NioEventLoopGroup
@@ -24,7 +26,8 @@ import org.springframework.stereotype.Component
 class NodeNettyClient(
     @Value("\${spring.application.name}")
     private val applicationName: String,
-    private val nodeConfiguration: NodeConfiguration
+    private val nodeConfiguration: NodeConfiguration,
+    private val ollamaTaskQueue: OllamaTaskQueue
 ) : AbstractNodeNettyClient(applicationName) {
     /**
      * Customize the client bootstrap
@@ -49,6 +52,12 @@ class NodeNettyClient(
                             currentNodeId = currentUUID,
                             applicationName = applicationName,
                             correctSecretKey = nodeConfiguration.secretKey
+                        )
+                    )
+                    ch.pipeline().addLast(
+                        NettyOllamaChatMessageHandler(
+                            ollamaTaskQueue = ollamaTaskQueue,
+                            nodeConfiguration = nodeConfiguration
                         )
                     )
                 }

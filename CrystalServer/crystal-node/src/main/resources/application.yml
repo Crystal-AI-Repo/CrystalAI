@@ -14,6 +14,7 @@ management:
       base-path: /actuator
       exposure:
         include: health, info
+
 crystal:
   # Only when the dispatcher is given the same secretKey will the node will respond properly.
   secret-key: Q3J5c3RhbEFJTm9kZQ==
@@ -30,3 +31,4 @@ crystal:
     ssl: false
     default-model: gemma2:27b
     default-temperature: 0.05
+    max-execution-time-millis: 16000
