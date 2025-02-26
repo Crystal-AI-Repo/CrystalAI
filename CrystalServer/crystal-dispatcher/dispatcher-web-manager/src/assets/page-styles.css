@@ -1,0 +1,13 @@
+.page-container {
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.page-container .page-title {
+    font-size: 1.25rem;
+}
+
+.page-container .page-header-toolbar {
+    width: 100%;
+    padding: .5rem 0;
+}

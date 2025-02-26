@@ -23,7 +23,7 @@ abstract class AbstractNodeManager(
 
     protected val registeredNodes = mutableMapOf<String, RegisteredNode>()
 
-    val allRegisteredNodes get() = this.registeredNodes.values
+    val allRegisteredNodes get() = this.registeredNodes.values.toList()
 
     /**
      * (NodeId, NettyClientPort)

@@ -1,5 +1,6 @@
 package com.lovelycatv.ai.crystal.dispatcher.data.node
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.lovelycatv.ai.crystal.common.response.ollama.OllamaModelMeta
 import io.netty.channel.Channel
 
@@ -20,6 +21,7 @@ data class RegisteredNode(
     val lastAliveCheckTimestamp: Long,
     val lastUpdateTimestamp: Long,
     val ollamaModels: List<OllamaModelMeta>,
+    @JsonIgnore
     val channel: Channel? = null
 ) {
     val requestUrl: String get() = "${if (ssl) "https" else "http"}://$host:$port"

@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.dispatcher.service
 
 import com.lovelycatv.ai.crystal.common.response.dispatcher.NodeRegisterResult
+import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 
 /**
  * @author lovelycat
@@ -13,4 +14,11 @@ interface NodeManagerService {
     fun unregisterNode(nodeHost: String, nodePort: Int): Boolean
 
     fun isNodeRegistered(nodeUUID: String): Boolean
+
+    /**
+     * List all registered nodes
+     *
+     * @return List of all [RegisteredNode]
+     */
+    fun listAllNodes(): List<RegisteredNode>
 }

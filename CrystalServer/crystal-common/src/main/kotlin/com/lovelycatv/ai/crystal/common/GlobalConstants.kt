@@ -20,6 +20,11 @@ object GlobalConstants {
                 const val NODE_UNREGISTER = "/unregister"
                 const val NODE_CHECK = "/check"
             }
+
+            object WebManagerController {
+                const val MAPPING = "/web-manager"
+                const val LIST_NODES = "/listNodes"
+            }
         }
 
         object Node {

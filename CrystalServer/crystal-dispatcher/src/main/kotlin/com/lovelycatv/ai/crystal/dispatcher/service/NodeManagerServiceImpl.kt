@@ -31,4 +31,13 @@ class NodeManagerServiceImpl(
         val node = nodeManager.getRegisteredNode(nodeUUID)
         return node != null && node.isAlive
     }
+
+    /**
+     * List all registered nodes
+     *
+     * @return List of all [RegisteredNode]
+     */
+    override fun listAllNodes(): List<RegisteredNode> {
+        return nodeManager.allRegisteredNodes
+    }
 }
