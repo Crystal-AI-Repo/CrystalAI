@@ -114,7 +114,7 @@ class OllamaTaskQueueConsumerCronJob(
                             messageTemplate.copy(messages = listOf(
                                 OllamaChatResponseMessage(
                                     success = true,
-                                    message = null,
+                                    message = GlobalConstants.Flags.MESSAGE_FINISHED,
                                     content = response.result?.output?.content,
                                     generatedTokens = response.metadata.usage.generationTokens,
                                     totalTokens = response.metadata.usage.totalTokens

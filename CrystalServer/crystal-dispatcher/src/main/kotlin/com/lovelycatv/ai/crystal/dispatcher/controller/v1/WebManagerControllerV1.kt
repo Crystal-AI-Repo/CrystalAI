@@ -2,10 +2,15 @@ package com.lovelycatv.ai.crystal.dispatcher.controller.v1
 
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.LIST_NODES
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.MAPPING
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.TEST_SEND_ONE_TIME_OLLAMA_CHAT
 import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_VERSION_1
+import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
 import com.lovelycatv.ai.crystal.common.response.Result
+import com.lovelycatv.ai.crystal.dispatcher.data.node.OllamaChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.service.NodeManagerService
+import com.lovelycatv.ai.crystal.dispatcher.service.OllamaChatService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -18,8 +23,33 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(API_PREFIX_VERSION_1 + MAPPING)
 class WebManagerControllerV1(
-    private val nodeManagerService: NodeManagerService
+    private val nodeManagerService: NodeManagerService,
+    private val ollamaChatService: OllamaChatService
 ) : IWebManagerControllerV1 {
+    @GetMapping(TEST_SEND_ONE_TIME_OLLAMA_CHAT)
+    override suspend fun testSendOneTimeChatTask(
+        model: String,
+        message: String,
+        waitForResult: Boolean
+    ): Result<OllamaChatRequestResult> {
+        val result = ollamaChatService.sendOneTimeChatTask(
+            options = OllamaChatOptions(modelName = model, temperature = null),
+            messages = listOf(
+                PromptMessage(
+                    role = PromptMessage.Role.USER,
+                    message = listOf(PromptMessage.Content.fromString(message)),
+                )
+            ),
+            ignoreResult = !waitForResult
+        )
+
+        return if (result.isRequestSent) {
+            Result.success("", result)
+        } else {
+            Result.badRequest("", result)
+        }
+    }
+
     /**
      * List all registered nodes
      *

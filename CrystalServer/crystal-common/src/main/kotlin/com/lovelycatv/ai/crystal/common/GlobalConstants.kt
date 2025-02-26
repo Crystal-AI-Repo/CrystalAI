@@ -24,6 +24,9 @@ object GlobalConstants {
             object WebManagerController {
                 const val MAPPING = "/web-manager"
                 const val LIST_NODES = "/listNodes"
+
+                // Test functions
+                const val TEST_SEND_ONE_TIME_OLLAMA_CHAT = "/test/sendOneTimeOllamaChat"
             }
         }
 
@@ -36,7 +39,10 @@ object GlobalConstants {
     }
 
     object Flags {
-        const val STREAMING_MESSAGE_FINISHED = "EOF"
+        const val MESSAGE_FINISHED = "EOF"
+        const val STREAMING_MESSAGE_FINISHED = "STREAM_EOF"
+
+        fun isFinishedFlag(flag: String?) = flag == MESSAGE_FINISHED || flag == STREAMING_MESSAGE_FINISHED
     }
 
 }

@@ -12,7 +12,9 @@ import io.netty.channel.SimpleChannelInboundHandler
  * @since 2025-02-26 23:21
  * @version 1.0
  */
-class NettyClientOllamaChatResponseHandler : SimpleChannelInboundHandler<MessageChain>() {
+class NettyClientOllamaChatResponseHandler(
+    private val onResponseReceived: (MessageChain, OllamaChatResponseMessage) -> Unit
+) : SimpleChannelInboundHandler<MessageChain>() {
     private val log = this.logger()
 
     /**
@@ -28,8 +30,8 @@ class NettyClientOllamaChatResponseHandler : SimpleChannelInboundHandler<Message
         if (filteredMessage.isEmpty()) {
             ctx.fireChannelRead(msg)
         } else {
-            filteredMessage.forEach { _ ->
-                // ...
+            filteredMessage.forEach {
+                onResponseReceived.invoke(msg.copyForEmptyMessages(), it)
             }
         }
     }

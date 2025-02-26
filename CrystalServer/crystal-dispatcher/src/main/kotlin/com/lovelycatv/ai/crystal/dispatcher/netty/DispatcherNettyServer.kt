@@ -4,6 +4,7 @@ import com.lovelycatv.ai.crystal.common.netty.codec.FrameDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainEncoder
 import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
+import com.lovelycatv.ai.crystal.dispatcher.OllamaTaskManager
 import com.lovelycatv.ai.crystal.dispatcher.config.RegisteredNodeConfiguration
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
 import com.lovelycatv.ai.crystal.dispatcher.netty.handler.NettyClientConnectionHandler
@@ -25,7 +26,8 @@ import org.springframework.stereotype.Component
 class DispatcherNettyServer(
     context: ConfigurableApplicationContext,
     private val dispatcherNodeConfiguration: RegisteredNodeConfiguration,
-    private val nodeManager: AbstractNodeManager
+    private val nodeManager: AbstractNodeManager,
+    private val ollamaTaskManager: OllamaTaskManager
 ) : AbstractDispatcherNettyServer(context) {
     override fun buildServerBootstrap(): ServerBootstrap {
         return ServerBootstrap()
@@ -46,7 +48,13 @@ class DispatcherNettyServer(
                             }
                         )
                     )
-                    channel.pipeline().addLast(NettyClientOllamaChatResponseHandler())
+                    channel.pipeline().addLast(
+                        NettyClientOllamaChatResponseHandler(
+                            onResponseReceived = { messageChain, it ->
+                                ollamaTaskManager.onMessageReceived(messageChain, it)
+                            }
+                        )
+                    )
                 }
             })
     }

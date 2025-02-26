@@ -26,6 +26,15 @@ data class Result<T> @JsonCreator constructor(
 
         fun success(message: String) = success(message, null)
 
+        fun <T> badRequest(message: String, data: T) = Result(RESPONSE_CODE_BAD_REQUEST, message, data)
+
+        fun <T> unauthorized(message: String, data: T) = Result(RESPONSE_CODE_UNAUTHORIZED, message, data)
+
+        fun <T> forbidden(message: String, data: T) = Result(RESPONSE_CODE_FORBIDDEN, message, data)
+
+        fun <T> internalServerError(message: String, data: T) = Result(RESPONSE_CODE_INTERNAL_SERVER_ERROR, message, data)
+
+        // Plain
         fun badRequest(message: String) = Result(RESPONSE_CODE_BAD_REQUEST, message, null)
 
         fun unauthorized(message: String) = Result(RESPONSE_CODE_UNAUTHORIZED, message, null)

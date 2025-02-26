@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.common.data.message.chat
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.lovelycatv.ai.crystal.common.GlobalConstants
@@ -29,4 +30,7 @@ data class OllamaChatResponseMessage @JsonCreator constructor(
             return OllamaChatResponseMessage(success = false, message = message)
         }
     }
+
+    @JsonIgnore
+    fun isFinished() = GlobalConstants.Flags.isFinishedFlag(this.message)
 }

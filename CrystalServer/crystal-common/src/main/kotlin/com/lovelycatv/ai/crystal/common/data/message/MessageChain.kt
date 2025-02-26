@@ -51,6 +51,9 @@ data class MessageChain @JsonCreator constructor(
         return this.messages.sortedBy { it.order }
     }
 
+    @JsonIgnore
+    fun copyForEmptyMessages() = this.copy(messages = listOf())
+
     class Builder {
         private val messages = mutableListOf<AbstractMessage>()
         private var sessionId: String = UUID.randomUUID().toString()
@@ -87,6 +90,13 @@ data class MessageChain @JsonCreator constructor(
                     tOrder++
                 }
             )
+            return this
+        }
+
+        fun addMessages(messages: Iterable<AbstractMessage>): Builder {
+            messages.forEach {
+                this.addMessage(it)
+            }
             return this
         }
 
