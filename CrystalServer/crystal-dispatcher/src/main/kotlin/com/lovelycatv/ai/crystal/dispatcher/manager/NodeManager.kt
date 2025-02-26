@@ -3,8 +3,11 @@ package com.lovelycatv.ai.crystal.dispatcher.manager
 import com.lovelycatv.ai.crystal.common.client.NodeActuatorClient
 import com.lovelycatv.ai.crystal.common.client.getFeignClient
 import com.lovelycatv.ai.crystal.common.client.safeRequest
+import com.lovelycatv.ai.crystal.common.util.runInIO
 import com.lovelycatv.ai.crystal.dispatcher.client.NodeProbeClient
 import com.lovelycatv.ai.crystal.dispatcher.config.DispatcherConfiguration
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 
 /**
@@ -22,12 +25,14 @@ class NodeManager(
      * @param nodeId NodeId
      * @return Is the node still alive && Node status successfully updated
      */
-    override fun checkNodeStatus(nodeId: String): Boolean {
+    override suspend fun checkAndUpdateNodeStatus(nodeId: String): Boolean {
         val node = super.getRegisteredNode(nodeId) ?: return false
 
         val client: NodeActuatorClient = getFeignClient(node.requestUrl)
 
-        val isUp = client.safeRequest { getHealthStatus().isUp() }
+        val isUp = runInIO {
+            client.safeRequest { getHealthStatus().isUp() }
+        }
 
         val currentTimestamp = System.currentTimeMillis()
 
@@ -46,10 +51,12 @@ class NodeManager(
      * @param nodeId NodeId
      * @return Node has been successfully updated
      */
-    override fun updateNodeInfo(nodeId: String): Boolean {
+    override suspend fun updateNodeInfo(nodeId: String): Boolean {
         val node = super.getRegisteredNode(nodeId) ?: return false
 
-        val nodeInfoResult = getFeignClient<NodeProbeClient>(node.requestUrl).safeRequest { getNodeInfo() }
+        val nodeInfoResult = runInIO {
+            getFeignClient<NodeProbeClient>(node.requestUrl).safeRequest { getNodeInfo() }
+        }
 
         return if (nodeInfoResult == null) false else if (nodeInfoResult.isSuccessful() && nodeInfoResult.data != null) {
             val responseData = nodeInfoResult.data!!

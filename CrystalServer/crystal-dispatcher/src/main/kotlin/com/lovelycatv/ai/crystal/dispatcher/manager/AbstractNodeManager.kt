@@ -155,7 +155,7 @@ abstract class AbstractNodeManager(
      * @param nodeId NodeId
      * @return Is the node still alive && Node status successfully updated
      */
-    abstract fun checkNodeStatus(nodeId: String): Boolean
+    abstract suspend fun checkAndUpdateNodeStatus(nodeId: String): Boolean
 
     /**
      * Update node information (supported models, ...)
@@ -163,5 +163,5 @@ abstract class AbstractNodeManager(
      * @param nodeId NodeId
      * @return Node has been successfully updated
      */
-    abstract fun updateNodeInfo(nodeId: String): Boolean
+    abstract suspend fun updateNodeInfo(nodeId: String): Boolean
 }
