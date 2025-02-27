@@ -14,7 +14,7 @@ import java.util.*
  */
 abstract class AbstractTaskDispatcher(
     protected val nodeManager: AbstractNodeManager,
-    protected val ollamaTaskManager: TaskManager
+    protected val taskManager: TaskManager
 ) {
     abstract suspend fun performTask(task: AbstractTask): TaskPerformResult<String>?
 
@@ -35,7 +35,7 @@ abstract class AbstractTaskDispatcher(
      */
     fun requireSessionId(): String {
         var uuid = UUID.randomUUID().toString()
-        while (ollamaTaskManager.getSession(uuid) != null) {
+        while (taskManager.getSession(uuid) != null) {
             uuid = UUID.randomUUID().toString()
         }
         return uuid

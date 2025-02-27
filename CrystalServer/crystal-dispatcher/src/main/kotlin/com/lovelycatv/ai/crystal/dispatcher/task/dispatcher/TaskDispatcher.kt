@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component
 @Component
 class TaskDispatcher(
     nodeManager: AbstractNodeManager,
-    ollamaTaskManager: TaskManager
-) : AbstractTaskDispatcher(nodeManager, ollamaTaskManager) {
+    taskManager: TaskManager
+) : AbstractTaskDispatcher(nodeManager, taskManager) {
     private val logger = logger()
 
     override suspend fun performTask(task: AbstractTask): TaskPerformResult<String>? {
@@ -50,7 +50,7 @@ class TaskDispatcher(
             val result = availableNode.channel.sendMessage(message)
 
             if (result.success) {
-                ollamaTaskManager.pushSession(recipient = availableNode, messageChain = message, timeout = task.timeout)
+                taskManager.pushSession(recipient = availableNode, messageChain = message, timeout = task.timeout)
                 TaskPerformResult.success(
                     taskId = taskId,
                     data = sessionId
