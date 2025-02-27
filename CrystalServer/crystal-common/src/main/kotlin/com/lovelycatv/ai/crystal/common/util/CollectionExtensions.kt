@@ -19,3 +19,8 @@ fun <E> Collection<E>.divide(condition: (E) -> Boolean): Pair<List<E>, List<E>> 
     }
     return left to right
 }
+
+inline fun <T> Iterable<T>.forEachAndThen(action: (T) -> Unit): Iterable<T> {
+    for (element in this) action(element)
+    return this
+}

@@ -1,18 +1,19 @@
 package com.lovelycatv.ai.crystal.dispatcher.service
 
-import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
 import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
-import com.lovelycatv.ai.crystal.common.netty.sendMessage
 import com.lovelycatv.ai.crystal.common.util.logger
-import com.lovelycatv.ai.crystal.common.util.suspendTimeoutCoroutine
-import com.lovelycatv.ai.crystal.dispatcher.OllamaTaskDispatcher
-import com.lovelycatv.ai.crystal.dispatcher.OllamaTaskManager
-import com.lovelycatv.ai.crystal.dispatcher.data.node.OllamaChatRequestResult
-import com.lovelycatv.ai.crystal.dispatcher.data.node.OllamaChatRequestSessionContainer
+import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
+import com.lovelycatv.ai.crystal.dispatcher.task.dispatcher.TaskDispatcher
+import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
+import com.lovelycatv.ai.crystal.dispatcher.task.OneTimeChatTask
+import com.lovelycatv.ai.crystal.dispatcher.task.TaskPerformResult
+import com.lovelycatv.ai.crystal.dispatcher.task.manager.ListenableTaskManager
 import org.springframework.stereotype.Service
 import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * @author lovelycat
@@ -21,8 +22,8 @@ import kotlin.coroutines.resume
  */
 @Service
 class OllamaChatServiceImpl(
-    private val ollamaTaskDispatcher: OllamaTaskDispatcher,
-    private val ollamaTaskManager: OllamaTaskManager
+    private val taskDispatcher: TaskDispatcher,
+    private val taskManager: TaskManager
 ) : OllamaChatService {
     private val logger = logger()
 
@@ -32,74 +33,59 @@ class OllamaChatServiceImpl(
      * @param options [OllamaChatOptions]
      * @param messages List of [PromptMessage]
      * @param ignoreResult If true, the response of node will be ignored.
-     * @return [OllamaChatRequestResult]
+     * @param timeout Request timeout
+     * @return [OneTimeChatRequestResult]
      */
     override suspend fun sendOneTimeChatTask(
         options: OllamaChatOptions?,
         messages: List<PromptMessage>,
-        ignoreResult: Boolean
-    ): OllamaChatRequestResult {
-        val node = ollamaTaskDispatcher.requireAvailableNode()
-        return if (node != null) {
-            if (node.channel != null) {
-                val sessionId = ollamaTaskDispatcher.requireSessionId()
+        ignoreResult: Boolean,
+        timeout: Long
+    ): OneTimeChatRequestResult {
+        val result = taskDispatcher.performTask(OneTimeChatTask(options, messages, timeout))
 
-                logger.info("Sending OneTimeChatTask to node: [${node.nodeName}], sessionId: [${sessionId}]")
-
-                val message = MessageChainBuilder {
-                    // Random sessionId
-                    this.sessionId(sessionId)
-                    // No streaming
-                    this.streamId(null)
-
-                    // Add OllamaChatOptions is non-null
-                    options?.let {
-                        this.addMessage(it)
-                    }
-
-                    // Add all messages
-                    this.addMessages(messages)
-                }
-
-                val result = node.channel.sendMessage(message)
-
-                if (result) {
+        if (result != null) {
+            when (result.status) {
+                TaskPerformResult.Status.SUCCESS -> {
+                    val sessionId = result.data
                     if (!ignoreResult) {
-                        var lastRecordedContainer: OllamaChatRequestSessionContainer? = null
-                        val nodeResponse = suspendTimeoutCoroutine(16000) { continuation ->
-                            ollamaTaskManager.pushSession(
-                                recipient = node,
-                                messageChain = message,
-                                callbacks = object : OllamaChatRequestSessionContainer.Callbacks {
-                                    override fun onReceived(message: OllamaChatResponseMessage, container: OllamaChatRequestSessionContainer) {
-                                        lastRecordedContainer = container
-                                    }
-                                    override fun onFinished(container: OllamaChatRequestSessionContainer) {
-                                        continuation.resume(container.getResponses())
-                                    }
+                        return suspendCoroutine { continuation ->
+                            taskManager.subscribe(sessionId, object : ListenableTaskManager.SimpleSubscriber {
+                                override fun onReceived(container: ChatRequestSessionContainer, message: OllamaChatResponseMessage) {}
+
+                                override fun onFinished(container: ChatRequestSessionContainer) {
+                                    continuation.resume(OneTimeChatRequestResult(
+                                        isRequestSent = true,
+                                        isSuccess = true,
+                                        message = "",
+                                        results = container.getResponses()
+                                    ))
                                 }
-                            )
-                        }
-                        if (nodeResponse != null) {
-                            OllamaChatRequestResult(
-                                isRequestSent = true,
-                                isSuccess = true,
-                                results = nodeResponse
-                            )
-                        } else {
-                            OllamaChatRequestResult(isRequestSent = true, isSuccess = false, results = lastRecordedContainer?.getResponses() ?: listOf())
+
+                                override fun onFailed(container: ChatRequestSessionContainer?, failedMessage: OllamaChatResponseMessage?) {
+                                    continuation.resume(OneTimeChatRequestResult(
+                                        isRequestSent = true,
+                                        isSuccess = false,
+                                        message = failedMessage?.message ?: "",
+                                        results = container?.getResponses() ?: emptyList()
+                                    ))
+                                }
+                            })
+
+                            taskManager.subscribe(sessionId, ListenableTaskManager.OnTimeoutSubscriber {
+                                continuation.resume(OneTimeChatRequestResult(isRequestSent = true, isSuccess = false, message = "Timeout"))
+                            })
                         }
                     } else {
-                        OllamaChatRequestResult(isRequestSent = true, isSuccess = true)
+                        return OneTimeChatRequestResult(isRequestSent = true, isSuccess = true, message = "")
                     }
-                } else {
-                    OllamaChatRequestResult(isRequestSent = false, isSuccess = false)
                 }
-            } else {
-                OllamaChatRequestResult(isRequestSent = false, isSuccess = false)
+                TaskPerformResult.Status.FAILED -> {
+                    return OneTimeChatRequestResult(isRequestSent = false, isSuccess = false, message = result.message ?: "")
+                }
             }
         } else {
-            OllamaChatRequestResult(isRequestSent = false, isSuccess = false)
+            return OneTimeChatRequestResult(isRequestSent = false, isSuccess = false, message = "No available node")
         }
     }
 

@@ -13,28 +13,41 @@ import kotlin.coroutines.resume
  */
 class CrystalNettyExtensions private constructor()
 
-suspend fun Channel?.sendMessage(message: MessageChain): Boolean {
+data class NettyMessageSendResult(
+    val reason: Reason,
+    val success: Boolean,
+    val cause: Throwable? = null,
+) {
+    enum class Reason {
+        SUCCESS,
+        FAILED,
+        NULL_CHANNEL,
+        EXCEPTION
+    }
+}
+
+suspend fun Channel?.sendMessage(message: MessageChain): NettyMessageSendResult {
     return suspendCancellableCoroutine { continuation ->
         if (this != null) {
             this.writeAndFlush(message).addListener {
                 try {
                     if (it.isSuccess) {
-                        continuation.resume(true)
+                        continuation.resume(NettyMessageSendResult(NettyMessageSendResult.Reason.SUCCESS, true, null))
                     } else {
-                        continuation.resume(false)
+                        continuation.resume(NettyMessageSendResult(NettyMessageSendResult.Reason.FAILED, false, it.cause()))
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    continuation.resume(false)
+                    continuation.resume(NettyMessageSendResult(NettyMessageSendResult.Reason.EXCEPTION, false, e))
                 }
             }
         } else {
-            continuation.resume(false)
+            continuation.resume(NettyMessageSendResult(NettyMessageSendResult.Reason.NULL_CHANNEL, false, null))
         }
     }
 }
 
-suspend fun Channel?.sendMessage(messageBuilder: MessageChain.Builder.() -> Unit): Boolean {
+suspend fun Channel?.sendMessage(messageBuilder: MessageChain.Builder.() -> Unit): NettyMessageSendResult {
     val builder = MessageChain.Builder()
     messageBuilder.invoke(builder)
     return sendMessage(builder.build())

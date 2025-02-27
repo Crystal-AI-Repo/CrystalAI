@@ -2,7 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.controller.v1
 
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.dispatcher.controller.IWebManagerController
-import com.lovelycatv.ai.crystal.dispatcher.data.node.OllamaChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
 import org.springframework.web.bind.annotation.RequestParam
 
 /**
@@ -17,6 +17,8 @@ interface IWebManagerControllerV1 : IWebManagerController {
         @RequestParam("message")
         message: String,
         @RequestParam("waitForResult")
-        waitForResult: Boolean
-    ): Result<OllamaChatRequestResult>
+        waitForResult: Boolean,
+        @RequestParam("timeout", required = false, defaultValue = "0")
+        timeout: Long
+    ): Result<OneTimeChatRequestResult>
 }

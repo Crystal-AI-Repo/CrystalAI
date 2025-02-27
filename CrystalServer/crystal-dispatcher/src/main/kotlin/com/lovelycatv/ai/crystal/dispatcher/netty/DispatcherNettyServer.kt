@@ -4,7 +4,7 @@ import com.lovelycatv.ai.crystal.common.netty.codec.FrameDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainEncoder
 import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
-import com.lovelycatv.ai.crystal.dispatcher.OllamaTaskManager
+import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
 import com.lovelycatv.ai.crystal.dispatcher.config.RegisteredNodeConfiguration
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
 import com.lovelycatv.ai.crystal.dispatcher.netty.handler.NettyClientConnectionHandler
@@ -27,7 +27,7 @@ class DispatcherNettyServer(
     context: ConfigurableApplicationContext,
     private val dispatcherNodeConfiguration: RegisteredNodeConfiguration,
     private val nodeManager: AbstractNodeManager,
-    private val ollamaTaskManager: OllamaTaskManager
+    private val ollamaTaskManager: TaskManager
 ) : AbstractDispatcherNettyServer(context) {
     override fun buildServerBootstrap(): ServerBootstrap {
         return ServerBootstrap()

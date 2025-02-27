@@ -7,8 +7,9 @@ import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatResponseMess
  * @since 2025-02-27 00:34
  * @version 1.0
  */
-data class OllamaChatRequestResult(
+data class OneTimeChatRequestResult(
     val isRequestSent: Boolean,
     val isSuccess: Boolean,
+    val message: String = "",
     val results: List<OllamaChatResponseMessage> = listOf()
 )

@@ -7,7 +7,7 @@ import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PR
 import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
 import com.lovelycatv.ai.crystal.common.response.Result
-import com.lovelycatv.ai.crystal.dispatcher.data.node.OllamaChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.service.NodeManagerService
 import com.lovelycatv.ai.crystal.dispatcher.service.OllamaChatService
@@ -30,8 +30,9 @@ class WebManagerControllerV1(
     override suspend fun testSendOneTimeChatTask(
         model: String,
         message: String,
-        waitForResult: Boolean
-    ): Result<OllamaChatRequestResult> {
+        waitForResult: Boolean,
+        timeout: Long
+    ): Result<OneTimeChatRequestResult> {
         val result = ollamaChatService.sendOneTimeChatTask(
             options = OllamaChatOptions(modelName = model, temperature = null),
             messages = listOf(
@@ -40,7 +41,8 @@ class WebManagerControllerV1(
                     message = listOf(PromptMessage.Content.fromString(message)),
                 )
             ),
-            ignoreResult = !waitForResult
+            ignoreResult = !waitForResult,
+            timeout = timeout
         )
 
         return if (result.isRequestSent) {

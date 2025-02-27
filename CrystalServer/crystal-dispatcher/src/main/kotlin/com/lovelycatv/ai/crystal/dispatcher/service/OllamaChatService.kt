@@ -2,7 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.service
 
 import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
-import com.lovelycatv.ai.crystal.dispatcher.data.node.OllamaChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
 
 /**
  * @author lovelycat
@@ -16,11 +16,13 @@ interface OllamaChatService {
      * @param options [OllamaChatOptions]
      * @param messages List of [PromptMessage]
      * @param ignoreResult If true, the response of node will be ignored.
-     * @return [OllamaChatRequestResult]
+     * @param timeout Request timeout
+     * @return [OneTimeChatRequestResult]
      */
     suspend fun sendOneTimeChatTask(
         options: OllamaChatOptions?,
         messages: List<PromptMessage>,
-        ignoreResult: Boolean
-    ): OllamaChatRequestResult
+        ignoreResult: Boolean,
+        timeout: Long
+    ): OneTimeChatRequestResult
 }
