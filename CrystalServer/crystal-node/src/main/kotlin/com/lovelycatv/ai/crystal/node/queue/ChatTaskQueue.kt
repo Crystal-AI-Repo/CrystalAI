@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.node.queue
 
 import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
+import com.lovelycatv.ai.crystal.node.data.AbstractTask
 import com.lovelycatv.ai.crystal.node.data.ChatTask
 
 /**
@@ -8,7 +9,7 @@ import com.lovelycatv.ai.crystal.node.data.ChatTask
  * @since 2025-02-26 22:27
  * @version 1.0
  */
-interface ChatTaskQueue<CHAT_OPTIONS: AbstractChatOptions> {
+interface ChatTaskQueue<CHAT_OPTIONS: AbstractChatOptions> : TaskQueue {
     /**
      * Submit tasks to the queue
      *
@@ -24,4 +25,6 @@ interface ChatTaskQueue<CHAT_OPTIONS: AbstractChatOptions> {
      * @return [ChatTask]
      */
     fun requireTask(): ChatTask<out CHAT_OPTIONS>?
+
+    override fun glance(): List<ChatTask<out CHAT_OPTIONS>>
 }

@@ -23,8 +23,22 @@ abstract class AbstractTaskDispatcher(
      *
      * @return Available [RegisteredNode]
      */
-    fun requireAvailableNode(): RegisteredNode? {
-        return nodeManager.allRegisteredNodes.filter { it.isNettyClientConnected }.randomOrNull()
+    fun requireAvailableNode(strategy: TaskDispatchStrategy): RegisteredNode? {
+        val workingNodeIds = taskManager.currentSessions.map { it.nodeId }
+
+        val allNodes = nodeManager.allRegisteredNodes
+
+        return allNodes.filter {
+            it.isNettyClientConnected && it.nodeId !in workingNodeIds
+        }.randomOrNull()
+            ?: when (strategy) {
+                TaskDispatchStrategy.REJECT -> {
+                    null
+                }
+                TaskDispatchStrategy.RANDOM -> {
+                    allNodes.randomOrNull()
+                }
+            }
     }
 
     /**

@@ -18,6 +18,7 @@ abstract class AbstractTaskManager(
     private val nodeManager: AbstractNodeManager
 ) {
     private val sessionResponseMap: MutableMap<String, ChatRequestSessionContainer> = mutableMapOf()
+    val currentSessions: Collection<ChatRequestSessionContainer> get() = this.sessionResponseMap.values
 
     @CallSuper
     @Throws(DuplicateSessionIdException::class)

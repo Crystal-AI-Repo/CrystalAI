@@ -1,5 +1,6 @@
 package com.lovelycatv.ai.crystal.node.data
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.options.DeepSeekChatOptions
@@ -21,21 +22,24 @@ import kotlin.reflect.KClass
  * @since 2025-02-26 22:15
  * @version 1.0
  */
-data class ChatTask<CHAT_OPTIONS: AbstractChatOptions>(
+class ChatTask<CHAT_OPTIONS: AbstractChatOptions>(
     val type: Type,
     val originalMessageChain: MessageChain,
     val expireTime: Long,
     val priority: Int,
     private val chatOptionsClazz: KClass<CHAT_OPTIONS>
-) : Comparable<ChatTask<CHAT_OPTIONS>> {
+) : AbstractTask(AbstractTask.Type.CHAT), Comparable<ChatTask<CHAT_OPTIONS>> {
     /**
      * SessionId in [MessageChain]
      */
+    @get:JsonIgnore
     val requesterSessionId: String get() = this.originalMessageChain.sessionId
 
+    @get:JsonIgnore
     @Suppress("UNCHECKED_CAST")
     val chatOptions: CHAT_OPTIONS? get() = this.originalMessageChain.messages.firstOrNull { chatOptionsClazz.isInstance(it) } as CHAT_OPTIONS?
 
+    @get:JsonIgnore
     val prompts: List<PromptMessage> get() = this.originalMessageChain.messages
         .filterIsInstance<PromptMessage>()
 

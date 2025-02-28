@@ -1,5 +1,6 @@
 package com.lovelycatv.ai.crystal.node
 
+import com.lovelycatv.ai.crystal.node.data.ChatTask
 import com.lovelycatv.ai.crystal.node.exception.InvalidSessionIdException
 
 object Global {
@@ -8,47 +9,38 @@ object Global {
         var dispatcherCommunicationPort: Int = -1
 
         @Volatile
-        var isOllamaTaskRunning: Boolean = false
+        var isChatTaskRunning: Boolean = false
         @Volatile
-        var ollamaTaskRequesterSessionId: String? = null
+        var currentRunningChatTask: ChatTask<*>? = null
         @Volatile
-        var ollamaTaskStartedAt: Long = 0L
-        @Volatile
-        var ollamaTaskExpireTime: Long = 0L
+        var chatTaskStartedAt: Long = 0L
+    }
+
+    fun isChatTaskRunning(): Boolean {
+        return Variables.isChatTaskRunning
     }
 
     @Synchronized
-    fun lockOllamaRunningStatus(requesterSessionId: String, expireTime: Long): Boolean {
-        if (requesterSessionId.isBlank()) {
-            throw InvalidSessionIdException(requesterSessionId)
+    fun lockChatRunningStatus(currentRunningChatTask: ChatTask<*>): Boolean {
+        if (Variables.isChatTaskRunning) {
+            return false
         }
 
-        if (Variables.isOllamaTaskRunning) {
-            return if (Variables.ollamaTaskExpireTime > 0 && System.currentTimeMillis() - Variables.ollamaTaskStartedAt > Variables.ollamaTaskExpireTime) {
-                // The last task is expired
-                this.unlockOllamaRunningStatus()
-                true
-            } else {
-                false
-            }
-        }
-
-        Variables.isOllamaTaskRunning = true
-        Variables.ollamaTaskRequesterSessionId = requesterSessionId
-        Variables.ollamaTaskStartedAt = System.currentTimeMillis()
-        Variables.ollamaTaskExpireTime = expireTime
+        Variables.isChatTaskRunning = true
+        Variables.currentRunningChatTask = currentRunningChatTask
+        Variables.chatTaskStartedAt = System.currentTimeMillis()
 
         return true
     }
 
     @Synchronized
-    fun unlockOllamaRunningStatus(requesterSessionId: String): Boolean {
+    fun unlockChatRunningStatus(requesterSessionId: String): Boolean {
         if (requesterSessionId.isBlank()) {
             throw InvalidSessionIdException(requesterSessionId)
         }
 
-        return if (Variables.isOllamaTaskRunning && Variables.ollamaTaskRequesterSessionId == requesterSessionId) {
-            this.unlockOllamaRunningStatus()
+        return if (Variables.isChatTaskRunning && Variables.currentRunningChatTask?.requesterSessionId == requesterSessionId) {
+            this.unlockChatRunningStatus()
             true
         } else {
             false
@@ -56,9 +48,9 @@ object Global {
     }
 
     @Synchronized
-    private fun unlockOllamaRunningStatus() {
-        Variables.isOllamaTaskRunning = false
-        Variables.ollamaTaskRequesterSessionId = null
+    private fun unlockChatRunningStatus() {
+        Variables.isChatTaskRunning = false
+        Variables.currentRunningChatTask = null
     }
 
     fun isNodeRegistered() = !Variables.currentNodeUUID.isNullOrEmpty()

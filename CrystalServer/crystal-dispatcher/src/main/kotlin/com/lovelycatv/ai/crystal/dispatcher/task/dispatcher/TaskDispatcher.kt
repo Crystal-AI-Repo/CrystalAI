@@ -24,10 +24,10 @@ class TaskDispatcher(
     private val logger = logger()
 
     override suspend fun performTask(task: AbstractTask): TaskPerformResult<String>? {
-        val availableNode = requireAvailableNode()
+        val availableNode = requireAvailableNode(TaskDispatchStrategy.RANDOM)
 
         if (availableNode == null) {
-            logger.error("No available node for task: ${task.taskId}")
+            logger.error("No available node for task: ${task.toJSONString()}")
             return null
         }
 

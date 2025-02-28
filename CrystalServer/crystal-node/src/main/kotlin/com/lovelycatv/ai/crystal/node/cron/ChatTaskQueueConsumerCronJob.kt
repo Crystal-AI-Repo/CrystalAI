@@ -2,18 +2,24 @@ package com.lovelycatv.ai.crystal.node.cron
 
 import com.lovelycatv.ai.crystal.common.GlobalConstants
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
-import com.lovelycatv.ai.crystal.common.data.message.chat.*
+import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.options.DeepSeekChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.util.logger
+import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.data.ChatTask
 import com.lovelycatv.ai.crystal.node.netty.AbstractNodeNettyClient
 import com.lovelycatv.ai.crystal.node.queue.ChatTaskQueue
 import com.lovelycatv.ai.crystal.node.service.chat.DeepSeekChatService
 import com.lovelycatv.ai.crystal.node.service.chat.OllamaChatService
-import com.lovelycatv.ai.crystal.node.service.chat.base.*
-import kotlinx.coroutines.*
+import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCallback
+import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCompletedCallback
+import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamRequestFailedCallback
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -47,12 +53,15 @@ class ChatTaskQueueConsumerCronJob(
     @Scheduled(cron = "0/1 * * * * ?")
     fun consume() {
         val task = chatTaskQueue.requireTask()
+
         if (task != null) {
-            logger.info("ChatTask-[${task.type}] consumed, sessionId: ${task.requesterSessionId}, maxExecTime: ${task.expireTime}ms")
+            val sessionId = task.requesterSessionId
+
+            logger.info("ChatTask-[${task.type}] consumed, sessionId: ${sessionId}, maxExecTime: ${task.expireTime}ms")
 
             val messageTemplate = MessageChainBuilder {
                 // Copy the sessionId
-                this.sessionId(task.requesterSessionId)
+                this.sessionId(sessionId)
 
                 // No streaming
                 this.streamId(null)
@@ -82,6 +91,8 @@ class ChatTaskQueueConsumerCronJob(
                     }
 
                     val onCompleted: ChatStreamCompletedCallback = { _, generatedTokens, totalTokens ->
+                        Global.unlockChatRunningStatus(sessionId)
+
                         blockingRequester.launch {
                             lock.withLock {
                                 nodeNettyClient.sendMessage(
@@ -100,6 +111,8 @@ class ChatTaskQueueConsumerCronJob(
                     }
 
                     val onFailed: ChatStreamRequestFailedCallback = {
+                        Global.unlockChatRunningStatus(sessionId)
+
                         blockingRequester.launch {
                             lock.withLock {
                                 nodeNettyClient.sendMessage(
@@ -137,6 +150,8 @@ class ChatTaskQueueConsumerCronJob(
                             deepSeekChatService.blockingGenerate(task.prompts, task.chatOptions as DeepSeekChatOptions?)
                         }
                     }
+
+                    Global.unlockChatRunningStatus(sessionId)
 
                     lock.withLock {
                         nodeNettyClient.sendMessage(

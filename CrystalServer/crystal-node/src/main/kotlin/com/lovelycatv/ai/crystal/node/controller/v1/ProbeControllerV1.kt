@@ -2,14 +2,21 @@ package com.lovelycatv.ai.crystal.node.controller.v1
 
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.NODE_INFO
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.MAPPING
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.NODE_AVAILABLE
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.NODE_TASKS
 import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_VERSION_1
 import com.lovelycatv.ai.crystal.common.client.DeepSeekClient
 import com.lovelycatv.ai.crystal.common.client.OllamaClient
 import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.response.node.probe.NodeProbeResult
+import com.lovelycatv.ai.crystal.common.response.node.probe.NodeTasksResult
+import com.lovelycatv.ai.crystal.common.vo.NodeTaskVO
+import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.config.NetworkConfig
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
+import com.lovelycatv.ai.crystal.node.data.AbstractTask
+import com.lovelycatv.ai.crystal.node.queue.DefaultChatTaskQueue
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,10 +35,11 @@ class ProbeControllerV1(
     private val networkConfig: NetworkConfig,
     private val nodeConfiguration: NodeConfiguration,
     private val ollamaFeignClient: OllamaClient,
-    private val deepSeekFeignClient: DeepSeekClient
+    private val deepSeekFeignClient: DeepSeekClient,
+    private val chatTaskQueue: DefaultChatTaskQueue
 ) : IProbeControllerV1 {
     @GetMapping(NODE_INFO)
-    override fun nodeInfo(): Result<NodeProbeResult> {
+    override fun getNodeInfo(): Result<NodeProbeResult> {
         return Result.success(
             "",
             NodeProbeResult(
@@ -49,5 +57,27 @@ class ProbeControllerV1(
                     null) ?: emptyList()
             )
         )
+    }
+
+    @GetMapping(NODE_TASKS)
+    override fun getNodeTasks(): Result<NodeTasksResult> {
+        val chatTasks = chatTaskQueue.glance()
+
+        return Result.success(
+            "",
+            NodeTasksResult(
+                runningTask = Global.Variables.currentRunningChatTask?.toNodeTaskVO(),
+                pendingTasks = chatTasks.map { it.toNodeTaskVO() }
+            )
+        )
+    }
+
+    @GetMapping(NODE_AVAILABLE)
+    override fun isNodeAvailable(): Result<Boolean> {
+        return Result.success("", !Global.isChatTaskRunning())
+    }
+
+    private fun AbstractTask.toNodeTaskVO(): NodeTaskVO {
+        return NodeTaskVO(taskType = this.taskType.name, taskClass = this::class.qualifiedName ?: "", data = this)
     }
 }

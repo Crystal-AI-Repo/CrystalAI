@@ -34,6 +34,8 @@ object GlobalConstants {
             object ProbeController {
                 const val MAPPING = "/probe"
                 const val NODE_INFO = "/info"
+                const val NODE_TASKS = "/tasks"
+                const val NODE_AVAILABLE = "/available"
             }
         }
     }

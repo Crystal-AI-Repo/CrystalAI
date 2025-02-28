@@ -59,7 +59,7 @@ class InMemoryChatTaskQueue(
             val peek: ChatTask<out AbstractChatOptions>? = super.peek()
             return if (peek != null) {
                 // The next task is existing
-                if (Global.lockOllamaRunningStatus(peek.requesterSessionId, peek.expireTime)) {
+                if (Global.lockChatRunningStatus(peek)) {
                     // Lock is acquired
                     super.poll()
                 } else {
@@ -71,6 +71,15 @@ class InMemoryChatTaskQueue(
                 null
             }
         }
+    }
+
+    /**
+     * Inspect the task queue
+     *
+     * @return All tasks in the queue
+     */
+    override fun glance(): List<ChatTask<out AbstractChatOptions>> {
+        return this.toList()
     }
 
     private fun expandQueue() {

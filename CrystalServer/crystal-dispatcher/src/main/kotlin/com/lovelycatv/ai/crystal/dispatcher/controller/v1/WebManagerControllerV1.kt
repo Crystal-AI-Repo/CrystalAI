@@ -12,6 +12,7 @@ import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.service.NodeManagerService
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultChatService
+import kotlinx.coroutines.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -27,6 +28,8 @@ class WebManagerControllerV1(
     private val nodeManagerService: NodeManagerService,
     private val chatService: DefaultChatService
 ) : IWebManagerControllerV1 {
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     @GetMapping(TEST_SEND_ONE_TIME_OLLAMA_CHAT)
     override suspend fun testSendOneTimeChatTask(
         model: String,
