@@ -3,6 +3,7 @@ package com.lovelycatv.ai.crystal.common.netty.codec
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder
+import org.springframework.core.codec.DecodingException
 
 /**
  * @author lovelycat
@@ -27,7 +28,7 @@ class FrameDecoder(
     0,
     if (includingFieldLength) 0 else lengthFieldLength
 ) {
-    override fun decode(ctx: ChannelHandlerContext?, `in`: ByteBuf?): Any {
-        return super.decode(ctx, `in`)
+    override fun decode(ctx: ChannelHandlerContext, `in`: ByteBuf): Any? {
+        return super.decode(ctx, `in`) ?: null
     }
 }

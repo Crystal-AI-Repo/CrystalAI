@@ -10,9 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName
  * @version 1.0
  */
 @JsonTypeName("DEEP_SEEK_CHAT_OPTIONS")
-data class DeepSeekChatOptions @JsonCreator constructor(
-    @JSONField(name = "modelName")
-    val modelName: String?,
+class DeepSeekChatOptions @JsonCreator constructor(
+    modelName: String,
     @JSONField(name = "temperature")
     val temperature: Double?
-) : AbstractChatOptions(Type.DEEP_SEEK_CHAT_OPTIONS)
+) : AbstractChatOptions(modelName, Type.DEEP_SEEK_CHAT_OPTIONS)

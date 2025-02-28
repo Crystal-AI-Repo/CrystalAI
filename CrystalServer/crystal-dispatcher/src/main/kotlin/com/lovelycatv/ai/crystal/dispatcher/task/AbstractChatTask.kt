@@ -10,7 +10,7 @@ import java.util.UUID
  * @version 1.0
  */
 abstract class AbstractChatTask<OPTIONS: AbstractChatOptions>(
-    val options: OPTIONS?,
+    val options: OPTIONS,
     val prompts: List<PromptMessage>,
     timeout: Long = 0L,
     taskId: String = UUID.randomUUID().toString(),

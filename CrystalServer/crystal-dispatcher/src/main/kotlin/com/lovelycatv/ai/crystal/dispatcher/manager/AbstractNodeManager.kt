@@ -110,7 +110,8 @@ abstract class AbstractNodeManager(
                         lastAliveTimestamp = currentTimestamp,
                         lastAliveCheckTimestamp = currentTimestamp,
                         lastUpdateTimestamp = currentTimestamp,
-                        ollamaModels = nodeInfo.ollamaModels
+                        ollamaModels = nodeInfo.ollamaModels,
+                        deepseekModels = nodeInfo.deepseekModels
                     )
                 } else {
                     RegisteredNode(
@@ -124,7 +125,8 @@ abstract class AbstractNodeManager(
                         lastAliveTimestamp = currentTimestamp,
                         lastAliveCheckTimestamp = currentTimestamp,
                         lastUpdateTimestamp = currentTimestamp,
-                        ollamaModels = nodeInfo.ollamaModels
+                        ollamaModels = nodeInfo.ollamaModels,
+                        deepseekModels = nodeInfo.deepseekModels
                     )
                 }
 

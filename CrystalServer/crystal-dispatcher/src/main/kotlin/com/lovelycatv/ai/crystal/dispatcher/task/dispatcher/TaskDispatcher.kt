@@ -1,9 +1,12 @@
 package com.lovelycatv.ai.crystal.dispatcher.task.dispatcher
 
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.DeepSeekChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.netty.sendMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
+import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
 import com.lovelycatv.ai.crystal.dispatcher.task.*
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
@@ -21,20 +24,27 @@ class TaskDispatcher(
 ) : AbstractTaskDispatcher(nodeManager, taskManager) {
     private val logger = logger()
 
-    override suspend fun performTask(task: AbstractTask): TaskPerformResult<String>? {
-        val availableNode = requireAvailableNode(TaskDispatchStrategy.RANDOM)
+    override suspend fun performTask(task: AbstractTask): TaskPerformResult<String> {
+        val availableNodeResult = super.requireAvailableNode(task, TaskDispatchStrategy.RANDOM)
 
-        if (availableNode == null) {
-            logger.error("No available node for task: ${task.toJSONString()}")
-            return null
+        if (!availableNodeResult.success) {
+            logger.error("${availableNodeResult.message}, task: ${task.toJSONString()}")
+            return TaskPerformResult.failed(
+                taskId = task.taskId,
+                data = "",
+                message = availableNodeResult.message ?: "",
+                cause = null
+            )
         }
+
+        val availableNode = availableNodeResult.node ?: throw IllegalStateException("Capable node found but acquired null")
 
         val taskId = task.taskId
 
         return if (task is AbstractChatTask<*>) {
-            val sessionId = requireSessionId()
+            val sessionId = super.requireSessionId()
 
-            logger.info("Executing OneTimeChatTask-[${taskId}], allocated node: [${availableNode.nodeName}], sessionId: [${sessionId}], options: [${task.options.toJSONString()}]")
+            logger.info("Executing ${task::class.simpleName}-[${taskId}], allocated node: [${availableNode.nodeName}], sessionId: [${sessionId}], options: [${task.options.toJSONString()}]")
 
             val message = MessageChainBuilder {
                 // Random sessionId
@@ -81,6 +91,27 @@ class TaskDispatcher(
                 message = "Task type [${task::class.qualifiedName}] is not supported currently"
             )
         }
+    }
+
+    /**
+     * Check whether the node could perform this task
+     *
+     * @param node [RegisteredNode]
+     * @param task Task to be performed
+     * @return [Boolean]
+     */
+    override fun canNodePerform(node: RegisteredNode, task: AbstractTask): Boolean {
+        return if (task is AbstractChatTask<*>) {
+            when (task.options) {
+                is OllamaChatOptions -> {
+                    node.ollamaModels.find { it.model == task.options.modelName } != null
+                }
+                is DeepSeekChatOptions -> {
+                    node.deepseekModels.find { it.id == task.options.modelName } != null
+                }
+                else -> false
+            }
+        } else false
     }
 
 

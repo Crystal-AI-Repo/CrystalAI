@@ -1,7 +1,9 @@
 package com.lovelycatv.ai.crystal.dispatcher.task.dispatcher
 
+import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
+import com.lovelycatv.ai.crystal.dispatcher.response.AvailableNodeRequireResult
 import com.lovelycatv.ai.crystal.dispatcher.task.AbstractTask
 import com.lovelycatv.ai.crystal.dispatcher.task.TaskPerformResult
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
@@ -19,26 +21,52 @@ abstract class AbstractTaskDispatcher(
     abstract suspend fun performTask(task: AbstractTask): TaskPerformResult<String>?
 
     /**
+     * Check whether the node could perform this task
+     *
+     * @param node [RegisteredNode]
+     * @param task Task to be performed
+     * @return [Boolean]
+     */
+    protected abstract fun canNodePerform(node: RegisteredNode, task: AbstractTask): Boolean
+
+    /**
      * Retrieve the best available node based on the scheduling rules. If no nodes are available, return null.
      *
+     * @param task Task to be performed
+     * @param strategy When dispatcher could not found an available node,
+     *                 then the strategy will be applied.
      * @return Available [RegisteredNode]
      */
-    fun requireAvailableNode(strategy: TaskDispatchStrategy): RegisteredNode? {
+    fun requireAvailableNode(task: AbstractTask, strategy: TaskDispatchStrategy): AvailableNodeRequireResult {
         val workingNodeIds = taskManager.currentSessions.map { it.nodeId }
 
-        val allNodes = nodeManager.allRegisteredNodes
+        val nettyConnectedNodes = nodeManager.allRegisteredNodes.filter { it.isNettyClientConnected }
+        if (nettyConnectedNodes.isEmpty()) {
+            return AvailableNodeRequireResult.failed("No available nodes")
+        }
 
-        return allNodes.filter {
-            it.isNettyClientConnected && it.nodeId !in workingNodeIds
+        val allFitNodes = nettyConnectedNodes.filter { this.canNodePerform(it, task) }
+        if (allFitNodes.isEmpty()) {
+            return AvailableNodeRequireResult.failed("Non of nodes could perform this task")
+        }
+
+        val idleNode = allFitNodes.filter {
+            it.nodeId !in workingNodeIds
         }.randomOrNull()
-            ?: when (strategy) {
+
+        return if (idleNode != null) {
+            AvailableNodeRequireResult.success(idleNode)
+        } else {
+            when (strategy) {
                 TaskDispatchStrategy.REJECT -> {
-                    null
+                    AvailableNodeRequireResult.failed("No capable node found, task rejected by strategy")
                 }
                 TaskDispatchStrategy.RANDOM -> {
-                    allNodes.randomOrNull()
+                    AvailableNodeRequireResult.success(allFitNodes.random())
                 }
             }
+        }
+
     }
 
     /**

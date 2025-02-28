@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonTypeName
 
 @JsonTypeName("OLLAMA_CHAT_OPTIONS")
-data class OllamaChatOptions @JsonCreator constructor(
-    @JSONField(name = "modelName")
-    val modelName: String?,
+class OllamaChatOptions @JsonCreator constructor(
+    modelName: String?,
     @JSONField(name = "temperature")
     val temperature: Double?
-) : AbstractChatOptions(Type.OLLAMA_CHAT_OPTIONS)
+) : AbstractChatOptions(modelName, Type.OLLAMA_CHAT_OPTIONS)

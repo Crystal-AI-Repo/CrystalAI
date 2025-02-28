@@ -43,7 +43,7 @@ class ChatServiceImpl(
      */
     @Suppress("UNCHECKED_CAST")
     override suspend fun sendOneTimeChatTask(
-        options: AbstractChatOptions?,
+        options: AbstractChatOptions,
         messages: List<PromptMessage>,
         ignoreResult: Boolean,
         timeout: Long
@@ -69,7 +69,7 @@ class ChatServiceImpl(
      * @param timeout Request timeout
      * @return [StreamChatRequestResult]
      */
-    override suspend fun sendStreamChatTask(options: AbstractChatOptions?, messages: List<PromptMessage>, timeout: Long): StreamChatRequestResult {
+    override suspend fun sendStreamChatTask(options: AbstractChatOptions, messages: List<PromptMessage>, timeout: Long): StreamChatRequestResult {
         return sendTask(StreamChatTask(options, messages, timeout), true) { it, args ->
             StreamChatRequestResult(it.isRequestSent, it.isSuccess, it.message, it.sessionId)
         }
@@ -82,73 +82,64 @@ class ChatServiceImpl(
     ): R {
         val result = taskDispatcher.performTask(task)
 
-        if (result != null) {
-            when (result.status) {
-                TaskPerformResult.Status.SUCCESS -> {
-                    val sessionId = result.data
-                    if (!ignoreResult) {
-                        return suspendCoroutine { continuation ->
-                            taskManager.subscribe(sessionId, object : ListenableTaskManager.SimpleSubscriber {
-                                override fun onReceived(container: ChatRequestSessionContainer, message: ChatResponseMessage) {}
+        when (result.status) {
+            TaskPerformResult.Status.SUCCESS -> {
+                val sessionId = result.data
+                if (!ignoreResult) {
+                    return suspendCoroutine { continuation ->
+                        taskManager.subscribe(sessionId, object : ListenableTaskManager.SimpleSubscriber {
+                            override fun onReceived(container: ChatRequestSessionContainer, message: ChatResponseMessage) {}
 
-                                override fun onFinished(container: ChatRequestSessionContainer) {
-                                    continuation.resume(resultTransform.invoke(ChatRequestResult(
-                                        isRequestSent = true,
-                                        isSuccess = true,
-                                        message = "",
-                                        sessionId = sessionId
-                                    ), arrayOf(container.getResponses())))
-                                }
+                            override fun onFinished(container: ChatRequestSessionContainer) {
+                                continuation.resume(resultTransform.invoke(ChatRequestResult(
+                                    isRequestSent = true,
+                                    isSuccess = true,
+                                    message = "",
+                                    sessionId = sessionId
+                                ), arrayOf(container.getResponses())))
+                            }
 
-                                override fun onFailed(container: ChatRequestSessionContainer?, failedMessage: ChatResponseMessage?) {
-                                    continuation.resume(resultTransform.invoke(ChatRequestResult(
+                            override fun onFailed(container: ChatRequestSessionContainer?, failedMessage: ChatResponseMessage?) {
+                                continuation.resume(resultTransform.invoke(ChatRequestResult(
+                                    isRequestSent = true,
+                                    isSuccess = false,
+                                    message = failedMessage?.message ?: "",
+                                    sessionId = sessionId
+                                ), arrayOf(container?.getResponses() ?: emptyList<ChatResponseMessage>())))
+                            }
+                        })
+
+                        taskManager.subscribe(sessionId, ListenableTaskManager.OnTimeoutSubscriber {
+                            continuation.resume(
+                                resultTransform.invoke(
+                                    ChatRequestResult(
                                         isRequestSent = true,
                                         isSuccess = false,
-                                        message = failedMessage?.message ?: "",
+                                        message = "Timeout",
                                         sessionId = sessionId
-                                    ), arrayOf(container?.getResponses() ?: emptyList<ChatResponseMessage>())))
-                                }
-                            })
-
-                            taskManager.subscribe(sessionId, ListenableTaskManager.OnTimeoutSubscriber {
-                                continuation.resume(
-                                    resultTransform.invoke(
-                                        ChatRequestResult(
-                                            isRequestSent = true,
-                                            isSuccess = false,
-                                            message = "Timeout",
-                                            sessionId = sessionId
-                                        ),
-                                        arrayOf()
-                                    )
+                                    ),
+                                    arrayOf()
                                 )
-                            })
-                        }
-                    } else {
-                        return resultTransform.invoke(ChatRequestResult(
-                            isRequestSent = true,
-                            isSuccess = true,
-                            message = "Async",
-                            sessionId = sessionId
-                        ), arrayOf())
+                            )
+                        })
                     }
-                }
-                TaskPerformResult.Status.FAILED -> {
+                } else {
                     return resultTransform.invoke(ChatRequestResult(
-                        isRequestSent = false,
-                        isSuccess = false,
-                        message = result.message ?: "",
-                        sessionId = null
+                        isRequestSent = true,
+                        isSuccess = true,
+                        message = "Async",
+                        sessionId = sessionId
                     ), arrayOf())
                 }
             }
-        } else {
-            return resultTransform.invoke(ChatRequestResult(
-                isRequestSent = false,
-                isSuccess = false,
-                message = "No available node",
-                sessionId = null
-            ), arrayOf())
+            TaskPerformResult.Status.FAILED -> {
+                return resultTransform.invoke(ChatRequestResult(
+                    isRequestSent = false,
+                    isSuccess = false,
+                    message = result.message ?: "",
+                    sessionId = null
+                ), arrayOf())
+            }
         }
     }
 

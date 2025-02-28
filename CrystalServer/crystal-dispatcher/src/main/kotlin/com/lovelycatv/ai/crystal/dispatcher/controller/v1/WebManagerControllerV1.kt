@@ -92,7 +92,7 @@ class WebManagerControllerV1(
 
             Result.success("", result)
         } else {
-            Result.badRequest("Could not send request to node: ${result.message}", result)
+            Result.badRequest("Could not send request to node", result)
         }
     }
 

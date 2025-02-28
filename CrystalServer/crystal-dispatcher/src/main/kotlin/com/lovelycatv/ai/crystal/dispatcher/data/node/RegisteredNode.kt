@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.dispatcher.data.node
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.lovelycatv.ai.crystal.common.response.deepseek.DeepSeekModelResults
 import com.lovelycatv.ai.crystal.common.response.ollama.OllamaModelMeta
 import io.netty.channel.Channel
 
@@ -21,6 +22,7 @@ data class RegisteredNode(
     val lastAliveCheckTimestamp: Long,
     val lastUpdateTimestamp: Long,
     val ollamaModels: List<OllamaModelMeta>,
+    val deepseekModels: List<DeepSeekModelResults.DeepSeekModelMeta>,
     @JsonIgnore
     val channel: Channel? = null
 ) {

@@ -10,7 +10,7 @@ import java.util.*
  * @version 1.0
  */
 class StreamChatTask<OPTIONS: AbstractChatOptions>(
-    options: OPTIONS?,
+    options: OPTIONS,
     prompts: List<PromptMessage>,
     timeout: Long = 0L,
     taskId: String = UUID.randomUUID().toString()

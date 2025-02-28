@@ -22,7 +22,7 @@ interface ChatService<OPTIONS: AbstractChatOptions> {
      * @return [OneTimeChatRequestResult]
      */
     suspend fun sendOneTimeChatTask(
-        options: OPTIONS?,
+        options: OPTIONS,
         messages: List<PromptMessage>,
         ignoreResult: Boolean,
         timeout: Long
@@ -37,7 +37,7 @@ interface ChatService<OPTIONS: AbstractChatOptions> {
      * @return [StreamChatRequestResult]
      */
     suspend fun sendStreamChatTask(
-        options: OPTIONS?,
+        options: OPTIONS,
         messages: List<PromptMessage>,
         timeout: Long
     ): StreamChatRequestResult
