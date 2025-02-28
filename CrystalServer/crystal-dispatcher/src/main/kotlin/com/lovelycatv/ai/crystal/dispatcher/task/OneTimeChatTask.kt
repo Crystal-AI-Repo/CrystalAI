@@ -10,8 +10,8 @@ import java.util.UUID
  * @version 1.0
  */
 class OneTimeChatTask<OPTIONS: AbstractChatOptions>(
-    val options: OPTIONS?,
-    val prompts: List<PromptMessage>,
+    options: OPTIONS?,
+    prompts: List<PromptMessage>,
     timeout: Long = 0L,
     taskId: String = UUID.randomUUID().toString()
-) : AbstractChatTask(taskId, timeout)
+) : AbstractChatTask<OPTIONS>(options, prompts, timeout, taskId)

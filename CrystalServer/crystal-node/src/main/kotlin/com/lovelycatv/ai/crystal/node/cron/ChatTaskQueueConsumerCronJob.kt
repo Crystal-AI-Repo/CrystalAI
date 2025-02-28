@@ -63,8 +63,11 @@ class ChatTaskQueueConsumerCronJob(
                 // Copy the sessionId
                 this.sessionId(sessionId)
 
-                // No streaming
-                this.streamId(null)
+                if (task.originalMessageChain.isStream()) {
+                    this.streamId(task.requesterStreamId)
+                } else {
+                    this.streamId(null)
+                }
             }
 
             if (task.originalMessageChain.isStream()) {

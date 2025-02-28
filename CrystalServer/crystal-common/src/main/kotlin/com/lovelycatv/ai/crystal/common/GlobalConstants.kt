@@ -27,6 +27,7 @@ object GlobalConstants {
 
                 // Test functions
                 const val TEST_SEND_ONE_TIME_OLLAMA_CHAT = "/test/sendOneTimeOllamaChat"
+                const val TEST_SEND_STREAM_OLLAMA_CHAT = "/test/sendStreamOllamaChat"
             }
         }
 

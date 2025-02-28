@@ -2,7 +2,8 @@ package com.lovelycatv.ai.crystal.dispatcher.controller.v1
 
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.dispatcher.controller.IWebManagerController
-import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.StreamChatRequestResult
 import org.springframework.web.bind.annotation.RequestParam
 
 /**
@@ -21,4 +22,13 @@ interface IWebManagerControllerV1 : IWebManagerController {
         @RequestParam("timeout", required = false, defaultValue = "0")
         timeout: Long
     ): Result<OneTimeChatRequestResult>
+
+    suspend fun testSendStreamChatTask(
+        @RequestParam("model")
+        model: String,
+        @RequestParam("message")
+        message: String,
+        @RequestParam("timeout", required = false, defaultValue = "0")
+        timeout: Long
+    ): Result<StreamChatRequestResult>
 }

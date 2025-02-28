@@ -36,6 +36,9 @@ class ChatTask<CHAT_OPTIONS: AbstractChatOptions>(
     val requesterSessionId: String get() = this.originalMessageChain.sessionId
 
     @get:JsonIgnore
+    val requesterStreamId: String? get() = this.originalMessageChain.streamId
+
+    @get:JsonIgnore
     @Suppress("UNCHECKED_CAST")
     val chatOptions: CHAT_OPTIONS? get() = this.originalMessageChain.messages.firstOrNull { chatOptionsClazz.isInstance(it) } as CHAT_OPTIONS?
 

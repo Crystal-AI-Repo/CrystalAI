@@ -3,7 +3,8 @@ package com.lovelycatv.ai.crystal.dispatcher.service
 import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
-import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.StreamChatRequestResult
 
 /**
  * @author lovelycat
@@ -26,4 +27,18 @@ interface ChatService<OPTIONS: AbstractChatOptions> {
         ignoreResult: Boolean,
         timeout: Long
     ): OneTimeChatRequestResult
+
+    /**
+     * Send a stream chat request, every new generated token will be sent to dispatcher.
+     *
+     * @param options [OllamaChatOptions]
+     * @param messages List of [PromptMessage]
+     * @param timeout Request timeout
+     * @return [StreamChatRequestResult]
+     */
+    suspend fun sendStreamChatTask(
+        options: OPTIONS?,
+        messages: List<PromptMessage>,
+        timeout: Long
+    ): StreamChatRequestResult
 }

@@ -5,9 +5,7 @@ import com.lovelycatv.ai.crystal.common.netty.sendMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
-import com.lovelycatv.ai.crystal.dispatcher.task.AbstractTask
-import com.lovelycatv.ai.crystal.dispatcher.task.OneTimeChatTask
-import com.lovelycatv.ai.crystal.dispatcher.task.TaskPerformResult
+import com.lovelycatv.ai.crystal.dispatcher.task.*
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
 import org.springframework.stereotype.Component
 
@@ -33,7 +31,7 @@ class TaskDispatcher(
 
         val taskId = task.taskId
 
-        return if (task is OneTimeChatTask<*>) {
+        return if (task is AbstractChatTask<*>) {
             val sessionId = requireSessionId()
 
             logger.info("Executing OneTimeChatTask-[${taskId}], allocated node: [${availableNode.nodeName}], sessionId: [${sessionId}], options: [${task.options.toJSONString()}]")
@@ -41,8 +39,14 @@ class TaskDispatcher(
             val message = MessageChainBuilder {
                 // Random sessionId
                 this.sessionId(sessionId)
-                // No streaming
-                this.streamId(null)
+
+                if (task is StreamChatTask<*>) {
+                    // Enable streaming
+                    this.streamId()
+                } else {
+                    // No streaming
+                    this.streamId(null)
+                }
 
                 // Add OllamaChatOptions is non-null
                 task.options?.let {
