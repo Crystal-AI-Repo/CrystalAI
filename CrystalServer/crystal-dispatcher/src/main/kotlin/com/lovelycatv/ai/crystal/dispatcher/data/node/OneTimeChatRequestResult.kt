@@ -1,6 +1,6 @@
 package com.lovelycatv.ai.crystal.dispatcher.data.node
 
-import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
 
 /**
  * @author lovelycat
@@ -11,5 +11,5 @@ data class OneTimeChatRequestResult(
     val isRequestSent: Boolean,
     val isSuccess: Boolean,
     val message: String = "",
-    val results: List<OllamaChatResponseMessage> = listOf()
+    val results: List<ChatResponseMessage> = listOf()
 )

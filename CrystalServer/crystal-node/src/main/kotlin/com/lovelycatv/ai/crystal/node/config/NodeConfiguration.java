@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 public class NodeConfiguration {
     private NodeDispatcherConfiguration dispatcher = new NodeDispatcherConfiguration();
     private NodeOllamaConfiguration ollama = new NodeOllamaConfiguration();
+    private NodeDeepSeekConfiguration deepseek = new NodeDeepSeekConfiguration();
 
     private boolean ssl = false;
 
@@ -46,6 +47,10 @@ public class NodeConfiguration {
         return ollama;
     }
 
+    public NodeDeepSeekConfiguration getDeepseek() {
+        return deepseek;
+    }
+
     public boolean isSsl() {
         return ssl;
     }
@@ -60,6 +65,10 @@ public class NodeConfiguration {
 
     public void setOllama(NodeOllamaConfiguration ollama) {
         this.ollama = ollama;
+    }
+
+    public void setDeepseek(NodeDeepSeekConfiguration deepseek) {
+        this.deepseek = deepseek;
     }
 
     public void setSsl(boolean ssl) {

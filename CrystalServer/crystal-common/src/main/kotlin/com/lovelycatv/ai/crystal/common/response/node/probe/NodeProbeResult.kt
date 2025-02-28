@@ -2,6 +2,7 @@ package com.lovelycatv.ai.crystal.common.response.node.probe
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.lovelycatv.ai.crystal.common.response.deepseek.DeepSeekModelResults
 import com.lovelycatv.ai.crystal.common.response.ollama.OllamaModelMeta
 
 /**
@@ -19,5 +20,7 @@ data class NodeProbeResult @JsonCreator constructor(
     @JsonProperty("ssl")
     val ssl: Boolean,
     @JsonProperty("ollamaModels")
-    val ollamaModels: List<OllamaModelMeta>
+    val ollamaModels: List<OllamaModelMeta>,
+    @JsonProperty("deepseekModels")
+    val deepseekModels: List<DeepSeekModelResults.DeepSeekModelMeta>
 )

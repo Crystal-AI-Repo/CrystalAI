@@ -1,7 +1,7 @@
-package com.lovelycatv.ai.crystal.node.service.impl
+package com.lovelycatv.ai.crystal.node.service.chat
 
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
-import com.lovelycatv.ai.crystal.node.service.OllamaChatService
 import org.springframework.ai.ollama.OllamaChatModel
 import org.springframework.ai.ollama.api.OllamaApi
 import org.springframework.ai.ollama.api.OllamaOptions
@@ -32,4 +32,14 @@ class OllamaChatServiceImpl(
             .build()
     }
 
+    override fun applyOptionsToSpringAIModelOptions(customOptions: OllamaChatOptions?): OllamaOptions {
+        return OllamaOptions.builder().apply {
+            customOptions?.modelName?.let {
+                this.model(it)
+            }
+            customOptions?.temperature.let {
+                this.temperature(it)
+            }
+        }.build()
+    }
 }

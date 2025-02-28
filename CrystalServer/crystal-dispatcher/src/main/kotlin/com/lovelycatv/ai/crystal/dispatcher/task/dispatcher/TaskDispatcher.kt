@@ -3,6 +3,7 @@ package com.lovelycatv.ai.crystal.dispatcher.task.dispatcher
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
 import com.lovelycatv.ai.crystal.common.netty.sendMessage
 import com.lovelycatv.ai.crystal.common.util.logger
+import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
 import com.lovelycatv.ai.crystal.dispatcher.task.AbstractTask
 import com.lovelycatv.ai.crystal.dispatcher.task.OneTimeChatTask
@@ -23,14 +24,19 @@ class TaskDispatcher(
     private val logger = logger()
 
     override suspend fun performTask(task: AbstractTask): TaskPerformResult<String>? {
-        val availableNode = requireAvailableNode() ?: return null
+        val availableNode = requireAvailableNode()
+
+        if (availableNode == null) {
+            logger.error("No available node for task: ${task.taskId}")
+            return null
+        }
 
         val taskId = task.taskId
 
-        return if (task is OneTimeChatTask) {
+        return if (task is OneTimeChatTask<*>) {
             val sessionId = requireSessionId()
 
-            logger.info("Executing OneTimeChatTask-[${taskId}], allocated node: [${availableNode.nodeName}], sessionId: [${sessionId}]")
+            logger.info("Executing OneTimeChatTask-[${taskId}], allocated node: [${availableNode.nodeName}], sessionId: [${sessionId}], options: [${task.options.toJSONString()}]")
 
             val message = MessageChainBuilder {
                 // Random sessionId

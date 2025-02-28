@@ -3,13 +3,13 @@ package com.lovelycatv.ai.crystal.node.netty
 import com.lovelycatv.ai.crystal.common.netty.codec.FrameDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainEncoder
+import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
 import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.exception.InvalidNodeIdException
 import com.lovelycatv.ai.crystal.node.netty.handler.NettyAuthorizationHandler
-import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
-import com.lovelycatv.ai.crystal.node.netty.handler.NettyOllamaChatMessageHandler
-import com.lovelycatv.ai.crystal.node.queue.OllamaTaskQueue
+import com.lovelycatv.ai.crystal.node.netty.handler.NettyChatMessageHandler
+import com.lovelycatv.ai.crystal.node.queue.DefaultChatTaskQueue
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.nio.NioEventLoopGroup
@@ -27,7 +27,7 @@ class NodeNettyClient(
     @Value("\${spring.application.name}")
     private val applicationName: String,
     private val nodeConfiguration: NodeConfiguration,
-    private val ollamaTaskQueue: OllamaTaskQueue
+    private val chatTaskQueue: DefaultChatTaskQueue
 ) : AbstractNodeNettyClient(applicationName) {
     /**
      * Customize the client bootstrap
@@ -55,8 +55,8 @@ class NodeNettyClient(
                         )
                     )
                     ch.pipeline().addLast(
-                        NettyOllamaChatMessageHandler(
-                            ollamaTaskQueue = ollamaTaskQueue,
+                        NettyChatMessageHandler(
+                            chatTaskQueue = chatTaskQueue,
                             nodeConfiguration = nodeConfiguration
                         )
                     )

@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.dispatcher.service
 
-import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
 import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
 
@@ -9,7 +10,7 @@ import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
  * @since 2025-02-27 00:19
  * @version 1.0
  */
-interface OllamaChatService {
+interface ChatService<OPTIONS: AbstractChatOptions> {
     /**
      * Send a chat request, and the response is given after the node has completely finished generating the text.
      *
@@ -20,7 +21,7 @@ interface OllamaChatService {
      * @return [OneTimeChatRequestResult]
      */
     suspend fun sendOneTimeChatTask(
-        options: OllamaChatOptions?,
+        options: OPTIONS?,
         messages: List<PromptMessage>,
         ignoreResult: Boolean,
         timeout: Long

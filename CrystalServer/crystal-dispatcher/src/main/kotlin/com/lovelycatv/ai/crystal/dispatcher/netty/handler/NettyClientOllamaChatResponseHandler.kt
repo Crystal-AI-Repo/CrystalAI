@@ -1,9 +1,8 @@
 package com.lovelycatv.ai.crystal.dispatcher.netty.handler
 
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
-import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.util.logger
-import com.lovelycatv.ai.crystal.common.util.toJSONString
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 
@@ -13,10 +12,8 @@ import io.netty.channel.SimpleChannelInboundHandler
  * @version 1.0
  */
 class NettyClientOllamaChatResponseHandler(
-    private val onResponseReceived: (MessageChain, OllamaChatResponseMessage) -> Unit
+    private val onResponseReceived: (MessageChain, ChatResponseMessage) -> Unit
 ) : SimpleChannelInboundHandler<MessageChain>() {
-    private val log = this.logger()
-
     /**
      * Is called for each message of type [I].
      *
@@ -26,7 +23,7 @@ class NettyClientOllamaChatResponseHandler(
      * @throws Exception    is thrown if an error occurred
      */
     override fun channelRead0(ctx: ChannelHandlerContext, msg: MessageChain) {
-        val filteredMessage = msg.messages.filterIsInstance<OllamaChatResponseMessage>()
+        val filteredMessage = msg.messages.filterIsInstance<ChatResponseMessage>()
         if (filteredMessage.isEmpty()) {
             ctx.fireChannelRead(msg)
         } else {

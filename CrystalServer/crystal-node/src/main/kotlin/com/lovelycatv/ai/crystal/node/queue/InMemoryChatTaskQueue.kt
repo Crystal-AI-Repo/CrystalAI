@@ -1,7 +1,8 @@
 package com.lovelycatv.ai.crystal.node.queue
 
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
 import com.lovelycatv.ai.crystal.node.Global
-import com.lovelycatv.ai.crystal.node.data.OllamaTask
+import com.lovelycatv.ai.crystal.node.data.ChatTask
 import java.util.concurrent.PriorityBlockingQueue
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
@@ -12,32 +13,32 @@ import kotlin.concurrent.withLock
  * @since 2025-02-26 21:30
  * @version 1.0
  */
-class InMemoryOllamaTaskQueue(
+class InMemoryChatTaskQueue(
     initialCapacity: Int = 16
-) : PriorityBlockingQueue<OllamaTask>(initialCapacity), OllamaTaskQueue {
+) : PriorityBlockingQueue<ChatTask<out AbstractChatOptions>>(initialCapacity), DefaultChatTaskQueue {
     private val currentCapacity = AtomicInteger(initialCapacity)
 
     // For capacity expanding or pop process
     private val lock = ReentrantLock()
 
-    override fun put(e: OllamaTask) {
+    override fun put(e: ChatTask<out AbstractChatOptions>) {
         this.submitTask(e)
     }
 
-    override fun take(): OllamaTask {
+    override fun take(): ChatTask<out AbstractChatOptions> {
         throw IllegalAccessException("Please use the OllamaTaskQueue\$requireTask()")
     }
 
-    override fun poll(): OllamaTask? {
+    override fun poll(): ChatTask<out AbstractChatOptions>? {
         return this.requireTask()
     }
 
     /**
      * Submit tasks to the queue
      *
-     * @param task [OllamaTask]
+     * @param task [ChatTask]
      */
-    override fun submitTask(task: OllamaTask) {
+    override fun submitTask(task: ChatTask<out AbstractChatOptions>) {
         lock.withLock {
             if (super.size >= currentCapacity.get()) {
                 this.expandQueue()
@@ -51,11 +52,11 @@ class InMemoryOllamaTaskQueue(
      * call this method will lock the ollama task running status.
      * (Only when the lock is available and queue is not empty)
      *
-     * @return [OllamaTask]
+     * @return [ChatTask]
      */
-    override fun requireTask(): OllamaTask? {
+    override fun requireTask(): ChatTask<out AbstractChatOptions>? {
         lock.withLock {
-            val peek: OllamaTask? = super.peek()
+            val peek: ChatTask<out AbstractChatOptions>? = super.peek()
             return if (peek != null) {
                 // The next task is existing
                 if (Global.lockOllamaRunningStatus(peek.requesterSessionId, peek.expireTime)) {

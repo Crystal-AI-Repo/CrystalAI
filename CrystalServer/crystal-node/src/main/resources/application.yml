@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: CrystalNode1
+  ai:
+    openai:
+      api-key: OpenAI-Api-Key
 
 management:
   endpoint:
@@ -25,6 +28,7 @@ crystal:
     port: 5210
     ssl: false
   ollama:
+    enabled: true
     host: localhost
     port: 11434
     # Enable SSL
@@ -32,3 +36,12 @@ crystal:
     default-model: gemma2:27b
     default-temperature: 0.05
     max-execution-time-millis: 16000
+  deepseek:
+    enabled: true
+    host: api.deepseek.com
+    port: 80
+    # Enable SSL
+    ssl: true
+    api-key: ${DEEPSEEK_API_KEY}
+    default-model: deepseek-chat
+    default-temperature: 0.1

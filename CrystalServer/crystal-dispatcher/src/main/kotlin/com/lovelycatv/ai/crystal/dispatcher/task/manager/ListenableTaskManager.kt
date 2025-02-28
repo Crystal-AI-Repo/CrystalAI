@@ -2,7 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.task.manager
 
 import com.lovelycatv.ai.crystal.common.annotations.CallSuper
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
-import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
@@ -79,7 +79,7 @@ abstract class ListenableTaskManager(
     }
 
     @CallSuper
-    override fun onMessageReceived(messageChain: MessageChain, ollamaChatResponseMessage: OllamaChatResponseMessage) {
+    override fun onMessageReceived(messageChain: MessageChain, chatResponseMessage: ChatResponseMessage) {
         val sessionId = messageChain.sessionId
 
         val sessionContainer = super.getSession(sessionId)
@@ -87,23 +87,27 @@ abstract class ListenableTaskManager(
         if (sessionContainer != null) {
             if (sessionContainer.checkAndSetTimeout()) {
                 this.dispatchSubscriptions(sessionId, sessionContainer)
-                super.removeSession(sessionId)
-                this.unsubscribeAll(sessionId)
-                logger.warn("Session [${sessionId}] timeout, expected: ${sessionContainer.timeout}ms, received: ${ollamaChatResponseMessage.toJSONString()}")
-            } else if (ollamaChatResponseMessage.isFinished()) {
-                sessionContainer.addReceivedMessage(ollamaChatResponseMessage)
+                this.removeSession(sessionId)
+                logger.warn("Session [${sessionId}] timeout, expected: ${sessionContainer.timeout}ms, received: ${chatResponseMessage.toJSONString()}")
+            } else if (chatResponseMessage.isFinished()) {
+                sessionContainer.addReceivedMessage(chatResponseMessage)
                 sessionContainer.setFinished()
                 this.dispatchSubscriptions(sessionId, sessionContainer)
-                super.removeSession(sessionId)
-                this.unsubscribeAll(sessionId)
+                this.removeSession(sessionId)
                 logger.info("Session [${sessionId}] finished")
             } else {
                 super.updateSession(sessionId = messageChain.sessionId) {
                     this.apply {
-                        this.addReceivedMessage(ollamaChatResponseMessage)
+                        // This function will detect whether the response is marked success and update container status automatically
+                        this.addReceivedMessage(chatResponseMessage)
                     }
                 }
                 this.dispatchSubscriptions(sessionId, sessionContainer)
+
+                if (!chatResponseMessage.success) {
+                    this.removeSession(sessionId)
+                    logger.warn("Session [${sessionId}] received failure message: ${chatResponseMessage.toJSONString()}")
+                }
             }
         } else {
             this.dispatchSubscriptions(sessionId, null)
@@ -127,9 +131,7 @@ abstract class ListenableTaskManager(
         val sessionContainer = super.getSession(sessionId) ?: return
 
         when (container.status.get()) {
-            ChatRequestSessionContainer.Status.PREPARED -> {
-
-            }
+            ChatRequestSessionContainer.Status.PREPARED -> {}
             ChatRequestSessionContainer.Status.RECEIVING -> {
                 val received = sessionContainer.recentReceived()!!
 
@@ -138,20 +140,21 @@ abstract class ListenableTaskManager(
                     .forEach {
                         it.onReceived(sessionContainer, received)
                     }
-
-                if (!received.success) {
-                    subscribers
-                        .filterIsInstance<OnFailedSubscriber>()
-                        .forEach {
-                            it.onFailed(sessionContainer, received)
-                        }
-                }
             }
             ChatRequestSessionContainer.Status.FINISHED -> {
                 subscribers
                     .filterIsInstance<OnFinishedSubscriber>()
                     .forEach {
                         it.onFinished(sessionContainer)
+                    }
+            }
+            ChatRequestSessionContainer.Status.FAILED -> {
+                val received = sessionContainer.recentReceived()!!
+
+                subscribers
+                    .filterIsInstance<OnFailedSubscriber>()
+                    .forEach {
+                        it.onFailed(sessionContainer, received)
                     }
             }
             ChatRequestSessionContainer.Status.TIMEOUT -> {
@@ -164,12 +167,18 @@ abstract class ListenableTaskManager(
         }
     }
 
+    @CallSuper
+    override fun removeSession(sessionId: String) {
+        super.removeSession(sessionId)
+        this.unsubscribeAll(sessionId)
+    }
+
     interface Subscriber
 
     interface SimpleSubscriber : OnReceivedSubscriber, OnFinishedSubscriber, OnFailedSubscriber
 
     fun interface OnReceivedSubscriber : Subscriber {
-        fun onReceived(container: ChatRequestSessionContainer, message: OllamaChatResponseMessage)
+        fun onReceived(container: ChatRequestSessionContainer, message: ChatResponseMessage)
     }
 
     fun interface OnFinishedSubscriber : Subscriber {
@@ -177,7 +186,7 @@ abstract class ListenableTaskManager(
     }
 
     fun interface OnFailedSubscriber : Subscriber {
-        fun onFailed(container: ChatRequestSessionContainer?, failedMessage: OllamaChatResponseMessage?)
+        fun onFailed(container: ChatRequestSessionContainer?, failedMessage: ChatResponseMessage?)
     }
 
     fun interface OnTimeoutSubscriber : Subscriber {

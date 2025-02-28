@@ -1,7 +1,8 @@
 package com.lovelycatv.ai.crystal.dispatcher.service
 
-import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
@@ -21,10 +22,10 @@ import kotlin.coroutines.suspendCoroutine
  * @version 1.0
  */
 @Service
-class OllamaChatServiceImpl(
+class ChatServiceImpl(
     private val taskDispatcher: TaskDispatcher,
     private val taskManager: TaskManager
-) : OllamaChatService {
+) : DefaultChatService {
     private val logger = logger()
 
     /**
@@ -37,7 +38,7 @@ class OllamaChatServiceImpl(
      * @return [OneTimeChatRequestResult]
      */
     override suspend fun sendOneTimeChatTask(
-        options: OllamaChatOptions?,
+        options: AbstractChatOptions?,
         messages: List<PromptMessage>,
         ignoreResult: Boolean,
         timeout: Long
@@ -51,7 +52,7 @@ class OllamaChatServiceImpl(
                     if (!ignoreResult) {
                         return suspendCoroutine { continuation ->
                             taskManager.subscribe(sessionId, object : ListenableTaskManager.SimpleSubscriber {
-                                override fun onReceived(container: ChatRequestSessionContainer, message: OllamaChatResponseMessage) {}
+                                override fun onReceived(container: ChatRequestSessionContainer, message: ChatResponseMessage) {}
 
                                 override fun onFinished(container: ChatRequestSessionContainer) {
                                     continuation.resume(OneTimeChatRequestResult(
@@ -62,7 +63,7 @@ class OllamaChatServiceImpl(
                                     ))
                                 }
 
-                                override fun onFailed(container: ChatRequestSessionContainer?, failedMessage: OllamaChatResponseMessage?) {
+                                override fun onFailed(container: ChatRequestSessionContainer?, failedMessage: ChatResponseMessage?) {
                                     continuation.resume(OneTimeChatRequestResult(
                                         isRequestSent = true,
                                         isSuccess = false,

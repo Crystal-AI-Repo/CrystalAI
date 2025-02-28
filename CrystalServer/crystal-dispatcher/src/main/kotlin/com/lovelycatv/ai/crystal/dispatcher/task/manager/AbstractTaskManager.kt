@@ -2,7 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.task.manager
 
 import com.lovelycatv.ai.crystal.common.annotations.CallSuper
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
-import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.exception.DuplicateSessionIdException
@@ -51,7 +51,7 @@ abstract class AbstractTaskManager(
         return updateSession(this.getSession(sessionId), fx)
     }
 
-    protected fun updateSession(session: ChatRequestSessionContainer?, fx: ChatRequestSessionContainer.() -> ChatRequestSessionContainer): Boolean {
+    private fun updateSession(session: ChatRequestSessionContainer?, fx: ChatRequestSessionContainer.() -> ChatRequestSessionContainer): Boolean {
         return if (session != null) {
             this.sessionResponseMap[session.originalMessageChain.sessionId] = fx.invoke(session)
             true
@@ -60,9 +60,10 @@ abstract class AbstractTaskManager(
         }
     }
 
-    protected fun removeSession(sessionId: String) {
+    @CallSuper
+    protected open fun removeSession(sessionId: String) {
         this.sessionResponseMap.remove(sessionId)
     }
 
-    abstract fun onMessageReceived(messageChain: MessageChain, ollamaChatResponseMessage: OllamaChatResponseMessage)
+    abstract fun onMessageReceived(messageChain: MessageChain, chatResponseMessage: ChatResponseMessage)
 }

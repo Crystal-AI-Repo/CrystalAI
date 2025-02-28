@@ -3,7 +3,9 @@ package com.lovelycatv.ai.crystal.node.controller.v1
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.NODE_INFO
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.MAPPING
 import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_VERSION_1
+import com.lovelycatv.ai.crystal.common.client.DeepSeekClient
 import com.lovelycatv.ai.crystal.common.client.OllamaClient
+import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.response.node.probe.NodeProbeResult
 import com.lovelycatv.ai.crystal.node.config.NetworkConfig
@@ -25,7 +27,8 @@ class ProbeControllerV1(
     private val applicationName: String,
     private val networkConfig: NetworkConfig,
     private val nodeConfiguration: NodeConfiguration,
-    private val ollamaFeignClient: OllamaClient
+    private val ollamaFeignClient: OllamaClient,
+    private val deepSeekFeignClient: DeepSeekClient
 ) : IProbeControllerV1 {
     @GetMapping(NODE_INFO)
     override fun nodeInfo(): Result<NodeProbeResult> {
@@ -36,7 +39,14 @@ class ProbeControllerV1(
                 networkConfig.localIpAddress(),
                 networkConfig.applicationPort,
                 nodeConfiguration.isSsl,
-                ollamaModels = ollamaFeignClient.getOllamaModels().models
+                ollamaModels = (if (nodeConfiguration.ollama.isEnabled)
+                    ollamaFeignClient.safeRequest { getOllamaModels().models }
+                else
+                    null) ?: emptyList(),
+                deepseekModels = (if (nodeConfiguration.deepseek.isEnabled)
+                    deepSeekFeignClient.safeRequest { getModels("Bearer " + nodeConfiguration.deepseek.apiKey).data }
+                else
+                    null) ?: emptyList()
             )
         )
     }

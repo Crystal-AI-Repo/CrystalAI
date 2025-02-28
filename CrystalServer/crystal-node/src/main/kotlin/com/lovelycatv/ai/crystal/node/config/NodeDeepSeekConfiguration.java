@@ -9,23 +9,24 @@ import org.springframework.context.annotation.Configuration;
  * @since 2025-02-15 17:59
  */
 @Configuration
-@ConfigurationProperties(prefix = "crystal.ollama")
-public class NodeOllamaConfiguration {
+@ConfigurationProperties(prefix = "crystal.deepseek")
+public class NodeDeepSeekConfiguration {
     private boolean enabled = false;
-    private String host = "localhost";
-    private int port = 11434;
-    private boolean ssl = false;
-    private String defaultModel = "gemma2:9b";
-    private double defaultTemperature = 0.5;
+    private String host = "https://api.deepseek.com";
+    private int port = 80;
+    private boolean ssl = true;
+    private String apiKey = "";
+    private String defaultModel = "deepseek-chat";
+    private double defaultTemperature = 0.1;
 
     private long maxExecutionTimeMillis = 16000;
 
-    public boolean isEnabled() {
-        return enabled;
+    public String getBaseUrl() {
+        return (this.ssl ? "https" : "http") + "://" + host + ((port != 80 && port != 443) ? (":" + port) : "");
     }
 
-    public String getBaseUrl() {
-        return (this.ssl ? "https" : "http") + "://" + host + ":" + port;
+    public boolean isEnabled() {
+        return enabled;
     }
 
     public String getHost() {
@@ -40,6 +41,10 @@ public class NodeOllamaConfiguration {
         return port;
     }
 
+    public String getApiKey() {
+        return apiKey;
+    }
+
     public String getDefaultModel() {
         return defaultModel;
     }
@@ -51,6 +56,7 @@ public class NodeOllamaConfiguration {
     public long getMaxExecutionTimeMillis() {
         return maxExecutionTimeMillis;
     }
+
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
@@ -66,6 +72,10 @@ public class NodeOllamaConfiguration {
 
     public void setSsl(boolean ssl) {
         this.ssl = ssl;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public void setDefaultModel(String defaultModel) {

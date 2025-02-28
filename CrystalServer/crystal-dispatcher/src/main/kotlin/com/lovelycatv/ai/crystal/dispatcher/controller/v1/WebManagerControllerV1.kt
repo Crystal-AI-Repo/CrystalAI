@@ -4,13 +4,14 @@ import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManage
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.MAPPING
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.TEST_SEND_ONE_TIME_OLLAMA_CHAT
 import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_VERSION_1
-import com.lovelycatv.ai.crystal.common.data.message.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.DeepSeekChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.dispatcher.data.node.OneTimeChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.service.NodeManagerService
-import com.lovelycatv.ai.crystal.dispatcher.service.OllamaChatService
+import com.lovelycatv.ai.crystal.dispatcher.service.DefaultChatService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(API_PREFIX_VERSION_1 + MAPPING)
 class WebManagerControllerV1(
     private val nodeManagerService: NodeManagerService,
-    private val ollamaChatService: OllamaChatService
+    private val chatService: DefaultChatService
 ) : IWebManagerControllerV1 {
     @GetMapping(TEST_SEND_ONE_TIME_OLLAMA_CHAT)
     override suspend fun testSendOneTimeChatTask(
@@ -33,8 +34,14 @@ class WebManagerControllerV1(
         waitForResult: Boolean,
         timeout: Long
     ): Result<OneTimeChatRequestResult> {
-        val result = ollamaChatService.sendOneTimeChatTask(
-            options = OllamaChatOptions(modelName = model, temperature = null),
+        val (platformName, modelName) = model.split("@")
+
+        val result = chatService.sendOneTimeChatTask(
+            options = when (platformName.lowercase()) {
+                "ollama" -> OllamaChatOptions(modelName = modelName, temperature = null)
+                "deepseek" -> DeepSeekChatOptions(modelName = modelName, temperature = null)
+                else -> throw IllegalStateException("$platformName is not supported yet.")
+            },
             messages = listOf(
                 PromptMessage(
                     role = PromptMessage.Role.USER,
@@ -48,7 +55,7 @@ class WebManagerControllerV1(
         return if (result.isRequestSent) {
             Result.success("", result)
         } else {
-            Result.badRequest("", result)
+            Result.badRequest("Could not send request to node", result)
         }
     }
 

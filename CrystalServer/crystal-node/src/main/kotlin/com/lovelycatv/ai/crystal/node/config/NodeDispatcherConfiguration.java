@@ -16,7 +16,7 @@ public class NodeDispatcherConfiguration {
     public boolean ssl = false;
 
     public String getBaseUrl() {
-        return (this.ssl ? "https" : "http") + "://" + host + ":" + port;
+        return (this.ssl ? "https" : "http") + "://" + host + ((port != 80 && port != 443) ? (":" + port) : "");
     }
 
     public String getHost() {
