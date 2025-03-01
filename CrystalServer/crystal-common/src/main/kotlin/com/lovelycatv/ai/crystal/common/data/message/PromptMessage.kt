@@ -1,9 +1,8 @@
-package com.lovelycatv.ai.crystal.common.data.message.chat
+package com.lovelycatv.ai.crystal.common.data.message
 
 import com.alibaba.fastjson2.annotation.JSONField
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonTypeName
-import com.lovelycatv.ai.crystal.common.data.message.AbstractMessage
 import org.springframework.core.io.Resource
 
 /**
@@ -69,6 +68,10 @@ data class PromptMessage @JsonCreator constructor(
                 return Content(type = Type.IMAGE, content = resource)
             }
         }
+
+        fun stringContent() = this.content as String
+
+        fun resourceContent() = this.content as Resource
 
         enum class Type {
             TEXT,

@@ -1,8 +1,8 @@
 package com.lovelycatv.ai.crystal.dispatcher.task.dispatcher
 
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.DeepSeekChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.netty.sendMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString

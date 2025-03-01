@@ -1,12 +1,13 @@
 package com.lovelycatv.ai.crystal.node.service.chat.base
 
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.util.divide
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.node.data.PackagedChatServiceResult
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedMessageContentType
+import com.lovelycatv.ai.crystal.node.interfaces.model.base.ChatOptions2SpringAIOptionsTranslator
 import org.springframework.ai.chat.messages.AssistantMessage
 import org.springframework.ai.chat.messages.SystemMessage
 import org.springframework.ai.chat.messages.UserMessage
@@ -27,13 +28,14 @@ import java.net.URL
  * @version 1.0
  */
 abstract class AbstractSpringAIChatService<CHAT_MODEL: ChatModel, MODEL_OPTIONS: ChatOptions, OPTIONS: AbstractChatOptions>(
-    private var defaultChatModel: CHAT_MODEL? = null
-) : AbstractChatService<OPTIONS, ChatResponse, Flux<ChatResponse>>() {
+    private var defaultChatModel: CHAT_MODEL? = null,
+    private val translatorDelegate: ChatOptions2SpringAIOptionsTranslator<OPTIONS, MODEL_OPTIONS>
+) : AbstractChatService<OPTIONS, ChatResponse, Flux<ChatResponse>>(),
+    ChatOptions2SpringAIOptionsTranslator<OPTIONS, MODEL_OPTIONS> by translatorDelegate
+{
     private val logger = logger()
 
     abstract fun buildChatModel(): CHAT_MODEL
-
-    abstract fun applyOptionsToSpringAIModelOptions(customOptions: OPTIONS?): MODEL_OPTIONS
 
     override fun streamGenerateImpl(
         stream: Flux<ChatResponse>,
@@ -89,7 +91,7 @@ abstract class AbstractSpringAIChatService<CHAT_MODEL: ChatModel, MODEL_OPTIONS:
             }
         }
 
-        val builtOptions = if (options != null) applyOptionsToSpringAIModelOptions(options) else null
+        val builtOptions = if (options != null) translate(options) else null
 
         val prompt = if (builtOptions != null) {
             Prompt(builtPrompt, builtOptions)

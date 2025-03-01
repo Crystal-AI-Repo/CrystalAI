@@ -28,10 +28,16 @@ export default {
                 values: {
                     secondsAgo: '{p0} 秒前',
                     ollamaModels: 'Ollama 模型',
+                    deepseekModels: 'DeepSeek 模型',
                     disconnected: '未连接',
                     online: '在线',
                     offline: '离线'
                 }
+            }
+        },
+        nodeDetails: {
+            message: {
+                couldNotFetchNodeDetails: '无法获取节点详情'
             }
         }
     }

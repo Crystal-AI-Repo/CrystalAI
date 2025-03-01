@@ -1,6 +1,6 @@
 package com.lovelycatv.ai.crystal.dispatcher.response
 
-import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 
 /**
  * @author lovelycat

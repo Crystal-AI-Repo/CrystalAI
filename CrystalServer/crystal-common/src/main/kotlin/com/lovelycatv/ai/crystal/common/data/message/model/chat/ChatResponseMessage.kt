@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.common.data.message.chat
+package com.lovelycatv.ai.crystal.common.data.message.model.chat
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore

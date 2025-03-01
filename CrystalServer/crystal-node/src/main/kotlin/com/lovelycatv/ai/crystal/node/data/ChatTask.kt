@@ -2,10 +2,10 @@ package com.lovelycatv.ai.crystal.node.data
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.DeepSeekChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import kotlin.reflect.KClass
 
 /**

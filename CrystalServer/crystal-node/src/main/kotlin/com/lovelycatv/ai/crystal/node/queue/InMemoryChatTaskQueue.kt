@@ -1,6 +1,6 @@
 package com.lovelycatv.ai.crystal.node.queue
 
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.data.ChatTask
 import java.util.concurrent.PriorityBlockingQueue

@@ -1,8 +1,7 @@
 package com.lovelycatv.ai.crystal.dispatcher.netty.handler
 
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
-import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
-import com.lovelycatv.ai.crystal.common.util.logger
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 

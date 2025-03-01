@@ -1,15 +1,16 @@
 package com.lovelycatv.ai.crystal.dispatcher.controller.v1
 
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.GET_NODE_BY_ID
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.LIST_NODES
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.MAPPING
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.TEST_SEND_ONE_TIME_OLLAMA_CHAT
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.WebManagerController.TEST_SEND_STREAM_OLLAMA_CHAT
 import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_VERSION_1
-import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.DeepSeekChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
@@ -18,12 +19,12 @@ import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.response.StreamChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.service.NodeManagerService
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultChatService
-import com.lovelycatv.ai.crystal.dispatcher.task.manager.AbstractTaskManager
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.ListenableTaskManager
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
 import kotlinx.coroutines.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -104,6 +105,17 @@ class WebManagerControllerV1(
     @GetMapping(LIST_NODES)
     override fun listAllNodes(): Result<List<RegisteredNode>> {
         return Result.success("", nodeManagerService.listAllNodes())
+    }
+
+    /**
+     * Get registered node by id
+     *
+     * @param nodeId nodeId
+     * @return [RegisteredNode]?
+     */
+    @GetMapping(GET_NODE_BY_ID)
+    override fun getNodeById(@RequestParam("nodeId") nodeId: String): Result<RegisteredNode?> {
+        return Result.success("", nodeManagerService.listAllNodes().find { it.nodeId == nodeId })
     }
 
     private fun buildOptions(model: String): AbstractChatOptions {

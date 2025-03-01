@@ -1,9 +1,9 @@
 package com.lovelycatv.ai.crystal.dispatcher.service
 
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
-import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer

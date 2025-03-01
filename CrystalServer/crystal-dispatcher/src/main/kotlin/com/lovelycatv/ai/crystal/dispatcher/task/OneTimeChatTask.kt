@@ -1,7 +1,7 @@
 package com.lovelycatv.ai.crystal.dispatcher.task
 
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import java.util.UUID
 
 /**

@@ -28,10 +28,16 @@ export default {
                 values: {
                     secondsAgo: '{p0}s ago',
                     ollamaModels: 'Ollama Models',
+                    deepseekModels: 'DeepSeek Models',
                     disconnected: 'Disconnected',
                     online: 'Online',
                     offline: 'Offline'
                 }
+            }
+        },
+        nodeDetails: {
+            message: {
+                couldNotFetchNodeDetails: 'Could not fetch node details'
             }
         }
     }

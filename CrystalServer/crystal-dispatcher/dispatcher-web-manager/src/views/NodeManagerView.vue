@@ -48,6 +48,7 @@ refreshData()
       <el-table-column type="expand">
         <template #default="props">
           <div class="node-table-row-sub-container">
+            <!-- Ollama Models -->
             <p class="font-size-1-05rem">{{ t('page.nodeManager.table.values.ollamaModels') }}</p>
             <el-table :data="props.row.ollamaModels" style="width: 100%">
               <!-- Model Display Name -->
@@ -92,6 +93,12 @@ refreshData()
                 </template>
               </el-table-column>
             </el-table>
+
+            <!-- DeepSeek Models -->
+            <p class="font-size-1-05rem">{{ t('page.nodeManager.table.values.deepseekModels') }}</p>
+            <el-table :data="props.row.deepseekModels" style="width: 100%">
+              <el-table-column :label="t('page.nodeManager.table.headers.qualifiedModelName')" prop="id" />
+            </el-table>
           </div>
         </template>
       </el-table-column>
@@ -99,7 +106,11 @@ refreshData()
       <!-- Node Id -->
       <el-table-column prop="nodeId" :label="t('page.nodeManager.table.headers.nodeId')" width="180" />
       <!-- Node Name -->
-      <el-table-column prop="nodeName" :label="t('page.nodeManager.table.headers.nodeName')" />
+      <el-table-column :label="t('page.nodeManager.table.headers.nodeName')">
+        <template #default="scope">
+          <el-link :href="`/node/${scope.row.nodeId}`" target="_self">{{ scope.row.nodeName }}</el-link>
+        </template>
+      </el-table-column>
       <!-- Node Address -->
       <el-table-column :label="t('page.nodeManager.table.headers.nodeAddress')">
         <template #default="scope">

@@ -2,10 +2,10 @@ package com.lovelycatv.ai.crystal.node.cron
 
 import com.lovelycatv.ai.crystal.common.GlobalConstants
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
-import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.AbstractChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.DeepSeekChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.chat.options.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.data.ChatTask

@@ -3,7 +3,7 @@ package com.lovelycatv.ai.crystal.dispatcher.data.node
 import com.lovelycatv.ai.crystal.common.data.LiveData
 import com.lovelycatv.ai.crystal.common.data.MutableLiveData
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
-import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 
 /**
  * @author lovelycat

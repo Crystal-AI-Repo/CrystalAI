@@ -24,6 +24,7 @@ object GlobalConstants {
             object WebManagerController {
                 const val MAPPING = "/web-manager"
                 const val LIST_NODES = "/listNodes"
+                const val GET_NODE_BY_ID = "/getNodeById"
 
                 // Test functions
                 const val TEST_SEND_ONE_TIME_OLLAMA_CHAT = "/test/sendOneTimeOllamaChat"

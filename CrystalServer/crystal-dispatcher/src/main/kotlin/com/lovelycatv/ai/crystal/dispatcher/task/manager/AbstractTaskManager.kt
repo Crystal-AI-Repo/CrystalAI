@@ -2,7 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.task.manager
 
 import com.lovelycatv.ai.crystal.common.annotations.CallSuper
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
-import com.lovelycatv.ai.crystal.common.data.message.chat.ChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
 import com.lovelycatv.ai.crystal.dispatcher.exception.DuplicateSessionIdException
