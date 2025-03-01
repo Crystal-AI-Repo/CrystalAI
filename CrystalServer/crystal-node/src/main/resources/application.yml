@@ -45,3 +45,12 @@ crystal:
     api-key: ${DEEPSEEK_API_KEY}
     default-model: deepseek-chat
     default-temperature: 0.1
+
+logging:
+  file:
+    name: logs/${spring.application.name}
+  logback:
+    rollingpolicy:
+      max-history: 31
+      max-file-size: 4GB
+      file-name-pattern: ${LOG_FILE}_%d{yyyy-MM-dd}_%i.gz

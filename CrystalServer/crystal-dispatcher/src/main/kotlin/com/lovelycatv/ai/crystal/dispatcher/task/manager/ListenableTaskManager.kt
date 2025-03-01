@@ -112,7 +112,7 @@ abstract class ListenableTaskManager(
         } else {
             this.dispatchSubscriptions(sessionId, null)
             this.unsubscribeAll(sessionId)
-            logger.warn("OllamaChatResponse received but the session: [${messageChain.sessionId}] is not found, received: ${messageChain.toJSONString()}")
+            logger.warn("OllamaChatResponse received but the session: [${messageChain.sessionId}] is not found, received: ${modelResponseMessage.toJSONString()}")
         }
     }
 

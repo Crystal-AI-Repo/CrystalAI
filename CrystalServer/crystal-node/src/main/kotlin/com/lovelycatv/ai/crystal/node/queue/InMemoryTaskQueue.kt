@@ -13,7 +13,7 @@ import kotlin.concurrent.withLock
  * @since 2025-03-01 16:51
  * @version 1.0
  */
-class InMemoryTaskQueue<TASK: AbstractTask>(
+open class InMemoryTaskQueue<TASK: AbstractTask>(
     initialCapacity: Int = 16
 ) : PriorityBlockingQueue<TASK>(initialCapacity), TaskQueue<TASK> {
     private val currentCapacity = AtomicInteger(initialCapacity)

@@ -23,3 +23,12 @@ crystal:
     secret-keys:
       - node-name: CrystalNode1
         secret-key: Q3J5c3RhbEFJTm9kZQ==
+
+logging:
+  file:
+    name: logs/${spring.application.name}
+  logback:
+    rollingpolicy:
+      max-history: 31
+      max-file-size: 4GB
+      file-name-pattern: ${LOG_FILE}_%d{yyyy-MM-dd}_%i.gz
