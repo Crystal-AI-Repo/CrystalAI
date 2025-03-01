@@ -3,6 +3,7 @@ package com.lovelycatv.ai.crystal.dispatcher.data.node
 import com.lovelycatv.ai.crystal.common.data.LiveData
 import com.lovelycatv.ai.crystal.common.data.MutableLiveData
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
+import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 
 /**
@@ -14,7 +15,7 @@ data class ChatRequestSessionContainer(
     val originalMessageChain: MessageChain,
     val nodeId: String,
     val timeout: Long,
-    private val receivedResponses: MutableList<ChatResponseMessage> = mutableListOf()
+    private val receivedResponses: MutableList<ModelResponseMessage> = mutableListOf()
 ) {
     val startedTimestamp = System.currentTimeMillis()
 
@@ -31,7 +32,7 @@ data class ChatRequestSessionContainer(
 
     val status: LiveData<Status> get() = this._status
 
-    fun getResponses(): List<ChatResponseMessage> = this.receivedResponses
+    fun getResponses(): List<ModelResponseMessage> = this.receivedResponses
 
     fun recentReceived() = this.receivedResponses.lastOrNull()
 
@@ -48,7 +49,7 @@ data class ChatRequestSessionContainer(
      *
      * @param message Received [ChatResponseMessage] from node
      */
-    fun addReceivedMessage(message: ChatResponseMessage) {
+    fun addReceivedMessage(message: ModelResponseMessage) {
         if (this._status.get() == Status.FAILED) {
             return
         }

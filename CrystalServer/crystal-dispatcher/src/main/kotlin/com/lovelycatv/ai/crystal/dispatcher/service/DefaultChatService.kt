@@ -7,4 +7,4 @@ import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOpti
  * @since 2025-02-28 18:05
  * @version 1.0
  */
-interface DefaultChatService : ChatService<AbstractChatOptions>
+abstract class DefaultChatService : ChatService<AbstractChatOptions>()

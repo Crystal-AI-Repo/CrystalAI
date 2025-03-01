@@ -12,6 +12,5 @@ import java.util.*
 class StreamChatTask<OPTIONS: AbstractChatOptions>(
     options: OPTIONS,
     prompts: List<PromptMessage>,
-    timeout: Long = 0L,
-    taskId: String = UUID.randomUUID().toString()
-) : AbstractChatTask<OPTIONS>(options, prompts, timeout, taskId)
+    timeout: Long = 0L
+) : AbstractChatTask<OPTIONS>(options, prompts, timeout)

@@ -2,7 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.task.manager
 
 import com.lovelycatv.ai.crystal.common.annotations.CallSuper
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
@@ -79,7 +79,7 @@ abstract class ListenableTaskManager(
     }
 
     @CallSuper
-    override fun onMessageReceived(messageChain: MessageChain, chatResponseMessage: ChatResponseMessage) {
+    override fun onMessageReceived(messageChain: MessageChain, modelResponseMessage: ModelResponseMessage) {
         val sessionId = messageChain.sessionId
 
         val sessionContainer = super.getSession(sessionId)
@@ -88,9 +88,9 @@ abstract class ListenableTaskManager(
             if (sessionContainer.checkAndSetTimeout()) {
                 this.dispatchSubscriptions(sessionId, sessionContainer)
                 this.removeSession(sessionId)
-                logger.warn("Session [${sessionId}] timeout, expected: ${sessionContainer.timeout}ms, received: ${chatResponseMessage.toJSONString()}")
-            } else if (chatResponseMessage.isFinished()) {
-                sessionContainer.addReceivedMessage(chatResponseMessage)
+                logger.warn("Session [${sessionId}] timeout, expected: ${sessionContainer.timeout}ms, received: ${modelResponseMessage.toJSONString()}")
+            } else if (modelResponseMessage.isFinished()) {
+                sessionContainer.addReceivedMessage(modelResponseMessage)
                 sessionContainer.setFinished()
                 this.dispatchSubscriptions(sessionId, sessionContainer)
                 this.removeSession(sessionId)
@@ -99,14 +99,14 @@ abstract class ListenableTaskManager(
                 super.updateSession(sessionId = messageChain.sessionId) {
                     this.apply {
                         // This function will detect whether the response is marked success and update container status automatically
-                        this.addReceivedMessage(chatResponseMessage)
+                        this.addReceivedMessage(modelResponseMessage)
                     }
                 }
                 this.dispatchSubscriptions(sessionId, sessionContainer)
 
-                if (!chatResponseMessage.success) {
+                if (!modelResponseMessage.success) {
                     this.removeSession(sessionId)
-                    logger.warn("Session [${sessionId}] received failure message: ${chatResponseMessage.toJSONString()}")
+                    logger.warn("Session [${sessionId}] received failure message: ${modelResponseMessage.toJSONString()}")
                 }
             }
         } else {
@@ -178,7 +178,7 @@ abstract class ListenableTaskManager(
     interface SimpleSubscriber : OnReceivedSubscriber, OnFinishedSubscriber, OnFailedSubscriber
 
     fun interface OnReceivedSubscriber : Subscriber {
-        fun onReceived(container: ChatRequestSessionContainer, message: ChatResponseMessage)
+        fun onReceived(container: ChatRequestSessionContainer, message: ModelResponseMessage)
     }
 
     fun interface OnFinishedSubscriber : Subscriber {
@@ -186,7 +186,7 @@ abstract class ListenableTaskManager(
     }
 
     fun interface OnFailedSubscriber : Subscriber {
-        fun onFailed(container: ChatRequestSessionContainer?, failedMessage: ChatResponseMessage?)
+        fun onFailed(container: ChatRequestSessionContainer?, failedMessage: ModelResponseMessage?)
     }
 
     fun interface OnTimeoutSubscriber : Subscriber {

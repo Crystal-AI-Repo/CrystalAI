@@ -5,4 +5,4 @@ class StreamChatRequestResult(
     isSuccess: Boolean,
     message: String,
     sessionId: String?
-) : ChatRequestResult(isRequestSent, isSuccess, message, sessionId)
+) : ModelRequestResult(isRequestSent, isSuccess, message, sessionId)

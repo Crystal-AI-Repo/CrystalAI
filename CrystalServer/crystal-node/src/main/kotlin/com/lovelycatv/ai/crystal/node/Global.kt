@@ -1,6 +1,6 @@
 package com.lovelycatv.ai.crystal.node
 
-import com.lovelycatv.ai.crystal.node.data.ChatTask
+import com.lovelycatv.ai.crystal.node.data.AbstractTask
 import com.lovelycatv.ai.crystal.node.exception.InvalidSessionIdException
 
 object Global {
@@ -9,38 +9,38 @@ object Global {
         var dispatcherCommunicationPort: Int = -1
 
         @Volatile
-        var isChatTaskRunning: Boolean = false
+        var isTaskRunning: Boolean = false
         @Volatile
-        var currentRunningChatTask: ChatTask<*>? = null
+        var currentRunningTask: AbstractTask? = null
         @Volatile
-        var chatTaskStartedAt: Long = 0L
+        var taskStartedAt: Long = 0L
     }
 
-    fun isChatTaskRunning(): Boolean {
-        return Variables.isChatTaskRunning
+    fun isTaskRunning(): Boolean {
+        return Variables.isTaskRunning
     }
 
     @Synchronized
-    fun lockChatRunningStatus(currentRunningChatTask: ChatTask<*>): Boolean {
-        if (Variables.isChatTaskRunning) {
+    fun lockTaskRunningStatus(currentRunningChatTask: AbstractTask): Boolean {
+        if (Variables.isTaskRunning) {
             return false
         }
 
-        Variables.isChatTaskRunning = true
-        Variables.currentRunningChatTask = currentRunningChatTask
-        Variables.chatTaskStartedAt = System.currentTimeMillis()
+        Variables.isTaskRunning = true
+        Variables.currentRunningTask = currentRunningChatTask
+        Variables.taskStartedAt = System.currentTimeMillis()
 
         return true
     }
 
     @Synchronized
-    fun unlockChatRunningStatus(requesterSessionId: String): Boolean {
+    fun unlockTaskRunningStatus(requesterSessionId: String): Boolean {
         if (requesterSessionId.isBlank()) {
             throw InvalidSessionIdException(requesterSessionId)
         }
 
-        return if (Variables.isChatTaskRunning && Variables.currentRunningChatTask?.requesterSessionId == requesterSessionId) {
-            this.unlockChatRunningStatus()
+        return if (Variables.isTaskRunning && Variables.currentRunningTask?.requesterSessionId == requesterSessionId) {
+            this.forceUnlockTaskRunningStatus()
             true
         } else {
             false
@@ -48,9 +48,9 @@ object Global {
     }
 
     @Synchronized
-    private fun unlockChatRunningStatus() {
-        Variables.isChatTaskRunning = false
-        Variables.currentRunningChatTask = null
+    fun forceUnlockTaskRunningStatus() {
+        Variables.isTaskRunning = false
+        Variables.currentRunningTask = null
     }
 
     fun isNodeRegistered() = !Variables.currentNodeUUID.isNullOrEmpty()

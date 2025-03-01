@@ -6,10 +6,11 @@ import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainEncode
 import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
 import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
+import com.lovelycatv.ai.crystal.node.data.AbstractTask
 import com.lovelycatv.ai.crystal.node.exception.InvalidNodeIdException
 import com.lovelycatv.ai.crystal.node.netty.handler.NettyAuthorizationHandler
 import com.lovelycatv.ai.crystal.node.netty.handler.NettyChatMessageHandler
-import com.lovelycatv.ai.crystal.node.queue.DefaultChatTaskQueue
+import com.lovelycatv.ai.crystal.node.queue.TaskQueue
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.nio.NioEventLoopGroup
@@ -27,7 +28,7 @@ class NodeNettyClient(
     @Value("\${spring.application.name}")
     private val applicationName: String,
     private val nodeConfiguration: NodeConfiguration,
-    private val chatTaskQueue: DefaultChatTaskQueue
+    private val taskQueue: TaskQueue<AbstractTask>
 ) : AbstractNodeNettyClient(applicationName) {
     /**
      * Customize the client bootstrap
@@ -56,7 +57,7 @@ class NodeNettyClient(
                     )
                     ch.pipeline().addLast(
                         NettyChatMessageHandler(
-                            chatTaskQueue = chatTaskQueue,
+                            taskQueue = taskQueue,
                             nodeConfiguration = nodeConfiguration
                         )
                     )

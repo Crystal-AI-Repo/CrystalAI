@@ -13,4 +13,4 @@ class OneTimeChatRequestResult(
     message: String,
     sessionId: String?,
     val results: List<ChatResponseMessage> = listOf()
-) : ChatRequestResult(isRequestSent, isSuccess, message, sessionId)
+) : ModelRequestResult(isRequestSent, isSuccess, message, sessionId)

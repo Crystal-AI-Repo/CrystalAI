@@ -27,8 +27,9 @@ object GlobalConstants {
                 const val GET_NODE_BY_ID = "/getNodeById"
 
                 // Test functions
-                const val TEST_SEND_ONE_TIME_OLLAMA_CHAT = "/test/sendOneTimeOllamaChat"
-                const val TEST_SEND_STREAM_OLLAMA_CHAT = "/test/sendStreamOllamaChat"
+                const val TEST_SEND_ONE_TIME_CHAT_REQUEST = "/test/sendOneTimeChatRequest"
+                const val TEST_SEND_STREAM_CHAT_REQUEST = "/test/sendStreamChatRequest"
+                const val TEST_SEND_ONE_TIME_EMBEDDING = "/test/sendOneTimeEmbeddingRequest"
             }
         }
 

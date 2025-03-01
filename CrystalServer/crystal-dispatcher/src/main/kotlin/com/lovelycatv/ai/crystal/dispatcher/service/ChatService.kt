@@ -11,7 +11,7 @@ import com.lovelycatv.ai.crystal.dispatcher.response.StreamChatRequestResult
  * @since 2025-02-27 00:19
  * @version 1.0
  */
-interface ChatService<OPTIONS: AbstractChatOptions> {
+abstract class ChatService<OPTIONS: AbstractChatOptions> : ModelRequestService() {
     /**
      * Send a chat request, and the response is given after the node has completely finished generating the text.
      *
@@ -21,7 +21,7 @@ interface ChatService<OPTIONS: AbstractChatOptions> {
      * @param timeout Request timeout
      * @return [OneTimeChatRequestResult]
      */
-    suspend fun sendOneTimeChatTask(
+    abstract suspend fun sendOneTimeChatTask(
         options: OPTIONS,
         messages: List<PromptMessage>,
         ignoreResult: Boolean,
@@ -36,7 +36,7 @@ interface ChatService<OPTIONS: AbstractChatOptions> {
      * @param timeout Request timeout
      * @return [StreamChatRequestResult]
      */
-    suspend fun sendStreamChatTask(
+    abstract suspend fun sendStreamChatTask(
         options: OPTIONS,
         messages: List<PromptMessage>,
         timeout: Long

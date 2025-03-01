@@ -1,8 +1,11 @@
 package com.lovelycatv.ai.crystal.dispatcher.task.dispatcher
 
+import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbeddingOptions
+import com.lovelycatv.ai.crystal.common.netty.NettyMessageSendResult
 import com.lovelycatv.ai.crystal.common.netty.sendMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
@@ -24,6 +27,13 @@ class TaskDispatcher(
 ) : AbstractTaskDispatcher(nodeManager, taskManager) {
     private val logger = logger()
 
+    /**
+     * Request to perform a task.
+     * The data of the returned [TaskPerformResult] is sessionId (If successful)
+     *
+     * @param task [AbstractTask] to be performed
+     * @return [TaskPerformResult]
+     */
     override suspend fun performTask(task: AbstractTask): TaskPerformResult<String> {
         val availableNodeResult = super.requireAvailableNode(task, TaskDispatchStrategy.RANDOM)
 
@@ -40,55 +50,71 @@ class TaskDispatcher(
         val availableNode = availableNodeResult.node ?: throw IllegalStateException("Capable node found but acquired null")
 
         val taskId = task.taskId
+        val sessionId = super.requireSessionId()
 
-        return if (task is AbstractChatTask<*>) {
-            val sessionId = super.requireSessionId()
-
-            logger.info("Executing ${task::class.simpleName}-[${taskId}], allocated node: [${availableNode.nodeName}], sessionId: [${sessionId}], options: [${task.options.toJSONString()}]")
-
-            val message = MessageChainBuilder {
-                // Random sessionId
-                this.sessionId(sessionId)
-
-                if (task is StreamChatTask<*>) {
-                    // Enable streaming
-                    this.streamId()
-                } else {
-                    // No streaming
-                    this.streamId(null)
-                }
-
-                // Add OllamaChatOptions is non-null
-                task.options?.let {
-                    this.addMessage(it)
-                }
-
-                // Add all messages
-                this.addMessages(task.prompts)
-            }
-
-            val result = availableNode.channel.sendMessage(message)
-
-            if (result.success) {
-                taskManager.pushSession(recipient = availableNode, messageChain = message, timeout = task.timeout)
-                TaskPerformResult.success(
-                    taskId = taskId,
-                    data = sessionId
+        return when (task) {
+            is AbstractModelTask<*> -> {
+                logger.info("Executing ${task::class.simpleName}-[${taskId}], " +
+                    "allocated node: [${availableNode.nodeName}], " +
+                    "sessionId: [${sessionId}], options: [${task.options.toJSONString()}]"
                 )
-            } else {
-                logger.error("Task-[${taskId}] execution failed, reason: ${result.reason.name}", result.cause)
+
+                val message = MessageChainBuilder {
+                    // Random sessionId
+                    this.sessionId(sessionId)
+
+                    if (task is AbstractChatTask<*>) {
+                        if (task is StreamChatTask<*>) {
+                            // Enable streaming
+                            this.streamId()
+                        } else {
+                            // No streaming
+                            this.streamId(null)
+                        }
+                    } else if (task is AbstractEmbeddingTask<*>) {
+                        // No streaming
+                        this.streamId(null)
+                    }
+
+                    task.options.let {
+                        this.addMessage(it)
+                    }
+
+                    // Add all messages
+                    this.addMessages(task.prompts)
+                }
+
+                val result = availableNode.channel.sendMessage(message)
+
+                processNettySendMessageResult(availableNode, message, task, result)
+            }
+            else -> {
+                logger.error("Task type [${task::class.qualifiedName}] is not supported currently")
+
                 TaskPerformResult.failed(
                     taskId = taskId,
                     data = "",
-                    message = "Message send failed, reason: ${result.reason.name}",
-                    cause = result.cause
+                    message = "Task type [${task::class.qualifiedName}] is not supported currently"
                 )
             }
+        }
+    }
+
+    private fun processNettySendMessageResult(availableNode: RegisteredNode, message: MessageChain, task: AbstractTask, result: NettyMessageSendResult): TaskPerformResult<String> {
+        return if (result.success) {
+            taskManager.pushSession(recipient = availableNode, messageChain = message, timeout = task.timeout)
+            TaskPerformResult.success(
+                taskId = task.taskId,
+                data = message.sessionId
+            )
         } else {
+            logger.error("Task-[${task.taskId}] execution failed, reason: ${result.reason.name}", result.cause)
+
             TaskPerformResult.failed(
-                taskId = taskId,
+                taskId = task.taskId,
                 data = "",
-                message = "Task type [${task::class.qualifiedName}] is not supported currently"
+                message = "Message send failed, reason: ${result.reason.name}",
+                cause = result.cause
             )
         }
     }
@@ -101,14 +127,32 @@ class TaskDispatcher(
      * @return [Boolean]
      */
     override fun canNodePerform(node: RegisteredNode, task: AbstractTask): Boolean {
-        return if (task is AbstractChatTask<*>) {
-            when (task.options) {
-                is OllamaChatOptions -> {
-                    node.ollamaModels.find { it.model == task.options.modelName } != null
+        return if (task is AbstractModelTask<*>) {
+            when (task) {
+                is AbstractChatTask<*> -> {
+                    when (task.options) {
+                        is OllamaChatOptions -> {
+                            node.ollamaModels.find { it.model == task.options.modelName } != null
+                        }
+
+                        is DeepSeekChatOptions -> {
+                            node.deepseekModels.find { it.id == task.options.modelName } != null
+                        }
+
+                        else -> false
+                    }
                 }
-                is DeepSeekChatOptions -> {
-                    node.deepseekModels.find { it.id == task.options.modelName } != null
+
+                is AbstractEmbeddingTask<*> -> {
+                    when (task.options) {
+                        is OllamaEmbeddingOptions -> {
+                            node.ollamaModels.find { it.model == task.options.modelName } != null
+                        }
+
+                        else -> false
+                    }
                 }
+
                 else -> false
             }
         } else false

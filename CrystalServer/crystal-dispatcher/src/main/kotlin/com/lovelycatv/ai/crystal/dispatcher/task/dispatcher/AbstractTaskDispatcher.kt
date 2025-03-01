@@ -18,7 +18,14 @@ abstract class AbstractTaskDispatcher(
     protected val nodeManager: AbstractNodeManager,
     protected val taskManager: TaskManager
 ) {
-    abstract suspend fun performTask(task: AbstractTask): TaskPerformResult<String>?
+    /**
+     * Request to perform a task.
+     * The data of the returned [TaskPerformResult] is sessionId (If successful)
+     *
+     * @param task [AbstractTask] to be performed
+     * @return [TaskPerformResult]
+     */
+    abstract suspend fun performTask(task: AbstractTask): TaskPerformResult<String>
 
     /**
      * Check whether the node could perform this task

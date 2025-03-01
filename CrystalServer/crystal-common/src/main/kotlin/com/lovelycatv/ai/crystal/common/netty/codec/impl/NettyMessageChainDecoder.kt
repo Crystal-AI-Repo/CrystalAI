@@ -3,6 +3,7 @@ package com.lovelycatv.ai.crystal.common.netty.codec.impl
 import com.lovelycatv.ai.crystal.common.netty.codec.NettyMessageDecoder
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.common.util.toExplicitObject
+import com.lovelycatv.ai.crystal.common.util.toJSONString
 
 /**
  * @author lovelycat

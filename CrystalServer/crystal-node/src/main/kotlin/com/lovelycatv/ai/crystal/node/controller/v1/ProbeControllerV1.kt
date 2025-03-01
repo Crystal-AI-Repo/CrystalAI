@@ -16,7 +16,7 @@ import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.config.NetworkConfig
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.data.AbstractTask
-import com.lovelycatv.ai.crystal.node.queue.DefaultChatTaskQueue
+import com.lovelycatv.ai.crystal.node.queue.TaskQueue
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -36,7 +36,7 @@ class ProbeControllerV1(
     private val nodeConfiguration: NodeConfiguration,
     private val ollamaFeignClient: OllamaClient,
     private val deepSeekFeignClient: DeepSeekClient,
-    private val chatTaskQueue: DefaultChatTaskQueue
+    private val taskQueue: TaskQueue<AbstractTask>
 ) : IProbeControllerV1 {
     @GetMapping(NODE_INFO)
     override fun getNodeInfo(): Result<NodeProbeResult> {
@@ -61,12 +61,12 @@ class ProbeControllerV1(
 
     @GetMapping(NODE_TASKS)
     override fun getNodeTasks(): Result<NodeTasksResult> {
-        val chatTasks = chatTaskQueue.glance()
+        val chatTasks = taskQueue.glance()
 
         return Result.success(
             "",
             NodeTasksResult(
-                runningTask = Global.Variables.currentRunningChatTask?.toNodeTaskVO(),
+                runningTask = Global.Variables.currentRunningTask?.toNodeTaskVO(),
                 pendingTasks = chatTasks.map { it.toNodeTaskVO() }
             )
         )
@@ -74,7 +74,7 @@ class ProbeControllerV1(
 
     @GetMapping(NODE_AVAILABLE)
     override fun isNodeAvailable(): Result<Boolean> {
-        return Result.success("", !Global.isChatTaskRunning())
+        return Result.success("", !Global.isTaskRunning())
     }
 
     private fun AbstractTask.toNodeTaskVO(): NodeTaskVO {

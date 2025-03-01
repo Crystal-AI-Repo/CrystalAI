@@ -20,3 +20,12 @@ fun MessageChain.transferToNextPipeLineIfNotEmpty(context: ChannelHandlerContext
         context.fireChannelRead(this)
     }
 }
+
+fun MessageChain.copyAndAddMessages(vararg messages: AbstractMessage): MessageChain {
+    return this.copy(
+        messages = messages.mapIndexed { index, message ->
+            // Set order of messages
+            message.apply { this.order = index.toLong() }
+        }.toList()
+    )
+}

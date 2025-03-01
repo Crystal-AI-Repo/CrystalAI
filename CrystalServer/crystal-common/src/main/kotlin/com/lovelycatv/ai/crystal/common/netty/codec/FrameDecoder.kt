@@ -18,8 +18,8 @@ import org.springframework.core.codec.DecodingException
  * @param includingFieldLength Including the lengthFieldLength. If only the message body needs to be received, set it to false
  */
 class FrameDecoder(
-    maxFrameLength: Int = 4096,
-    lengthFieldLength: Int = 2,
+    maxFrameLength: Int = 131_072,
+    lengthFieldLength: Int = 4,
     includingFieldLength: Boolean = false
 ) : LengthFieldBasedFrameDecoder(
      maxFrameLength,

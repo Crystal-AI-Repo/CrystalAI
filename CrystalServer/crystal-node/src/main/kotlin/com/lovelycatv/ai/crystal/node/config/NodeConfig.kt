@@ -1,7 +1,7 @@
 package com.lovelycatv.ai.crystal.node.config
 
-import com.lovelycatv.ai.crystal.node.queue.DefaultChatTaskQueue
-import com.lovelycatv.ai.crystal.node.queue.InMemoryChatTaskQueue
+import com.lovelycatv.ai.crystal.node.data.AbstractTask
+import com.lovelycatv.ai.crystal.node.queue.InMemoryTaskQueue
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class NodeConfig {
     @Bean
-    fun taskQueue(): DefaultChatTaskQueue {
-        return InMemoryChatTaskQueue()
+    fun taskQueue(): InMemoryTaskQueue<AbstractTask> {
+        return InMemoryTaskQueue()
     }
 }

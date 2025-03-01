@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.lovelycatv.ai.crystal.common.GlobalConstants
 import com.lovelycatv.ai.crystal.common.data.message.AbstractMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
 
 /**
  * @author lovelycat
@@ -13,24 +14,19 @@ import com.lovelycatv.ai.crystal.common.data.message.AbstractMessage
  * @version 1.0
  */
 @JsonTypeName("CHAT_RESPONSE")
-data class ChatResponseMessage @JsonCreator constructor(
-    @JsonProperty("success")
-    val success: Boolean,
-    @JsonProperty("message")
-    val message: String?,
+class ChatResponseMessage @JsonCreator constructor(
+    success: Boolean,
+    message: String?,
     @JsonProperty("content")
     val content: String? = null,
     @JsonProperty("generatedTokens")
     val generatedTokens: Long = 0L,
     @JsonProperty("totalTokens")
     val totalTokens: Long = 0L
-) : AbstractMessage(Type.CHAT_RESPONSE) {
+) : ModelResponseMessage(success, message, Type.CHAT_RESPONSE) {
     companion object {
-        fun failed(message: String): ChatResponseMessage {
-            return ChatResponseMessage(success = false, message = message)
+        fun failed(message: String?): ChatResponseMessage {
+            return failed(message, null, 0L, 0L)
         }
     }
-
-    @JsonIgnore
-    fun isFinished() = GlobalConstants.Flags.isFinishedFlag(this.message)
 }
