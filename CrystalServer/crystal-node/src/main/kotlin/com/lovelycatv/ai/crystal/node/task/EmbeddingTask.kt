@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.node.data
+package com.lovelycatv.ai.crystal.node.task
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
@@ -12,25 +12,18 @@ import kotlin.reflect.KClass
  * @version 1.0
  */
 class EmbeddingTask<EMBEDDING_OPTIONS: AbstractEmbeddingOptions>(
-    val type: ChatTask.Type,
     originalMessageChain: MessageChain,
     expireTime: Long,
     priority: Int,
-    private val embeddingOptionsClazz: KClass<EMBEDDING_OPTIONS>
-) : AbstractTask(AbstractTask.Type.EMBEDDING, originalMessageChain, expireTime, priority) {
+    val embeddingOptionsClazz: KClass<EMBEDDING_OPTIONS>
+) : AbstractTask(Type.EMBEDDING, originalMessageChain, expireTime, priority) {
     @get:JsonIgnore
     @Suppress("UNCHECKED_CAST")
     val chatOptions: EMBEDDING_OPTIONS? get() = this.originalMessageChain.messages.firstOrNull { embeddingOptionsClazz.isInstance(it) } as EMBEDDING_OPTIONS?
-
-    enum class Type {
-        OLLAMA,
-        DEEPSEEK
-    }
 }
 
 fun MessageChain.toOllamaEmbeddingTask(expireTime: Long, priority: Int = 0): EmbeddingTask<OllamaEmbeddingOptions> {
     return EmbeddingTask(
-        type = ChatTask.Type.OLLAMA,
         originalMessageChain = this,
         expireTime = expireTime,
         priority = priority,

@@ -1,0 +1,6 @@
+name: NvidiaAI Support
+description: ""
+authors: LovelyCat
+version: 1.0
+package: com.lovelycatv.crystal.plugin.nvidia
+main: com.lovelycatv.crystal.plugin.nvidia.MainClass

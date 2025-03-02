@@ -1,7 +1,7 @@
 package com.lovelycatv.ai.crystal.node.exception
 
 import com.lovelycatv.ai.crystal.common.util.toJSONString
-import com.lovelycatv.ai.crystal.node.data.AbstractTask
+import com.lovelycatv.ai.crystal.node.task.AbstractTask
 
 /**
  * @author lovelycat

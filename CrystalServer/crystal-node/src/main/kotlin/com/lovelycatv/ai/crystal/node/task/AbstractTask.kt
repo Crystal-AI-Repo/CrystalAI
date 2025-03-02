@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.node.data
+package com.lovelycatv.ai.crystal.node.task
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain

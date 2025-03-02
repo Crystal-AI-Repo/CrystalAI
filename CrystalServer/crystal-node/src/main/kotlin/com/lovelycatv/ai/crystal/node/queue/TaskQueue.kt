@@ -1,7 +1,7 @@
 package com.lovelycatv.ai.crystal.node.queue
 
-import com.lovelycatv.ai.crystal.node.data.AbstractTask
-import com.lovelycatv.ai.crystal.node.data.ChatTask
+import com.lovelycatv.ai.crystal.node.task.AbstractTask
+import com.lovelycatv.ai.crystal.node.task.ChatTask
 
 /**
  * @author lovelycat

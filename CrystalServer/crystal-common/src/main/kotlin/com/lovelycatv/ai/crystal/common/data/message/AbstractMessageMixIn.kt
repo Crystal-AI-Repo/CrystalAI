@@ -1,28 +1,14 @@
 package com.lovelycatv.ai.crystal.common.data.message
 
-import com.alibaba.fastjson2.annotation.JSONField
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.lovelycatv.ai.crystal.common.data.message.auth.AuthorizeRequestMessage
 import com.lovelycatv.ai.crystal.common.data.message.auth.AuthorizeResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.EmbeddingResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbeddingOptions
 
-/**
- * @author lovelycat
- * @since 2025-02-16 19:21
- * @version 1.0
- */
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "type",
-    visible = true
-)
 @JsonSubTypes(
     JsonSubTypes.Type(value = AuthorizeRequestMessage::class, name = "AUTHORIZE_REQUEST"),
     JsonSubTypes.Type(value = AuthorizeResponseMessage::class, name = "AUTHORIZE_RESPONSE"),
@@ -34,23 +20,4 @@ import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbed
     JsonSubTypes.Type(value = ChatResponseMessage::class, name = "CHAT_RESPONSE"),
     JsonSubTypes.Type(value = EmbeddingResponseMessage::class, name = "EMBEDDING_RESPONSE")
 )
-abstract class AbstractMessage @JsonCreator constructor(
-    @JSONField(name = "type")
-    val type: String,
-    @JSONField(name = "order")
-    var order: Long = 0
-) {
-    constructor(type: IMessageType) : this(type.typeName)
-
-    enum class Type(override val typeName: String) : IMessageType {
-        PROMPT("PROMPT"),
-        OLLAMA_CHAT_OPTIONS("OLLAMA_CHAT_OPTIONS"),
-        DEEPSEEK_CHAT_OPTIONS("DEEPSEEK_CHAT_OPTIONS"),
-        OLLAMA_EMBEDDING_OPTIONS("OLLAMA_EMBEDDING_OPTIONS"),
-        AUTHORIZE_REQUEST("AUTHORIZE_REQUEST"),
-        AUTHORIZE_RESPONSE("AUTHORIZE_RESPONSE"),
-        CLIENT_CONNECTED("CLIENT_CONNECTED"),
-        CHAT_RESPONSE("CHAT_RESPONSE"),
-        EMBEDDING_RESPONSE("EMBEDDING_RESPONSE")
-    }
-}
+abstract class AbstractMessageMixIn

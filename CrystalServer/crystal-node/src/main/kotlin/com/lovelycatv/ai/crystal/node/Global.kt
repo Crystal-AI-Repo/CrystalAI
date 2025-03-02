@@ -1,6 +1,6 @@
 package com.lovelycatv.ai.crystal.node
 
-import com.lovelycatv.ai.crystal.node.data.AbstractTask
+import com.lovelycatv.ai.crystal.node.task.AbstractTask
 import com.lovelycatv.ai.crystal.node.exception.InvalidSessionIdException
 
 object Global {

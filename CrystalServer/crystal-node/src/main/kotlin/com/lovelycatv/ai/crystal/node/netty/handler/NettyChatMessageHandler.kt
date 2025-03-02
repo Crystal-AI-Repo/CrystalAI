@@ -19,12 +19,13 @@ import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.data.*
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedModelOptionsType
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedTaskTypeException
-import com.lovelycatv.ai.crystal.node.queue.InMemoryTaskQueue
 import com.lovelycatv.ai.crystal.node.queue.TaskQueue
+import com.lovelycatv.ai.crystal.node.task.AbstractTask
+import com.lovelycatv.ai.crystal.node.task.toDeepSeekTask
+import com.lovelycatv.ai.crystal.node.task.toOllamaEmbeddingTask
+import com.lovelycatv.ai.crystal.node.task.toOllamaTask
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 /**
  * @author lovelycat

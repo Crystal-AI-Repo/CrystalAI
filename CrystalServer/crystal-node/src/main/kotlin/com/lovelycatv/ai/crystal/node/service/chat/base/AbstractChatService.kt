@@ -2,6 +2,7 @@ package com.lovelycatv.ai.crystal.node.service.chat.base
 
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
+import com.lovelycatv.ai.crystal.node.data.AbstractChatResult
 import com.lovelycatv.ai.crystal.node.data.PackagedChatServiceResult
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
  * @since 2025-02-28 14:23
  * @version 1.0
  */
-abstract class AbstractChatService<OPTIONS: AbstractChatOptions, BLOCKING, STREAMING> {
+abstract class AbstractChatService<OPTIONS: AbstractChatOptions, BLOCKING: AbstractChatResult, STREAMING> {
     private val streamCoroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("StreamGenerate"))
 
     protected abstract suspend fun generate(

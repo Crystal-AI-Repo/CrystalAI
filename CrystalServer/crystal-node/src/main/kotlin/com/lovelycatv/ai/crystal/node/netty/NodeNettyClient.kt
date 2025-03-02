@@ -1,15 +1,17 @@
 package com.lovelycatv.ai.crystal.node.netty
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.lovelycatv.ai.crystal.common.netty.codec.FrameDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainDecoder
 import com.lovelycatv.ai.crystal.common.netty.codec.impl.NettyMessageChainEncoder
 import com.lovelycatv.ai.crystal.common.netty.handler.NettyEmptyReceivedMessageHandler
 import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
-import com.lovelycatv.ai.crystal.node.data.AbstractTask
+import com.lovelycatv.ai.crystal.node.task.AbstractTask
 import com.lovelycatv.ai.crystal.node.exception.InvalidNodeIdException
 import com.lovelycatv.ai.crystal.node.netty.handler.NettyAuthorizationHandler
 import com.lovelycatv.ai.crystal.node.netty.handler.NettyChatMessageHandler
+import com.lovelycatv.ai.crystal.node.plugin.PluginManager
 import com.lovelycatv.ai.crystal.node.queue.TaskQueue
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.ChannelInitializer
@@ -46,7 +48,7 @@ class NodeNettyClient(
                 override fun initChannel(ch: NioSocketChannel) {
                     ch.pipeline().addLast(FrameDecoder())
                     ch.pipeline().addLast(NettyMessageChainEncoder())
-                    ch.pipeline().addLast(NettyMessageChainDecoder())
+                    ch.pipeline().addLast(NettyMessageChainDecoder(mapper = PluginManager.objectMapper))
                     ch.pipeline().addLast(NettyEmptyReceivedMessageHandler())
                     ch.pipeline().addLast(
                         NettyAuthorizationHandler(

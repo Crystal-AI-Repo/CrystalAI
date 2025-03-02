@@ -3,6 +3,7 @@ package com.lovelycatv.ai.crystal.common.data.message.model.embedding
 import com.alibaba.fastjson2.annotation.JSONField
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lovelycatv.ai.crystal.common.data.message.AbstractMessage
+import com.lovelycatv.ai.crystal.common.data.message.IMessageType
 import com.lovelycatv.ai.crystal.common.data.message.model.AbstractModelOptions
 
 /**
@@ -12,5 +13,5 @@ import com.lovelycatv.ai.crystal.common.data.message.model.AbstractModelOptions
  */
 abstract class AbstractEmbeddingOptions @JsonCreator constructor(
     modelName: String?,
-    type: Type,
+    type: IMessageType,
 ) : AbstractModelOptions(modelName, type)

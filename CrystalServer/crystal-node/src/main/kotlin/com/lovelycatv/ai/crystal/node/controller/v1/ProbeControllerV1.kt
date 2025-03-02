@@ -15,7 +15,7 @@ import com.lovelycatv.ai.crystal.common.vo.NodeTaskVO
 import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.config.NetworkConfig
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
-import com.lovelycatv.ai.crystal.node.data.AbstractTask
+import com.lovelycatv.ai.crystal.node.task.AbstractTask
 import com.lovelycatv.ai.crystal.node.queue.TaskQueue
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping

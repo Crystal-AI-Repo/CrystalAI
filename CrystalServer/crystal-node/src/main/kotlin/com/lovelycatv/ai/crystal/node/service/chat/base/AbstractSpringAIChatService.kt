@@ -5,7 +5,9 @@ import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.util.divide
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
+import com.lovelycatv.ai.crystal.node.data.AbstractChatResult
 import com.lovelycatv.ai.crystal.node.data.PackagedChatServiceResult
+import com.lovelycatv.ai.crystal.node.data.SpringAIChatResult
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedMessageContentType
 import com.lovelycatv.ai.crystal.node.interfaces.model.base.ChatOptions2SpringAIOptionsTranslator
 import org.springframework.ai.chat.messages.AssistantMessage
@@ -30,7 +32,7 @@ import java.net.URL
 abstract class AbstractSpringAIChatService<CHAT_MODEL: ChatModel, MODEL_OPTIONS: ChatOptions, OPTIONS: AbstractChatOptions>(
     private var defaultChatModel: CHAT_MODEL? = null,
     private val translatorDelegate: ChatOptions2SpringAIOptionsTranslator<OPTIONS, MODEL_OPTIONS>
-) : AbstractChatService<OPTIONS, ChatResponse, Flux<ChatResponse>>(),
+) : AbstractChatService<OPTIONS, SpringAIChatResult, Flux<ChatResponse>>(),
     ChatOptions2SpringAIOptionsTranslator<OPTIONS, MODEL_OPTIONS> by translatorDelegate
 {
     private val logger = logger()
@@ -104,7 +106,21 @@ abstract class AbstractSpringAIChatService<CHAT_MODEL: ChatModel, MODEL_OPTIONS:
             if (stream)
                 PackagedChatServiceResult.success(this.defaultChatModel!!.stream(prompt))
             else
-                PackagedChatServiceResult.success(this.defaultChatModel!!.call(prompt))
+                PackagedChatServiceResult.success(this.defaultChatModel!!.call(prompt).run {
+                    val response = this
+                    // Transform to AbstractChatResult
+                    SpringAIChatResult(
+                        metadata = AbstractChatResult.Metadata(
+                            generatedTokens = response.metadata.usage.generationTokens,
+                            totalTokens = response.metadata.usage.totalTokens
+                        ),
+                        results = this.results.map {
+                            AbstractChatResult.Result(
+                                content = it.output.content
+                            )
+                        }
+                    )
+                })
         } catch (e: NonTransientAiException) {
             logger.warn("Could not send chat request, message: [${e.message}], options: ${options.toJSONString()}, stream: $stream", e)
             PackagedChatServiceResult.failed("Request failed, message: " + e.message, e)
