@@ -1,13 +1,9 @@
 package com.lovelycatv.ai.crystal.dispatcher.controller
 
 import com.lovelycatv.ai.crystal.dispatcher.data.ChatCompletionPayloads
-import com.lovelycatv.ai.crystal.dispatcher.data.ChatCompletionResponse
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.context.request.async.DeferredResult
 import reactor.core.CorePublisher
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 
 /**
  * @author lovelycat
@@ -16,5 +12,7 @@ import reactor.core.publisher.Mono
  */
 interface IOpenApiController {
     @Async
-    suspend fun chatCompletion(@RequestBody payloads: ChatCompletionPayloads): CorePublisher<String>
+    suspend fun chatCompletion(
+        @RequestBody payloads: ChatCompletionPayloads
+    ): Any
 }

@@ -25,7 +25,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.springframework.http.MediaType
-import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -49,11 +48,10 @@ class OpenApiControllerV1(
 
     private val chatCompletionRequestHandler = CoroutineScope(Dispatchers.IO)
 
-    @Async
-    @PostMapping(CHAT_COMPLETION, produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    @PostMapping(CHAT_COMPLETION, produces = [MediaType.TEXT_EVENT_STREAM_VALUE, MediaType.APPLICATION_JSON_VALUE])
     override suspend fun chatCompletion(
         @RequestBody payloads: ChatCompletionPayloads
-    ): CorePublisher<String> {
+    ): Any {
         val options = buildChatOptions(payloads.model)
         val messages = payloads.messages.map {
             PromptMessage(
