@@ -23,9 +23,9 @@ abstract class AbstractTaskDispatcher(
      * The data of the returned [TaskPerformResult] is sessionId (If successful)
      *
      * @param task [AbstractTask] to be performed
-     * @return [TaskPerformResult]
+     * @return [TaskPerformResult], inner data is Pair<SessionId, StreamId?>
      */
-    abstract suspend fun performTask(task: AbstractTask): TaskPerformResult<String>
+    abstract suspend fun performTask(task: AbstractTask): TaskPerformResult<Pair<String, String?>>
 
     /**
      * Check whether the node could perform this task

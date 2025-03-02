@@ -2,9 +2,8 @@ package com.lovelycatv.ai.crystal.dispatcher.service
 
 import com.lovelycatv.ai.crystal.common.data.message.model.AbstractModelOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
-import com.lovelycatv.ai.crystal.dispatcher.response.ModelRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.base.ModelRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.task.AbstractModelTask
 import com.lovelycatv.ai.crystal.dispatcher.task.TaskPerformResult
 import com.lovelycatv.ai.crystal.dispatcher.task.dispatcher.TaskDispatcher
@@ -30,27 +29,33 @@ abstract class ModelRequestService {
 
         when (result.status) {
             TaskPerformResult.Status.SUCCESS -> {
-                val sessionId = result.data
+                val sessionId = result.data.first
+                val streamId = result.data.second
+
                 if (!ignoreResult) {
                     return suspendCoroutine { continuation ->
                         taskManager.subscribe(sessionId, object : ListenableTaskManager.SimpleSubscriber {
                             override fun onReceived(container: ChatRequestSessionContainer, message: ModelResponseMessage) {}
 
                             override fun onFinished(container: ChatRequestSessionContainer) {
-                                continuation.resume(resultTransform.invoke(ModelRequestResult(
+                                continuation.resume(resultTransform.invoke(
+                                    ModelRequestResult(
                                     isRequestSent = true,
                                     isSuccess = true,
                                     message = "",
-                                    sessionId = sessionId
+                                    sessionId = sessionId,
+                                    streamId = streamId
                                 ), arrayOf(container.getResponses())))
                             }
 
                             override fun onFailed(container: ChatRequestSessionContainer?, failedMessage: ModelResponseMessage?) {
-                                continuation.resume(resultTransform.invoke(ModelRequestResult(
+                                continuation.resume(resultTransform.invoke(
+                                    ModelRequestResult(
                                     isRequestSent = true,
                                     isSuccess = false,
                                     message = failedMessage?.message ?: "",
-                                    sessionId = sessionId
+                                    sessionId = sessionId,
+                                    streamId = streamId
                                 ), arrayOf(container?.getResponses() ?: emptyList<ModelResponseMessage>())))
                             }
                         })
@@ -62,7 +67,8 @@ abstract class ModelRequestService {
                                         isRequestSent = true,
                                         isSuccess = false,
                                         message = "Timeout",
-                                        sessionId = sessionId
+                                        sessionId = sessionId,
+                                        streamId = streamId
                                     ),
                                     arrayOf()
                                 )
@@ -70,20 +76,24 @@ abstract class ModelRequestService {
                         })
                     }
                 } else {
-                    return resultTransform.invoke(ModelRequestResult(
+                    return resultTransform.invoke(
+                        ModelRequestResult(
                         isRequestSent = true,
                         isSuccess = true,
                         message = "Async",
-                        sessionId = sessionId
+                        sessionId = sessionId,
+                        streamId = streamId
                     ), arrayOf())
                 }
             }
             TaskPerformResult.Status.FAILED -> {
-                return resultTransform.invoke(ModelRequestResult(
+                return resultTransform.invoke(
+                    ModelRequestResult(
                     isRequestSent = false,
                     isSuccess = false,
                     message = result.message ?: "",
-                    sessionId = null
+                    sessionId = null,
+                    streamId = null
                 ), arrayOf())
             }
         }

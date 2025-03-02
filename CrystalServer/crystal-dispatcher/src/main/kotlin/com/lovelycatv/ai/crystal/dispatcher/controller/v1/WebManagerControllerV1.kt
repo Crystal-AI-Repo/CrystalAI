@@ -18,10 +18,10 @@ import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbed
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
-import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.OneTimeChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.data.node.RegisteredNode
-import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeEmbeddingRequestResult
-import com.lovelycatv.ai.crystal.dispatcher.response.StreamChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.embedding.OneTimeEmbeddingRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.StreamChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.service.NodeManagerService
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultChatService
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultEmbeddingService

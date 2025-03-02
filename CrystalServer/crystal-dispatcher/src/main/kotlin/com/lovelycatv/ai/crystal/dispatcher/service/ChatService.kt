@@ -3,8 +3,8 @@ package com.lovelycatv.ai.crystal.dispatcher.service
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
-import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeChatRequestResult
-import com.lovelycatv.ai.crystal.dispatcher.response.StreamChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.StreamChatRequestResult
 
 /**
  * @author lovelycat

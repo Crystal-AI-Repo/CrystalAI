@@ -2,9 +2,9 @@ package com.lovelycatv.ai.crystal.dispatcher.controller.v1
 
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.dispatcher.controller.IWebManagerController
-import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeChatRequestResult
-import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeEmbeddingRequestResult
-import com.lovelycatv.ai.crystal.dispatcher.response.StreamChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.embedding.OneTimeEmbeddingRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.StreamChatRequestResult
 import org.springframework.web.bind.annotation.RequestParam
 
 /**

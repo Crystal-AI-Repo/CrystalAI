@@ -2,7 +2,7 @@ package com.lovelycatv.ai.crystal.dispatcher.service
 
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
-import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeEmbeddingRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.embedding.OneTimeEmbeddingRequestResult
 
 /**
  * @author lovelycat

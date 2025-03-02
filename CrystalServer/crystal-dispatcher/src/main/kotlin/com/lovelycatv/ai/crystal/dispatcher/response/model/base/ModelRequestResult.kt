@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.dispatcher.response
+package com.lovelycatv.ai.crystal.dispatcher.response.model.base
 
 /**
  * @author lovelycat
@@ -9,5 +9,6 @@ open class ModelRequestResult(
     val isRequestSent: Boolean,
     val isSuccess: Boolean,
     val message: String,
-    val sessionId: String?
+    val sessionId: String?,
+    val streamId: String?
 )

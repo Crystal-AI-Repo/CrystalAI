@@ -32,16 +32,16 @@ class TaskDispatcher(
      * The data of the returned [TaskPerformResult] is sessionId (If successful)
      *
      * @param task [AbstractTask] to be performed
-     * @return [TaskPerformResult]
+     * @return [TaskPerformResult], inner data is Pair<SessionId, StreamId?>
      */
-    override suspend fun performTask(task: AbstractTask): TaskPerformResult<String> {
+    override suspend fun performTask(task: AbstractTask): TaskPerformResult<Pair<String, String?>> {
         val availableNodeResult = super.requireAvailableNode(task, TaskDispatchStrategy.RANDOM)
 
         if (!availableNodeResult.success) {
             logger.error("${availableNodeResult.message}, task: ${task.toJSONString()}")
             return TaskPerformResult.failed(
                 taskId = task.taskId,
-                data = "",
+                data = "" to null,
                 message = availableNodeResult.message ?: "",
                 cause = null
             )
@@ -93,26 +93,31 @@ class TaskDispatcher(
 
                 TaskPerformResult.failed(
                     taskId = taskId,
-                    data = "",
+                    data = "" to null,
                     message = "Task type [${task::class.qualifiedName}] is not supported currently"
                 )
             }
         }
     }
 
-    private fun processNettySendMessageResult(availableNode: RegisteredNode, message: MessageChain, task: AbstractTask, result: NettyMessageSendResult): TaskPerformResult<String> {
+    private fun processNettySendMessageResult(
+        availableNode: RegisteredNode,
+        message: MessageChain,
+        task: AbstractTask,
+        result: NettyMessageSendResult
+    ): TaskPerformResult<Pair<String, String?>> {
         return if (result.success) {
             taskManager.pushSession(recipient = availableNode, messageChain = message, timeout = task.timeout)
             TaskPerformResult.success(
                 taskId = task.taskId,
-                data = message.sessionId
+                data = message.sessionId to message.streamId
             )
         } else {
             logger.error("Task-[${task.taskId}] execution failed, reason: ${result.reason.name}", result.cause)
 
             TaskPerformResult.failed(
                 taskId = task.taskId,
-                data = "",
+                data = "" to null,
                 message = "Message send failed, reason: ${result.reason.name}",
                 cause = result.cause
             )

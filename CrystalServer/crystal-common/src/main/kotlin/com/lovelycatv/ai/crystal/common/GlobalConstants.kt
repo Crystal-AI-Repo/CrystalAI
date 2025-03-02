@@ -21,6 +21,11 @@ object GlobalConstants {
                 const val NODE_CHECK = "/check"
             }
 
+            object OpenApiController {
+                const val CHAT_COMPLETION = "/v1/chat/completion"
+                const val EMBEDDINGS = "/v1/embeddings"
+            }
+
             object WebManagerController {
                 const val MAPPING = "/web-manager"
                 const val LIST_NODES = "/listNodes"

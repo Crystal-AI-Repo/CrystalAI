@@ -4,22 +4,13 @@ import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOpti
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
-import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
-import com.lovelycatv.ai.crystal.common.util.logger
-import com.lovelycatv.ai.crystal.dispatcher.response.OneTimeChatRequestResult
-import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
-import com.lovelycatv.ai.crystal.dispatcher.response.ModelRequestResult
-import com.lovelycatv.ai.crystal.dispatcher.response.StreamChatRequestResult
-import com.lovelycatv.ai.crystal.dispatcher.task.AbstractChatTask
+import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.OneTimeChatRequestResult
+import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.StreamChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.task.dispatcher.TaskDispatcher
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
 import com.lovelycatv.ai.crystal.dispatcher.task.OneTimeChatTask
 import com.lovelycatv.ai.crystal.dispatcher.task.StreamChatTask
-import com.lovelycatv.ai.crystal.dispatcher.task.TaskPerformResult
-import com.lovelycatv.ai.crystal.dispatcher.task.manager.ListenableTaskManager
 import org.springframework.stereotype.Service
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * @author lovelycat
@@ -53,6 +44,7 @@ class DefaultChatServiceImpl(
                 it.isSuccess,
                 it.message,
                 it.sessionId,
+                it.streamId,
                 results = if (args.isNotEmpty())
                     args[0] as List<ChatResponseMessage>
                 else emptyList()
@@ -70,7 +62,7 @@ class DefaultChatServiceImpl(
      */
     override suspend fun sendStreamChatTask(options: AbstractChatOptions, messages: List<PromptMessage>, timeout: Long): StreamChatRequestResult {
         return sendTask(taskDispatcher, taskManager, StreamChatTask(options, messages, timeout), true) { it, args ->
-            StreamChatRequestResult(it.isRequestSent, it.isSuccess, it.message, it.sessionId)
+            StreamChatRequestResult(it.isRequestSent, it.isSuccess, it.message, it.sessionId, it.streamId, listOf())
         }
     }
 }
