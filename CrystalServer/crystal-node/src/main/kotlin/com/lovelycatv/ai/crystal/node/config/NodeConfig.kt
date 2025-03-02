@@ -1,5 +1,6 @@
 package com.lovelycatv.ai.crystal.node.config
 
+import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.node.data.AbstractEmbeddingResult
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
@@ -7,15 +8,17 @@ import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOption
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbeddingOptions
 import com.lovelycatv.ai.crystal.node.data.AbstractChatResult
-import com.lovelycatv.ai.crystal.node.task.AbstractTask
 import com.lovelycatv.ai.crystal.node.queue.InMemoryTaskQueue
-import com.lovelycatv.ai.crystal.node.service.ChatServiceDispatcher
-import com.lovelycatv.ai.crystal.node.service.EmbeddingServiceDispatcher
+import com.lovelycatv.ai.crystal.node.api.dispatcher.ChatServiceDispatcher
+import com.lovelycatv.ai.crystal.node.api.dispatcher.EmbeddingServiceDispatcher
+import com.lovelycatv.ai.crystal.node.api.task.NodeChatTaskBuilder
+import com.lovelycatv.ai.crystal.node.api.task.NodeEmbeddingTaskBuilder
 import com.lovelycatv.ai.crystal.node.service.chat.DeepSeekChatService
 import com.lovelycatv.ai.crystal.node.service.chat.OllamaChatService
 import com.lovelycatv.ai.crystal.node.service.chat.base.AbstractChatService
 import com.lovelycatv.ai.crystal.node.service.embedding.OllamaEmbeddingService
 import com.lovelycatv.ai.crystal.node.service.embedding.base.AbstractEmbeddingService
+import com.lovelycatv.ai.crystal.node.task.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import kotlin.reflect.KClass
@@ -30,7 +33,8 @@ import kotlin.reflect.KClass
 class NodeConfig(
     private val ollamaChatService: OllamaChatService,
     private val deepSeekChatService: DeepSeekChatService,
-    private val ollamaEmbeddingService: OllamaEmbeddingService
+    private val ollamaEmbeddingService: OllamaEmbeddingService,
+    private val nodeConfiguration: NodeConfiguration
 ) {
     @Bean
     fun taskQueue(): InMemoryTaskQueue<AbstractTask> {
@@ -66,6 +70,27 @@ class NodeConfig(
                     } as? AbstractChatService<AbstractChatOptions, AbstractChatResult, Any>?
                 }
 
+            }
+        )
+    }
+
+    @Bean
+    fun defaultChatTaskBuilders(): List<NodeChatTaskBuilder<*>> {
+        return listOf(
+            NodeChatTaskBuilder {
+                it.toOllamaTask(nodeConfiguration.ollama.maxExecutionTimeMillis)
+            },
+            NodeChatTaskBuilder {
+                it.toDeepSeekTask(nodeConfiguration.deepseek.maxExecutionTimeMillis)
+            }
+        )
+    }
+
+    @Bean
+    fun defaultEmbeddingTaskBuilders(): List<NodeEmbeddingTaskBuilder<*>> {
+        return listOf(
+            NodeEmbeddingTaskBuilder {
+                it.toOllamaEmbeddingTask(nodeConfiguration.ollama.maxExecutionTimeMillis)
             }
         )
     }

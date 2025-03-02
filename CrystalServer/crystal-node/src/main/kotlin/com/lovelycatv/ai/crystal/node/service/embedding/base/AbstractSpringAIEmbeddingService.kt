@@ -4,12 +4,10 @@ import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.node.data.SpringAIEmbeddingResult
-import com.lovelycatv.ai.crystal.node.interfaces.model.base.EmbeddingOptions2SpringAIOptionsTranslator
-import com.lovelycatv.ai.crystal.node.interfaces.model.base.ModelOptions2SpringAIOptionsTranslator
+import com.lovelycatv.ai.crystal.node.api.interfaces.model.EmbeddingOptions2SpringAIOptionsTranslator
 import org.springframework.ai.embedding.EmbeddingModel
 import org.springframework.ai.embedding.EmbeddingOptions
 import org.springframework.ai.embedding.EmbeddingRequest
-import org.springframework.ai.embedding.EmbeddingResponse
 
 /**
  * @author lovelycat

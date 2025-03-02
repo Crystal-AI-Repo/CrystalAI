@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.node.plugin.exception
+package com.lovelycatv.crystal.plugin.exception
 
 /**
  * @author lovelycat

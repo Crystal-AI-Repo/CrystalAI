@@ -16,10 +16,10 @@ import com.lovelycatv.ai.crystal.node.data.AbstractEmbeddingResult
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedModelOptionsType
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedTaskTypeException
 import com.lovelycatv.ai.crystal.node.netty.AbstractNodeNettyClient
-import com.lovelycatv.ai.crystal.node.plugin.PluginManager
+import com.lovelycatv.ai.crystal.node.plugin.NodePluginManager
 import com.lovelycatv.ai.crystal.node.queue.InMemoryTaskQueue
-import com.lovelycatv.ai.crystal.node.service.ChatServiceDispatcher
-import com.lovelycatv.ai.crystal.node.service.EmbeddingServiceDispatcher
+import com.lovelycatv.ai.crystal.node.api.dispatcher.ChatServiceDispatcher
+import com.lovelycatv.ai.crystal.node.api.dispatcher.EmbeddingServiceDispatcher
 import com.lovelycatv.ai.crystal.node.service.chat.base.AbstractChatService
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCallback
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCompletedCallback
@@ -59,7 +59,7 @@ class TaskQueueConsumerCronJob(
 
     private fun determineEmbeddingService(task: EmbeddingTask<*>) = null.run {
         var service: AbstractEmbeddingService<AbstractEmbeddingOptions, AbstractEmbeddingResult>? = null
-        (embeddingServiceDispatchers + PluginManager.embeddingServiceDispatchers).forEach {
+        (embeddingServiceDispatchers + NodePluginManager.embeddingServiceDispatchers).forEach {
             if (service == null) {
                 service = it.getService(task.embeddingOptionsClazz)
             } else {
@@ -71,7 +71,7 @@ class TaskQueueConsumerCronJob(
 
     private fun determineChatService(task: ChatTask<*>) = null.run {
         var service: AbstractChatService<AbstractChatOptions, AbstractChatResult, Any>? = null
-        (chatServiceDispatchers + PluginManager.chatServiceDispatchers).forEach {
+        (chatServiceDispatchers + NodePluginManager.chatServiceDispatchers).forEach {
             if (service == null) {
                 service = it.getService(task.chatOptionsClazz)
             } else {

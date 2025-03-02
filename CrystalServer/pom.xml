@@ -25,6 +25,7 @@
         <module>crystal-dispatcher</module>
         <module>crystal-node</module>
         <module>crystal-common</module>
+        <module>plugin-loader</module>
     </modules>
     <scm>
         <connection/>
@@ -40,6 +41,7 @@
         <spring-ai.version>1.0.0-M5</spring-ai.version>
 
         <crystal.common.version>0.0.1-SNAPSHOT</crystal.common.version>
+        <plugin.loader.version>0.0.1-SNAPSHOT</plugin.loader.version>
     </properties>
     <dependencies>
         <!-- Kotlin -->
@@ -156,6 +158,12 @@
                 <groupId>com.lovelycatv.ai.crystal.common</groupId>
                 <artifactId>crystal-common</artifactId>
                 <version>${crystal.common.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.lovelycatv.crystal.plugin</groupId>
+                <artifactId>plugin-loader</artifactId>
+                <version>${plugin.loader.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

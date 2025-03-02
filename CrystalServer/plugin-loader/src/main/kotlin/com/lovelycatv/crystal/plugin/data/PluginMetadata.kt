@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.node.plugin
+package com.lovelycatv.crystal.plugin.data
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty

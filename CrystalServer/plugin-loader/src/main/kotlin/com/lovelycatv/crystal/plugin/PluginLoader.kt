@@ -1,12 +1,12 @@
-package com.lovelycatv.ai.crystal.node.plugin
+package com.lovelycatv.crystal.plugin
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.lovelycatv.ai.crystal.node.plugin.exception.PluginMetadataNotFoundException
-import org.springframework.context.ApplicationContext
-import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
+import com.lovelycatv.crystal.plugin.config.YAMLConfiguration
+import com.lovelycatv.crystal.plugin.data.PluginMetadata
+import com.lovelycatv.crystal.plugin.data.RawLoadedPlugin
+import com.lovelycatv.crystal.plugin.exception.PluginMetadataNotFoundException
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
@@ -25,6 +25,7 @@ class PluginLoader {
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
 
+        @Throws(PluginMetadataNotFoundException::class)
         fun getPluginMetadata(pluginJarPath: String): PluginMetadata {
             JarFile(pluginJarPath).use { jarFile ->
                 val entry: JarEntry = jarFile.getJarEntry("plugin.yml") ?: throw PluginMetadataNotFoundException(jarFile.name)
@@ -34,12 +35,8 @@ class PluginLoader {
             }
         }
 
-        @Suppress("UNCHECKED_CAST")
-        fun getPluginConfig(pluginJarPath: String): Map<String, Any?> {
-            JarFile(pluginJarPath).use { jarFile ->
-                val entry: JarEntry = jarFile.getJarEntry("plugin.yml") ?: throw PluginMetadataNotFoundException(jarFile.name)
-                return yamlMapper.readValue(jarFile.getInputStream(entry), Map::class.java) as Map<String, Any?>
-            }
+        fun getPluginConfig(pluginConfigPath: String): YAMLConfiguration {
+            return YAMLConfiguration(File(pluginConfigPath))
         }
     }
 
@@ -50,16 +47,9 @@ class PluginLoader {
         val jarUrl: URL = File(pluginJarPath).toURI().toURL()
         val pluginClassLoader = URLClassLoader(arrayOf(jarUrl), javaClass.classLoader)
 
-        val pluginContext = AnnotationConfigApplicationContext()
-        pluginContext.classLoader = pluginClassLoader
-        pluginContext.scan(pluginMetadata.packageName)
-        pluginContext.refresh()
-
         return RawLoadedPlugin(
             metadata = pluginMetadata,
-            context = pluginContext,
-            classLoader = pluginClassLoader,
-            rawPluginConfig = getPluginConfig(pluginJarPath)
+            classLoader = pluginClassLoader
         )
     }
 }

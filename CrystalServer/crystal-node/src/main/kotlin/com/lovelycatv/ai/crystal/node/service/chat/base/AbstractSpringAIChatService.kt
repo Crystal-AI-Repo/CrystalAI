@@ -9,7 +9,7 @@ import com.lovelycatv.ai.crystal.node.data.AbstractChatResult
 import com.lovelycatv.ai.crystal.node.data.PackagedChatServiceResult
 import com.lovelycatv.ai.crystal.node.data.SpringAIChatResult
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedMessageContentType
-import com.lovelycatv.ai.crystal.node.interfaces.model.base.ChatOptions2SpringAIOptionsTranslator
+import com.lovelycatv.ai.crystal.node.api.interfaces.model.ChatOptions2SpringAIOptionsTranslator
 import org.springframework.ai.chat.messages.AssistantMessage
 import org.springframework.ai.chat.messages.SystemMessage
 import org.springframework.ai.chat.messages.UserMessage

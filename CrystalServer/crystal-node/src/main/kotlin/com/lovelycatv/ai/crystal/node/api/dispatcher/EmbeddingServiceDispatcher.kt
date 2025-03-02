@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.node.service
+package com.lovelycatv.ai.crystal.node.api.dispatcher
 
 import com.lovelycatv.ai.crystal.node.data.AbstractEmbeddingResult
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
@@ -10,6 +10,6 @@ import kotlin.reflect.KClass
  * @since 2025-03-02 17:47
  * @version 1.0
  */
-interface EmbeddingServiceDispatcher {
+fun interface EmbeddingServiceDispatcher {
     fun getService(options: KClass<out AbstractEmbeddingOptions>): AbstractEmbeddingService<AbstractEmbeddingOptions, AbstractEmbeddingResult>?
 }

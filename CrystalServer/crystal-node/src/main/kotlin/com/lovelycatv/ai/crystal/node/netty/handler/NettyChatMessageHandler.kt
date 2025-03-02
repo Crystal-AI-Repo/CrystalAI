@@ -15,6 +15,8 @@ import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbed
 import com.lovelycatv.ai.crystal.common.data.message.transferToNextPipeLineIfNotEmpty
 import com.lovelycatv.ai.crystal.common.util.implies
 import com.lovelycatv.ai.crystal.common.util.logger
+import com.lovelycatv.ai.crystal.node.api.task.NodeChatTaskBuilder
+import com.lovelycatv.ai.crystal.node.api.task.NodeEmbeddingTaskBuilder
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.data.*
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedModelOptionsType
@@ -26,6 +28,7 @@ import com.lovelycatv.ai.crystal.node.task.toOllamaEmbeddingTask
 import com.lovelycatv.ai.crystal.node.task.toOllamaTask
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
+import kotlin.reflect.KClass
 
 /**
  * @author lovelycat
@@ -34,7 +37,8 @@ import io.netty.channel.SimpleChannelInboundHandler
  */
 class NettyChatMessageHandler(
     private val taskQueue: TaskQueue<AbstractTask>,
-    private val nodeConfiguration: NodeConfiguration
+    private val nodeChatTaskBuilders: List<NodeChatTaskBuilder<*>>,
+    private val nodeEmbeddingTaskBuilders: List<NodeEmbeddingTaskBuilder<*>>
 ) : SimpleChannelInboundHandler<MessageChain>() {
     private val log = this.logger()
 
@@ -86,7 +90,7 @@ class NettyChatMessageHandler(
                     )
                 })
             }
-        }else {
+        } else {
             ctx.fireChannelRead(msg)
         }
     }
@@ -107,20 +111,15 @@ class NettyChatMessageHandler(
         }
     }
 
-    private fun submitEmbeddingTask(options: AbstractEmbeddingOptions?, messageChain: MessageChain) {
-        val task = when (options) {
-            is OllamaEmbeddingOptions, null -> messageChain.toOllamaEmbeddingTask(nodeConfiguration.ollama.maxExecutionTimeMillis)
-            else -> throw UnsupportedModelOptionsType(options::class)
-        }
+    private fun submitChatTask(options: AbstractChatOptions, messageChain: MessageChain) {
+        val builder = nodeChatTaskBuilders.firstOrNull { builder -> builder.getOptionsClass().isInstance(options) }
+        val task = builder?.buildChatTask(messageChain) ?: throw UnsupportedModelOptionsType(options::class)
         taskQueue.submitTask(task)
     }
 
-    private fun submitChatTask(options: AbstractChatOptions?, messageChain: MessageChain) {
-        val task = when (options) {
-            is OllamaChatOptions, null -> messageChain.toOllamaTask(nodeConfiguration.ollama.maxExecutionTimeMillis)
-            is DeepSeekChatOptions -> messageChain.toDeepSeekTask(nodeConfiguration.deepseek.maxExecutionTimeMillis)
-            else -> throw UnsupportedModelOptionsType(options::class)
-        }
+    private fun submitEmbeddingTask(options: AbstractEmbeddingOptions, messageChain: MessageChain) {
+        val builder = nodeEmbeddingTaskBuilders.firstOrNull { builder -> builder.getOptionsClass().isInstance(options) }
+        val task = builder?.buildEmbeddingTask(messageChain) ?: throw UnsupportedModelOptionsType(options::class)
         taskQueue.submitTask(task)
     }
 }

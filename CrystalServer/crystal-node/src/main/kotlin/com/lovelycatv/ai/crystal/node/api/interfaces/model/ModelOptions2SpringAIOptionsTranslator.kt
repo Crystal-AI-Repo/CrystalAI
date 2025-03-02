@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.node.interfaces.model.base
+package com.lovelycatv.ai.crystal.node.api.interfaces.model
 
 import com.lovelycatv.ai.crystal.common.data.message.model.AbstractModelOptions
 import org.springframework.ai.model.ModelOptions

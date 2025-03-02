@@ -1,7 +1,7 @@
 package com.lovelycatv.ai.crystal.node.interfaces.model
 
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
-import com.lovelycatv.ai.crystal.node.interfaces.model.base.ChatOptions2SpringAIOptionsTranslator
+import com.lovelycatv.ai.crystal.node.api.interfaces.model.ChatOptions2SpringAIOptionsTranslator
 import org.springframework.ai.openai.OpenAiChatOptions
 
 /**
