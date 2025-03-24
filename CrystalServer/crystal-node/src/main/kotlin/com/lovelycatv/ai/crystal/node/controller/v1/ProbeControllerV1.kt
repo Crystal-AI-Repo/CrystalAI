@@ -82,6 +82,13 @@ class ProbeControllerV1(
     }
 
     private fun AbstractTask.toNodeTaskVO(): NodeTaskVO {
-        return NodeTaskVO(taskType = this.taskType.name, taskClass = this::class.qualifiedName ?: "", data = this)
+        return NodeTaskVO(
+            sessionId = this.requesterSessionId,
+            taskType = this.taskType.name,
+            taskClass = this::class.qualifiedName ?: "",
+            expireTime = this.expireTime,
+            priority = this.priority,
+            originalMessages = this.originalMessageChain
+        )
     }
 }
