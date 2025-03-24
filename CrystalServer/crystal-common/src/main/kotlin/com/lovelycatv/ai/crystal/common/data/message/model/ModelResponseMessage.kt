@@ -22,7 +22,7 @@ abstract class ModelResponseMessage @JsonCreator constructor(
 ) : AbstractMessage(type) {
     companion object {
         inline fun <reified T: ModelResponseMessage> failed(message: String?, vararg additionalArgs: Any?): T {
-            return T::class.primaryConstructor!!.call(*(listOf<Any?>(message) + additionalArgs.toList()).toTypedArray())
+            return T::class.primaryConstructor!!.call(*(listOf<Any?>(false, message) + additionalArgs.toList()).toTypedArray())
         }
     }
 

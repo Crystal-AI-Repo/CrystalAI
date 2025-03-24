@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.node.plugin
+package com.lovelycatv.ai.crystal.dispatcher.plugin
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lovelycatv.ai.crystal.common.data.message.AbstractMessage
@@ -12,8 +12,6 @@ import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOpti
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.EmbeddingResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbeddingOptions
-import com.lovelycatv.ai.crystal.node.api.dispatcher.ChatServiceDispatcher
-import com.lovelycatv.ai.crystal.node.api.dispatcher.EmbeddingServiceDispatcher
 import java.io.File
 
 /**
@@ -21,7 +19,7 @@ import java.io.File
  * @since 2025-03-02 23:00
  * @version 1.0
  */
-object NodePluginManager {
+object DispatcherPluginManager {
     val objectMapper = ObjectMapper().apply {
         addMixIn(AbstractMessage::class.java, AbstractMessageMixIn::class.java)
         registerSubtypes(
@@ -39,10 +37,12 @@ object NodePluginManager {
 
     val pluginsDir = File(File("").absolutePath, "plugins")
 
-    private val _registeredPlugins: MutableList<AbstractNodePlugin> = mutableListOf()
-    val registeredPlugins: List<AbstractNodePlugin> get() = this._registeredPlugins
+    private val _registeredPlugins: MutableList<AbstractDispatcherPlugin> = mutableListOf()
+    val registeredPlugins: List<AbstractDispatcherPlugin> get() = this._registeredPlugins
 
-    fun addRegisteredPlugin(plugin: AbstractNodePlugin) {
+    fun addRegisteredPlugin(plugin: AbstractDispatcherPlugin) {
         this._registeredPlugins.add(plugin)
     }
+
+    val chatOptionsBuilders = this.registeredPlugins.flatMap { it.chatOptionsBuilders }
 }

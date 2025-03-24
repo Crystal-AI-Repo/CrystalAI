@@ -1,5 +1,7 @@
 package com.lovelycatv.ai.crystal.node.plugin
 
+import com.lovelycatv.ai.crystal.common.data.message.AbstractMessageTypeRegistry
+import com.lovelycatv.ai.crystal.common.plugin.CrystalPluginMetadata
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.node.api.dispatcher.ChatServiceDispatcher
 import com.lovelycatv.ai.crystal.node.api.dispatcher.EmbeddingServiceDispatcher
@@ -33,7 +35,10 @@ class NodePluginInitializer : CommandLineRunner {
         PluginLoaderHook.addOnPluginEnabledListener { loadedPlugin ->
             val pluginContext = AnnotationConfigApplicationContext()
             pluginContext.classLoader = loadedPlugin.classLoader
-            pluginContext.scan(loadedPlugin.metadata.packageName)
+            pluginContext.scan(
+                (loadedPlugin.metadata as CrystalPluginMetadata).commonPackageName,
+                (loadedPlugin.metadata as CrystalPluginMetadata).nodePackageName
+            )
             pluginContext.refresh()
 
             val nodePlugin = loadedPlugin.pluginInstance as AbstractNodePlugin
@@ -47,9 +52,20 @@ class NodePluginInitializer : CommandLineRunner {
 
             NodePluginManager.addRegisteredPlugin(nodePlugin)
 
+            // Register message types to the Global ObjectMapper
+            val messageTypeRegistries = pluginContext.getBeansOfType(AbstractMessageTypeRegistry::class.java).values.filterNotNull()
+            messageTypeRegistries.forEach {
+                it.registerTypes(NodePluginManager.objectMapper)
+            }
+
             logger.info("==================================================================================================")
             logger.info("Plugin ${loadedPlugin.metadata.name} (${loadedPlugin.metadata.version}) is enabled successfully.")
             logger.info("${nodePlugin.getBeans(Any::class).size} beans detected in total")
+            logger.info("")
+            logger.info("MessageTypes: ${messageTypeRegistries.size}")
+            messageTypeRegistries.forEachIndexed { index, it ->
+                logger.info("> ${index + 1}. ${it::class.java.typeName}")
+            }
             logger.info("")
             logger.info("ChatServiceDispatchers: ${nodePlugin.chatServiceDispatchers.size}")
             nodePlugin.chatServiceDispatchers.forEachIndexed { index, it ->
@@ -74,7 +90,11 @@ class NodePluginInitializer : CommandLineRunner {
         }
 
         pluginsDir.listFiles()?.filter { it.isFile && it.extension == "jar" }?.forEach {
-            PluginManager.registerPlugin(it.absolutePath)
+            PluginManager.registerPlugin(
+                pluginJarPath = it.absolutePath,
+                metadataClazz = CrystalPluginMetadata::class.java,
+                pluginMainClass = { _, metadata -> metadata.nodeMain }
+            )
         }
     }
 }

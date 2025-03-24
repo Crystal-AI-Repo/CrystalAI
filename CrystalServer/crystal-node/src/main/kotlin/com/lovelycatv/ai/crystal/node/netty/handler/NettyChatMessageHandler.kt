@@ -21,6 +21,7 @@ import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.data.*
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedModelOptionsType
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedTaskTypeException
+import com.lovelycatv.ai.crystal.node.plugin.NodePluginManager
 import com.lovelycatv.ai.crystal.node.queue.TaskQueue
 import com.lovelycatv.ai.crystal.node.task.AbstractTask
 import com.lovelycatv.ai.crystal.node.task.toDeepSeekTask
@@ -28,6 +29,7 @@ import com.lovelycatv.ai.crystal.node.task.toOllamaEmbeddingTask
 import com.lovelycatv.ai.crystal.node.task.toOllamaTask
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
+import org.w3c.dom.Node
 import kotlin.reflect.KClass
 
 /**
@@ -113,13 +115,13 @@ class NettyChatMessageHandler(
 
     private fun submitChatTask(options: AbstractChatOptions, messageChain: MessageChain) {
         val builder = nodeChatTaskBuilders.firstOrNull { builder -> builder.getOptionsClass().isInstance(options) }
-        val task = builder?.buildChatTask(messageChain) ?: throw UnsupportedModelOptionsType(options::class)
+        val task = builder?.buildChatTask(messageChain) ?: throw UnsupportedModelOptionsType(options::class.qualifiedName)
         taskQueue.submitTask(task)
     }
 
     private fun submitEmbeddingTask(options: AbstractEmbeddingOptions, messageChain: MessageChain) {
         val builder = nodeEmbeddingTaskBuilders.firstOrNull { builder -> builder.getOptionsClass().isInstance(options) }
-        val task = builder?.buildEmbeddingTask(messageChain) ?: throw UnsupportedModelOptionsType(options::class)
+        val task = builder?.buildEmbeddingTask(messageChain) ?: throw UnsupportedModelOptionsType(options::class.qualifiedName)
         taskQueue.submitTask(task)
     }
 }

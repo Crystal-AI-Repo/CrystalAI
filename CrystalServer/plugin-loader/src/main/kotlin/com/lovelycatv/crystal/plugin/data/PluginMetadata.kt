@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @since 2025-03-02 15:07
  * @version 1.0
  */
-data class PluginMetadata @JsonCreator constructor(
+open class PluginMetadata @JsonCreator constructor(
     @JsonProperty("name")
     val name: String,
     @JsonProperty("description")

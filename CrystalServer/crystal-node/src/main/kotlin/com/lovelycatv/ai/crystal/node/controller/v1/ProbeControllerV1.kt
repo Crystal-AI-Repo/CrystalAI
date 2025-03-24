@@ -15,6 +15,7 @@ import com.lovelycatv.ai.crystal.common.vo.NodeTaskVO
 import com.lovelycatv.ai.crystal.node.Global
 import com.lovelycatv.ai.crystal.node.config.NetworkConfig
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
+import com.lovelycatv.ai.crystal.node.plugin.NodePluginManager
 import com.lovelycatv.ai.crystal.node.task.AbstractTask
 import com.lovelycatv.ai.crystal.node.queue.TaskQueue
 import org.springframework.beans.factory.annotation.Value
@@ -54,7 +55,10 @@ class ProbeControllerV1(
                 deepseekModels = (if (nodeConfiguration.deepseek.isEnabled)
                     deepSeekFeignClient.safeRequest { getModels("Bearer " + nodeConfiguration.deepseek.apiKey).data }
                 else
-                    null) ?: emptyList()
+                    null) ?: emptyList(),
+                modelOptionClassNamesFromPlugins = NodePluginManager.registeredPlugins.flatMap { plugin ->
+                    plugin.chatTaskBuilders.map { it.getOptionsClass().canonicalName }
+                }
             )
         )
     }

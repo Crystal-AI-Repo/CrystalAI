@@ -64,8 +64,8 @@ class NodeNettyClient(
                     ch.pipeline().addLast(
                         NettyChatMessageHandler(
                             taskQueue = taskQueue,
-                            nodeChatTaskBuilders = (nodeChatTaskBuilders + NodePluginManager.chatTaskBuilders),
-                            nodeEmbeddingTaskBuilders = (nodeEmbeddingTaskBuilders + NodePluginManager.embeddingTaskBuilders)
+                            nodeChatTaskBuilders = (nodeChatTaskBuilders + NodePluginManager.registeredPlugins.flatMap { it.chatTaskBuilders }),
+                            nodeEmbeddingTaskBuilders = (nodeEmbeddingTaskBuilders + NodePluginManager.registeredPlugins.flatMap { it.embeddingTaskBuilders })
                         )
                     )
                 }

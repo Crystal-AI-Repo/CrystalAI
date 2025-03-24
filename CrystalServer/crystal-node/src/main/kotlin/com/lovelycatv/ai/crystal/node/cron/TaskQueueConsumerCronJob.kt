@@ -59,7 +59,7 @@ class TaskQueueConsumerCronJob(
 
     private fun determineEmbeddingService(task: EmbeddingTask<*>) = null.run {
         var service: AbstractEmbeddingService<AbstractEmbeddingOptions, AbstractEmbeddingResult>? = null
-        (embeddingServiceDispatchers + NodePluginManager.embeddingServiceDispatchers).forEach {
+        (embeddingServiceDispatchers + NodePluginManager.registeredPlugins.flatMap { it.embeddingServiceDispatchers }).forEach {
             if (service == null) {
                 service = it.getService(task.embeddingOptionsClazz)
             } else {
@@ -71,7 +71,7 @@ class TaskQueueConsumerCronJob(
 
     private fun determineChatService(task: ChatTask<*>) = null.run {
         var service: AbstractChatService<AbstractChatOptions, AbstractChatResult, Any>? = null
-        (chatServiceDispatchers + NodePluginManager.chatServiceDispatchers).forEach {
+        (chatServiceDispatchers + NodePluginManager.registeredPlugins.flatMap { it.chatServiceDispatchers }).forEach {
             if (service == null) {
                 service = it.getService(task.chatOptionsClazz)
             } else {
@@ -112,7 +112,7 @@ class TaskQueueConsumerCronJob(
                 val service = determineEmbeddingService(task)
 
                 val result = service?.embedding(task.chatOptions, task.prompts)
-                    ?: throw UnsupportedModelOptionsType(task.embeddingOptionsClazz)
+                    ?: throw UnsupportedModelOptionsType(task.embeddingOptionsClazz.qualifiedName)
 
                 unlock.invoke()
 
@@ -138,7 +138,7 @@ class TaskQueueConsumerCronJob(
                 val service = determineChatService(task)
 
                 val result = service?.blockingGenerate(task.prompts, task.chatOptions)
-                    ?: throw UnsupportedModelOptionsType(task.chatOptionsClazz)
+                    ?: throw UnsupportedModelOptionsType(task.chatOptionsClazz.qualifiedName)
 
                 unlock.invoke()
 
@@ -197,7 +197,7 @@ class TaskQueueConsumerCronJob(
 
                 val service = determineChatService(task)
                 service?.streamGenerate(task.prompts, task.chatOptions, onNewTokenReceived, onFailed, onCompleted)
-                    ?: throw UnsupportedModelOptionsType(task.chatOptionsClazz)
+                    ?: throw UnsupportedModelOptionsType(task.chatOptionsClazz.qualifiedName)
             }
         )
     }

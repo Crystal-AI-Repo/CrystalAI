@@ -2,6 +2,7 @@ package com.lovelycatv.crystal.plugin
 
 import com.lovelycatv.crystal.plugin.api.PluginLoaderHook
 import com.lovelycatv.crystal.plugin.data.LoadedPlugin
+import com.lovelycatv.crystal.plugin.data.PluginMetadata
 import com.lovelycatv.crystal.plugin.data.RawLoadedPlugin
 import java.io.File
 
@@ -13,16 +14,29 @@ import java.io.File
 object PluginManager {
     val pluginsDir = File(System.getProperty("user.dir"), "plugins")
 
-    private val pluginLoader = PluginLoader()
-
     private val _registeredRawPlugins: MutableMap<String, RawLoadedPlugin> = mutableMapOf()
     val registeredRawPlugins: Map<String, RawLoadedPlugin> get() = this._registeredRawPlugins
 
     private val _registeredPlugins: MutableMap<String, LoadedPlugin> = mutableMapOf()
     val registeredPlugins: Map<String, LoadedPlugin> get() = _registeredPlugins
 
-    fun registerPlugin(pluginJarPath: String) {
-        val raw = pluginLoader.loadPlugin(pluginJarPath)
+    /**
+     * Register a plugin, if you want to do something when the plugin is loaded/enabled/disabled,
+     * see hook functions in [PluginLoaderHook]
+     *
+     * @param T PluginMetadataPlugin or its subtype
+     * @param pluginJarPath Plugin JAR file path
+     * @param metadataClazz T.class
+     * @param pluginMainClass Default plugin main class is using the config property: main.
+     *                        You could customize the plugin main class by this anonymous function
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <T: PluginMetadata> registerPlugin(
+        pluginJarPath: String,
+        metadataClazz: Class<T>,
+        pluginMainClass: (RawLoadedPlugin, T) -> String = { _, metadata -> metadata.main }
+    ) {
+        val raw = PluginLoader.loadPlugin(pluginJarPath, metadataClazz)
         val metadata = raw.metadata
         val classLoader = raw.classLoader
 
@@ -30,9 +44,10 @@ object PluginManager {
             it.onLoaded(raw)
         }
 
-        _registeredRawPlugins[metadata.main] = raw
+        val mainClassName = pluginMainClass.invoke(raw, metadata as T)
+        _registeredRawPlugins[mainClassName] = raw
 
-        val pluginInstance = classLoader.loadClass(metadata.main).getDeclaredConstructor().newInstance() as AbstractPlugin
+        val pluginInstance = classLoader.loadClass(mainClassName).getDeclaredConstructor().newInstance() as AbstractPlugin
         pluginInstance.onLoad()
 
         PluginLoaderHook.onPluginPostEnabledListeners.forEach {
@@ -47,8 +62,8 @@ object PluginManager {
             metadata, classLoader,
         )
 
-        _registeredRawPlugins.remove(metadata.main)
-        _registeredPlugins[metadata.main] = loadedPlugin
+        _registeredRawPlugins.remove(mainClassName)
+        _registeredPlugins[mainClassName] = loadedPlugin
 
         PluginLoaderHook.onPluginEnabledListeners.forEach {
             it.onEnabled(loadedPlugin)

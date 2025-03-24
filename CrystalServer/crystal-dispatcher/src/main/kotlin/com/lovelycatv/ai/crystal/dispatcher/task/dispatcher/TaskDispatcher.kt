@@ -144,7 +144,7 @@ class TaskDispatcher(
                             node.deepseekModels.find { it.id == task.options.modelName } != null
                         }
 
-                        else -> false
+                        else -> node.modelOptionClassNamesFromPlugins.contains(task.options::class.java.canonicalName)
                     }
                 }
 
@@ -154,7 +154,7 @@ class TaskDispatcher(
                             node.ollamaModels.find { it.model == task.options.modelName } != null
                         }
 
-                        else -> false
+                        else -> node.modelOptionClassNamesFromPlugins.contains(task.options::class.java.canonicalName)
                     }
                 }
 

@@ -22,7 +22,7 @@ object GlobalConstants {
             }
 
             object OpenApiController {
-                const val CHAT_COMPLETION = "/v1/chat/completion"
+                const val CHAT_COMPLETION = "/v1/chat/completions"
                 const val EMBEDDINGS = "/v1/embeddings"
             }
 

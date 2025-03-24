@@ -7,15 +7,16 @@ import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.util.toJSONString
+import com.lovelycatv.ai.crystal.dispatcher.api.options.ChatOptionsBuilder
 import com.lovelycatv.ai.crystal.dispatcher.data.ChatCompletionMessage
 import com.lovelycatv.ai.crystal.dispatcher.data.ChatCompletionPayloads
 import com.lovelycatv.ai.crystal.dispatcher.data.ChatCompletionResponse
 import com.lovelycatv.ai.crystal.dispatcher.data.StreamChatCompletionResponse
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
+import com.lovelycatv.ai.crystal.dispatcher.exception.PlatformNotSupportException
+import com.lovelycatv.ai.crystal.dispatcher.plugin.DispatcherPluginManager
 import com.lovelycatv.ai.crystal.dispatcher.response.model.base.ModelChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.StreamChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultChatService
@@ -28,7 +29,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import reactor.core.CorePublisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -40,7 +40,8 @@ import reactor.core.publisher.Mono
 @RestController
 class OpenApiControllerV1(
     private val chatService: DefaultChatService,
-    private val taskManager: TaskManager
+    private val taskManager: TaskManager,
+    private val chatOptionsBuilders: List<ChatOptionsBuilder<*>>
 ) : IOpenApiControllerV1 {
     private val objectMapper = jacksonObjectMapper().apply {
         this.setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -135,11 +136,11 @@ class OpenApiControllerV1(
     private fun buildChatOptions(model: String): AbstractChatOptions {
         val (platformName, modelName) = model.split("@")
 
-        return when (platformName.lowercase()) {
-            "ollama" -> OllamaChatOptions(modelName = modelName, temperature = null)
-            "deepseek" -> DeepSeekChatOptions(modelName = modelName, temperature = null)
-            else -> throw IllegalStateException("$platformName is not supported yet.")
+        val builder = (chatOptionsBuilders + DispatcherPluginManager.registeredPlugins.flatMap { it.chatOptionsBuilders }).find {
+            it.getPlatformName().lowercase() == platformName.lowercase()
         }
+
+        return builder?.build(modelName) ?: throw PlatformNotSupportException(platformName)
     }
 
     private fun ModelChatRequestResult.toChatCompletionResponse(payloads: ChatCompletionPayloads): ChatCompletionResponse {

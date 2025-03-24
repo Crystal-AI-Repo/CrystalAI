@@ -84,7 +84,9 @@ abstract class AbstractNodeManager(
         val result = client.safeRequest { getHealthStatus() }
 
         return if (result?.isUp() == true) {
-            val nodeInfoResult = getFeignClient<NodeProbeClient>(url).safeRequest { getNodeInfo() }
+            val nodeInfoResult = getFeignClient<NodeProbeClient>(url).safeRequest(onException = {
+                it.printStackTrace()
+            }) { getNodeInfo() }
 
             if (nodeInfoResult?.isSuccessful() == true) {
                 val nodeInfo = nodeInfoResult.data
@@ -111,7 +113,8 @@ abstract class AbstractNodeManager(
                         lastAliveCheckTimestamp = currentTimestamp,
                         lastUpdateTimestamp = currentTimestamp,
                         ollamaModels = nodeInfo.ollamaModels,
-                        deepseekModels = nodeInfo.deepseekModels
+                        deepseekModels = nodeInfo.deepseekModels,
+                        modelOptionClassNamesFromPlugins = nodeInfo.modelOptionClassNamesFromPlugins
                     )
                 } else {
                     RegisteredNode(
@@ -126,7 +129,8 @@ abstract class AbstractNodeManager(
                         lastAliveCheckTimestamp = currentTimestamp,
                         lastUpdateTimestamp = currentTimestamp,
                         ollamaModels = nodeInfo.ollamaModels,
-                        deepseekModels = nodeInfo.deepseekModels
+                        deepseekModels = nodeInfo.deepseekModels,
+                        modelOptionClassNamesFromPlugins = nodeInfo.modelOptionClassNamesFromPlugins
                     )
                 }
 

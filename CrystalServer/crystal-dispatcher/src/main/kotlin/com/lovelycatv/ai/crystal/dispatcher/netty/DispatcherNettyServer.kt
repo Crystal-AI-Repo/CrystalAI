@@ -9,6 +9,7 @@ import com.lovelycatv.ai.crystal.dispatcher.config.RegisteredNodeConfiguration
 import com.lovelycatv.ai.crystal.dispatcher.manager.AbstractNodeManager
 import com.lovelycatv.ai.crystal.dispatcher.netty.handler.NettyClientConnectionHandler
 import com.lovelycatv.ai.crystal.dispatcher.netty.handler.NettyClientChatResponseHandler
+import com.lovelycatv.ai.crystal.dispatcher.plugin.DispatcherPluginManager
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.nio.NioEventLoopGroup
@@ -37,7 +38,7 @@ class DispatcherNettyServer(
                 override fun initChannel(channel: NioSocketChannel) {
                     channel.pipeline().addLast(FrameDecoder())
                     channel.pipeline().addLast(NettyMessageChainEncoder())
-                    channel.pipeline().addLast(NettyMessageChainDecoder())
+                    channel.pipeline().addLast(NettyMessageChainDecoder(DispatcherPluginManager.objectMapper))
                     channel.pipeline().addLast(NettyEmptyReceivedMessageHandler())
                     channel.pipeline().addLast(
                         NettyClientConnectionHandler(

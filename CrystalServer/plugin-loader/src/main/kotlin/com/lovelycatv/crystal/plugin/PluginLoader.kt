@@ -19,30 +19,24 @@ import java.util.jar.JarFile
  * @since 2025-03-02 14:54
  * @version 1.0
  */
-class PluginLoader {
-    companion object {
-        private val yamlMapper = ObjectMapper(YAMLFactory()).apply {
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        }
+object PluginLoader {
+    val yamlMapper = ObjectMapper(YAMLFactory()).apply {
+        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    }
 
-        @Throws(PluginMetadataNotFoundException::class)
-        fun getPluginMetadata(pluginJarPath: String): PluginMetadata {
-            JarFile(pluginJarPath).use { jarFile ->
-                val entry: JarEntry = jarFile.getJarEntry("plugin.yml") ?: throw PluginMetadataNotFoundException(jarFile.name)
-                jarFile.getInputStream(entry).use { inputStream ->
-                    return yamlMapper.readValue(inputStream, PluginMetadata::class.java)
-                }
+    @Throws(PluginMetadataNotFoundException::class)
+    fun <T: PluginMetadata> getPluginMetadata(pluginJarPath: String, clazz: Class<T>): T {
+        JarFile(pluginJarPath).use { jarFile ->
+            val entry: JarEntry = jarFile.getJarEntry("plugin.yml") ?: throw PluginMetadataNotFoundException(jarFile.name)
+            jarFile.getInputStream(entry).use { inputStream ->
+                return yamlMapper.readValue(inputStream, clazz)
             }
-        }
-
-        fun getPluginConfig(pluginConfigPath: String): YAMLConfiguration {
-            return YAMLConfiguration(File(pluginConfigPath))
         }
     }
 
     @Throws(Exception::class)
-    fun loadPlugin(pluginJarPath: String): RawLoadedPlugin {
-         val pluginMetadata = getPluginMetadata(pluginJarPath)
+    fun <T: PluginMetadata> loadPlugin(pluginJarPath: String, clazz: Class<T>): RawLoadedPlugin {
+        val pluginMetadata = getPluginMetadata(pluginJarPath, clazz)
 
         val jarUrl: URL = File(pluginJarPath).toURI().toURL()
         val pluginClassLoader = URLClassLoader(arrayOf(jarUrl), javaClass.classLoader)
@@ -51,5 +45,9 @@ class PluginLoader {
             metadata = pluginMetadata,
             classLoader = pluginClassLoader
         )
+    }
+
+    fun getPluginConfig(pluginConfigPath: String): YAMLConfiguration {
+        return YAMLConfiguration(File(pluginConfigPath))
     }
 }
