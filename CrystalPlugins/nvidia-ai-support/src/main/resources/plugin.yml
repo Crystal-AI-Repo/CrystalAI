@@ -1,0 +1,10 @@
+name: NvidiaAI-Support
+description: ""
+authors:
+  - LovelyCat
+version: 1.0
+package: com.lovelycatv.crystal.plugin.nvidia.dispatcher
+nodePackageName: com.lovelycatv.crystal.plugin.nvidia.node
+commonPackageName: com.lovelycatv.crystal.plugin.nvidia.common
+main: com.lovelycatv.crystal.plugin.nvidia.dispatcher.DispatcherMainClass
+nodeMain: com.lovelycatv.crystal.plugin.nvidia.node.NodeMainClass
