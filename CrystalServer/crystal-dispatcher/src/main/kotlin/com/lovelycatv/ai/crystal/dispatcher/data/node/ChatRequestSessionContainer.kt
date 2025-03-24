@@ -69,7 +69,7 @@ data class ChatRequestSessionContainer(
     }
 
     fun checkAndSetTimeout() = (timeout > 0 && (System.currentTimeMillis() - this.lastReceivedTimestamp) > timeout).also {
-        this._status.set(Status.TIMEOUT)
+        if (it) this._status.set(Status.TIMEOUT)
     }
 
 

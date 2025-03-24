@@ -1,15 +1,15 @@
 package com.lovelycatv.ai.crystal.node.service.chat.base
 
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.util.divide
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
+import com.lovelycatv.ai.crystal.node.api.interfaces.model.ChatOptions2SpringAIOptionsTranslator
 import com.lovelycatv.ai.crystal.node.data.AbstractChatResult
 import com.lovelycatv.ai.crystal.node.data.PackagedChatServiceResult
 import com.lovelycatv.ai.crystal.node.data.SpringAIChatResult
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedMessageContentType
-import com.lovelycatv.ai.crystal.node.api.interfaces.model.ChatOptions2SpringAIOptionsTranslator
 import org.springframework.ai.chat.messages.AssistantMessage
 import org.springframework.ai.chat.messages.SystemMessage
 import org.springframework.ai.chat.messages.UserMessage
@@ -66,10 +66,10 @@ abstract class AbstractSpringAIChatService<CHAT_MODEL: ChatModel, MODEL_OPTIONS:
             this.defaultChatModel = buildChatModel()
         }
 
-        val builtPrompt = content.map {
-            val (textList, mediaList) = it.message.divide { it.type == PromptMessage.Content.Type.TEXT }
+        val builtPrompt = content.map { promptMessage ->
+            val (textList, mediaList) = promptMessage.message.divide { it.type == PromptMessage.Content.Type.TEXT }
 
-            val plainText = textList.joinToString(separator = it.messageSeparator)
+            val plainText = textList.joinToString(separator = promptMessage.messageSeparator) { it.stringContent() }
             val medias = mediaList.map {
                 Media.builder().apply {
                     when (it.content) {
@@ -80,7 +80,7 @@ abstract class AbstractSpringAIChatService<CHAT_MODEL: ChatModel, MODEL_OPTIONS:
                 }.build()
             }
 
-            when (it.role) {
+            when (promptMessage.role) {
                 PromptMessage.Role.USER -> {
                     UserMessage(plainText, medias)
                 }

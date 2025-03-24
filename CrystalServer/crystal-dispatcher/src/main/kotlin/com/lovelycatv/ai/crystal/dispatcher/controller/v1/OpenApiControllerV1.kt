@@ -26,6 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.springframework.http.MediaType
+import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -49,6 +50,7 @@ class OpenApiControllerV1(
 
     private val chatCompletionRequestHandler = CoroutineScope(Dispatchers.IO)
 
+    @Async
     @PostMapping(CHAT_COMPLETION, produces = [MediaType.TEXT_EVENT_STREAM_VALUE, MediaType.APPLICATION_JSON_VALUE])
     override suspend fun chatCompletion(
         @RequestBody payloads: ChatCompletionPayloads
@@ -83,7 +85,7 @@ class OpenApiControllerV1(
                                 message: ModelResponseMessage
                             ) {
                                 emitter.next(
-                                    result.appendResults(message).toStreamChatCompletionResponse(payloads, false)
+                                    result.appendResults(message).toStreamChatCompletionResponse(false)
                                         .toJSONString(objectMapper)
                                 )
                             }
@@ -92,7 +94,7 @@ class OpenApiControllerV1(
                                 container.recentReceived()?.let { lastReceived ->
                                     emitter.next(
                                         result.appendResults(lastReceived)
-                                            .toStreamChatCompletionResponse(payloads, true).toJSONString(objectMapper)
+                                            .toStreamChatCompletionResponse(true).toJSONString(objectMapper)
                                     )
                                 }
                                 emitter.next("[DONE]")
@@ -169,7 +171,7 @@ class OpenApiControllerV1(
         )
     }
 
-    private fun ModelChatRequestResult.toStreamChatCompletionResponse(payloads: ChatCompletionPayloads, finally: Boolean): StreamChatCompletionResponse {
+    private fun ModelChatRequestResult.toStreamChatCompletionResponse(finally: Boolean): StreamChatCompletionResponse {
         val totalTokens = this.results.sumOf { it.totalTokens }
         val completionTokens = this.results.sumOf { it.generatedTokens }
 
