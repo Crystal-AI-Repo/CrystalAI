@@ -1,0 +1,25 @@
+server:
+  port: 5410
+
+spring:
+  application:
+    name: CrystalRAG
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health, info
+
+logging:
+  file:
+    name: logs/${spring.application.name}
+  logback:
+    rollingpolicy:
+      max-history: 31
+      max-file-size: 4GB
+      file-name-pattern: ${LOG_FILE}_%d{yyyy-MM-dd}_%i.gz
