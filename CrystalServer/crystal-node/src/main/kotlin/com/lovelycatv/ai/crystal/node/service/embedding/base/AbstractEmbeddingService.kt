@@ -1,8 +1,8 @@
 package com.lovelycatv.ai.crystal.node.service.embedding.base
 
-import com.lovelycatv.ai.crystal.node.data.AbstractEmbeddingResult
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
+import com.lovelycatv.ai.crystal.node.data.AbstractEmbeddingResult
 
 /**
  * @author lovelycat

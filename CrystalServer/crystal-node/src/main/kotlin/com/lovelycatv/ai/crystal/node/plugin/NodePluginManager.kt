@@ -12,8 +12,6 @@ import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOpti
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.EmbeddingResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbeddingOptions
-import com.lovelycatv.ai.crystal.node.api.dispatcher.ChatServiceDispatcher
-import com.lovelycatv.ai.crystal.node.api.dispatcher.EmbeddingServiceDispatcher
 import java.io.File
 
 /**

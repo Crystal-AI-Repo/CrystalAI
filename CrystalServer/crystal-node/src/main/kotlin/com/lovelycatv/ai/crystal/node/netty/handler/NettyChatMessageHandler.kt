@@ -2,35 +2,25 @@ package com.lovelycatv.ai.crystal.node.netty.handler
 
 import com.lovelycatv.ai.crystal.common.data.message.MessageChain
 import com.lovelycatv.ai.crystal.common.data.message.MessageChainBuilder
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.AbstractModelOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.EmbeddingResponseMessage
-import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbeddingOptions
 import com.lovelycatv.ai.crystal.common.data.message.transferToNextPipeLineIfNotEmpty
 import com.lovelycatv.ai.crystal.common.util.implies
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.node.api.task.NodeChatTaskBuilder
 import com.lovelycatv.ai.crystal.node.api.task.NodeEmbeddingTaskBuilder
-import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.data.*
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedModelOptionsType
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedTaskTypeException
-import com.lovelycatv.ai.crystal.node.plugin.NodePluginManager
 import com.lovelycatv.ai.crystal.node.queue.TaskQueue
 import com.lovelycatv.ai.crystal.node.task.AbstractTask
-import com.lovelycatv.ai.crystal.node.task.toDeepSeekTask
-import com.lovelycatv.ai.crystal.node.task.toOllamaEmbeddingTask
-import com.lovelycatv.ai.crystal.node.task.toOllamaTask
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
-import org.w3c.dom.Node
-import kotlin.reflect.KClass
 
 /**
  * @author lovelycat

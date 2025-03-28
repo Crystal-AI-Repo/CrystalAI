@@ -11,6 +11,8 @@ import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmb
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.EmbeddingResponseMessage
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.node.Global
+import com.lovelycatv.ai.crystal.node.api.dispatcher.ChatServiceDispatcher
+import com.lovelycatv.ai.crystal.node.api.dispatcher.EmbeddingServiceDispatcher
 import com.lovelycatv.ai.crystal.node.data.AbstractChatResult
 import com.lovelycatv.ai.crystal.node.data.AbstractEmbeddingResult
 import com.lovelycatv.ai.crystal.node.exception.UnsupportedModelOptionsType
@@ -18,8 +20,6 @@ import com.lovelycatv.ai.crystal.node.exception.UnsupportedTaskTypeException
 import com.lovelycatv.ai.crystal.node.netty.AbstractNodeNettyClient
 import com.lovelycatv.ai.crystal.node.plugin.NodePluginManager
 import com.lovelycatv.ai.crystal.node.queue.InMemoryTaskQueue
-import com.lovelycatv.ai.crystal.node.api.dispatcher.ChatServiceDispatcher
-import com.lovelycatv.ai.crystal.node.api.dispatcher.EmbeddingServiceDispatcher
 import com.lovelycatv.ai.crystal.node.service.chat.base.AbstractChatService
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCallback
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCompletedCallback

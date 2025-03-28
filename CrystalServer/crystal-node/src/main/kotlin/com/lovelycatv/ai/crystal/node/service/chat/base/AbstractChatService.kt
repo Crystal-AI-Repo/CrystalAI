@@ -1,7 +1,7 @@
 package com.lovelycatv.ai.crystal.node.service.chat.base
 
-import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.node.data.AbstractChatResult
 import com.lovelycatv.ai.crystal.node.data.PackagedChatServiceResult
 import kotlinx.coroutines.CoroutineName
