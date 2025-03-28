@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.dispatcher.api.options
+package com.lovelycatv.crystal.openapi.plugin
 
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 

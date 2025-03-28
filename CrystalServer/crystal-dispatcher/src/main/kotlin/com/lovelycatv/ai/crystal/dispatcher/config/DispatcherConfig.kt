@@ -3,8 +3,8 @@ package com.lovelycatv.ai.crystal.dispatcher.config
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbeddingOptions
-import com.lovelycatv.ai.crystal.dispatcher.api.options.ChatOptionsBuilder
-import com.lovelycatv.ai.crystal.dispatcher.api.options.EmbeddingOptionsBuilder
+import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.crystal.openapi.plugin.EmbeddingOptionsBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

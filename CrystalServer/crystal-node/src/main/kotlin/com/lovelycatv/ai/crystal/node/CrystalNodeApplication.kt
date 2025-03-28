@@ -22,13 +22,12 @@ class CrystalNodeApplication(
      * @throws Exception on error
      */
     override fun run(vararg args: String?) {
-        if (nodeConfiguration._mode == NodeRunningMode.STANDALONE) {
+        if (nodeConfiguration.modeEnum == NodeRunningMode.STANDALONE) {
             logger.info("Crystal Node is running in standalone mode.")
-        } else if (nodeConfiguration._mode == NodeRunningMode.STANDALONE) {
+        } else if (nodeConfiguration.modeEnum == NodeRunningMode.STANDALONE) {
             logger.info("Crystal Node is running in cluster mode.")
         }
     }
-
 }
 
 fun main(args: Array<String>) {

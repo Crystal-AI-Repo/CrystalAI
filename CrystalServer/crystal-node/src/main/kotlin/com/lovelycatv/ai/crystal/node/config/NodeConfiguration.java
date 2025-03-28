@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "crystal")
 public class NodeConfiguration {
-    public NodeRunningMode _mode;
+    public NodeRunningMode modeEnum;
     private String mode;
     private NodeDispatcherConfiguration dispatcher = new NodeDispatcherConfiguration();
     private NodeOllamaConfiguration ollama = new NodeOllamaConfiguration();
@@ -70,7 +70,7 @@ public class NodeConfiguration {
 
     public void setMode(String mode) {
         this.mode = mode;
-        this._mode = this.getModeEnum();
+        this.modeEnum = this.getModeEnum();
     }
 
     public boolean isSsl() {

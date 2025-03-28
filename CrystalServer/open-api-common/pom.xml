@@ -9,10 +9,12 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.lovelycatv.ai.crystal.dispatcher</groupId>
-    <artifactId>crystal-dispatcher</artifactId>
+    <groupId>com.lovelycatv.crystal.openaiapi</groupId>
+    <artifactId>open-api-common</artifactId>
 
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -20,11 +22,6 @@
         <dependency>
             <groupId>com.lovelycatv.ai.crystal.common</groupId>
             <artifactId>crystal-common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.lovelycatv.crystal.openaiapi</groupId>
-            <artifactId>open-api-common</artifactId>
         </dependency>
     </dependencies>
 
@@ -34,14 +31,18 @@
 
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>

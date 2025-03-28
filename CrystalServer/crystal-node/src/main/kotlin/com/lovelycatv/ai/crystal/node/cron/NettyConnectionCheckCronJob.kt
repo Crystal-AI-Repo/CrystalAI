@@ -21,7 +21,7 @@ class NettyConnectionCheckCronJob(
 ) {
     @Scheduled(cron = "0/3 * * * * ?")
     fun checkNettyConnection() {
-        if (nodeConfiguration._mode == NodeRunningMode.STANDALONE) {
+        if (nodeConfiguration.modeEnum == NodeRunningMode.STANDALONE) {
             return
         }
         // Check if the node is registered to the dispatcher.

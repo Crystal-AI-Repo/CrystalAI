@@ -28,7 +28,7 @@ class NodeRegisterCronJob(
 
     @Scheduled(cron = "0/3 * * * * ?")
     fun checkRegisterStatus() {
-        if (nodeConfiguration._mode == NodeRunningMode.STANDALONE) {
+        if (nodeConfiguration.modeEnum == NodeRunningMode.STANDALONE) {
             return
         }
 

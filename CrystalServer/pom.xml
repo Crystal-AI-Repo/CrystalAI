@@ -27,6 +27,7 @@
         <module>crystal-common</module>
         <module>plugin-loader</module>
         <module>crystal-rag</module>
+        <module>open-api-common</module>
     </modules>
     <scm>
         <connection/>
@@ -43,6 +44,7 @@
 
         <crystal.common.version>0.0.1-SNAPSHOT</crystal.common.version>
         <plugin.loader.version>0.0.1-SNAPSHOT</plugin.loader.version>
+        <open.api.common.version>0.0.1-SNAPSHOT</open.api.common.version>
     </properties>
     <dependencies>
         <!-- Kotlin -->
@@ -165,6 +167,12 @@
                 <groupId>com.lovelycatv.crystal.plugin</groupId>
                 <artifactId>plugin-loader</artifactId>
                 <version>${plugin.loader.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.lovelycatv.crystal.openaiapi</groupId>
+                <artifactId>open-api-common</artifactId>
+                <version>${open.api.common.version}</version>
             </dependency>
 
             <dependency>

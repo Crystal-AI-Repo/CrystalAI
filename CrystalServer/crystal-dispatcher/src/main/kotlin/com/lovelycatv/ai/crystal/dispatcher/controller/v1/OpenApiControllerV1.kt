@@ -9,30 +9,32 @@ import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.embedding.EmbeddingResponseMessage
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.util.toJSONString
-import com.lovelycatv.ai.crystal.dispatcher.api.options.ChatOptionsBuilder
-import com.lovelycatv.ai.crystal.dispatcher.api.options.EmbeddingOptionsBuilder
 import com.lovelycatv.ai.crystal.dispatcher.data.*
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
-import com.lovelycatv.ai.crystal.dispatcher.exception.PlatformNotSupportException
-import com.lovelycatv.ai.crystal.dispatcher.plugin.DispatcherPluginManager
 import com.lovelycatv.ai.crystal.dispatcher.response.model.base.ModelChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.StreamChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultChatService
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultEmbeddingService
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.ListenableTaskManager
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
+import com.lovelycatv.crystal.openapi.AbstractOpenApiController
+import com.lovelycatv.crystal.openapi.dto.ChatCompletionApiRequest
+import com.lovelycatv.crystal.openapi.dto.EmbeddingApiRequest
+import com.lovelycatv.crystal.openapi.dto.StreamChatCompletionResponse
+import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.crystal.openapi.plugin.EmbeddingOptionsBuilder
+import com.lovelycatv.crystal.openapi.toStreamChatCompletionResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 
 /**
  * @author lovelycat
@@ -44,9 +46,9 @@ class OpenApiControllerV1(
     private val chatService: DefaultChatService,
     private val embeddingService: DefaultEmbeddingService,
     private val taskManager: TaskManager,
-    private val chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
-    private val embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
-) : IOpenApiControllerV1 {
+    chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
+    embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
+) : AbstractOpenApiController(chatOptionsBuilders, embeddingOptionsBuilders) {
     private val objectMapper = jacksonObjectMapper().apply {
         this.setSerializationInclusion(JsonInclude.Include.NON_NULL)
     }
@@ -55,188 +57,113 @@ class OpenApiControllerV1(
 
     @Async
     @PostMapping(CHAT_COMPLETION, produces = [MediaType.TEXT_EVENT_STREAM_VALUE, MediaType.APPLICATION_JSON_VALUE])
-    override suspend fun chatCompletion(
-        @RequestBody payloads: ChatCompletionApiRequest
-    ): Any {
-        val options = buildChatOptions(payloads.model)
-        val messages = payloads.messages.map {
-            PromptMessage(
-                role = if (it.role.lowercase() == "system") {
-                    PromptMessage.Role.SYSTEM
-                } else if (it.role.lowercase() == "user") {
-                    PromptMessage.Role.USER
-                } else if (it.role.lowercase() == "assistant") {
-                    PromptMessage.Role.ASSISTANT
-                } else throw IllegalStateException(""),
-                message = listOf(PromptMessage.Content.fromString(it.content))
-            )
-        }
-
-        return if (payloads.stream) {
-            Flux.create { emitter ->
-                chatCompletionRequestHandler.launch {
-                    val result = chatService.sendStreamChatTask(
-                        options = options,
-                        messages = messages,
-                        timeout = 600000
-                    )
-
-                    if (result.isSuccess) {
-                        taskManager.subscribe(result.sessionId!!, object : ListenableTaskManager.SimpleSubscriber {
-                            override fun onReceived(
-                                container: ChatRequestSessionContainer,
-                                message: ModelResponseMessage
-                            ) {
-                                emitter.next(
-                                    result.appendResults(message).toStreamChatCompletionResponse(false)
-                                        .toJSONString(objectMapper)
-                                )
-                            }
-
-                            override fun onFinished(container: ChatRequestSessionContainer) {
-                                container.recentReceived()?.let { lastReceived ->
-                                    emitter.next(
-                                        result.appendResults(lastReceived)
-                                            .toStreamChatCompletionResponse(true).toJSONString(objectMapper)
-                                    )
-                                }
-                                emitter.next("[DONE]")
-                                emitter.complete()
-                            }
-
-                            override fun onFailed(
-                                container: ChatRequestSessionContainer?,
-                                failedMessage: ModelResponseMessage?
-                            ) {
-                                emitter.next(Result.badRequest(failedMessage?.message ?: "").toJSONString())
-                                emitter.complete()
-                            }
-                        })
-                    } else {
-                        emitter.next(Result.badRequest(result.message).toJSONString())
-                        emitter.complete()
-                    }
-
-                }
-            }
-        } else {
-            // Blocking request
-            val result = chatService.sendOneTimeChatTask(
-                options = options,
-                messages = messages,
-                ignoreResult = false,
-                timeout = 600000
-            )
-
-            Mono.just(
-                if (result.isSuccess) {
-                    result.toChatCompletionResponse(payloads).toJSONString(objectMapper)
-                } else {
-                    Result.badRequest(result.message).toJSONString()
-                }
-            )
-        }
+    override suspend fun chatCompletion(payloads: ChatCompletionApiRequest): Any {
+        return super.chatCompletion(payloads)
     }
 
     @Async
     @PostMapping(EMBEDDINGS)
     override suspend fun embedding(payloads: EmbeddingApiRequest): Any {
+        return super.embedding(payloads)
+    }
+
+
+    /**
+     * Actual implementation of chat completion
+     *
+     * @param options [AbstractChatOptions]
+     * @param messages List of [PromptMessage]
+     * @return
+     */
+    override suspend fun doChatCompletion(options: AbstractChatOptions, messages: List<PromptMessage>): Triple<List<ChatResponseMessage>?, String, String> {
+        // Blocking request
+        val result = chatService.sendOneTimeChatTask(
+            options = options,
+            messages = messages,
+            ignoreResult = false,
+            timeout = 600000
+        )
+
+        return Triple(result.results, result.sessionId ?: "", result.message)
+    }
+
+    /**
+     * Actual implementation of stream chat completion
+     *
+     * @param options [AbstractChatOptions]
+     * @param messages List of [PromptMessage]
+     * @return
+     */
+    override fun doStreamChatCompletion(options: AbstractChatOptions, messages: List<PromptMessage>): Flux<*> {
+        return Flux.create { emitter ->
+            chatCompletionRequestHandler.launch {
+                val result = chatService.sendStreamChatTask(
+                    options = options,
+                    messages = messages,
+                    timeout = 600000
+                )
+
+                if (result.isSuccess) {
+                    taskManager.subscribe(result.sessionId!!, object : ListenableTaskManager.SimpleSubscriber {
+                        override fun onReceived(
+                            container: ChatRequestSessionContainer,
+                            message: ModelResponseMessage
+                        ) {
+                            emitter.next(
+                                result.appendResults(message).run {
+                                    this.results.toStreamChatCompletionResponse(this.sessionId ?: "", false)
+                                        .toJSONString(objectMapper)
+                                }
+                            )
+                        }
+
+                        override fun onFinished(container: ChatRequestSessionContainer) {
+                            container.recentReceived()?.let { lastReceived ->
+                                emitter.next(
+                                    result.appendResults(lastReceived).run {
+                                        this.results.toStreamChatCompletionResponse(this.sessionId ?: "", true)
+                                            .toJSONString(objectMapper)
+                                    }
+
+                                )
+                            }
+                            emitter.next("[DONE]")
+                            emitter.complete()
+                        }
+
+                        override fun onFailed(
+                            container: ChatRequestSessionContainer?,
+                            failedMessage: ModelResponseMessage?
+                        ) {
+                            emitter.next(Result.badRequest(failedMessage?.message ?: "").toJSONString())
+                            emitter.complete()
+                        }
+                    })
+                } else {
+                    emitter.next(Result.badRequest(result.message).toJSONString())
+                    emitter.complete()
+                }
+
+            }
+        }
+    }
+
+    /**
+     * Actual implementation of embedding
+     *
+     * @param options [AbstractEmbeddingOptions]
+     * @param messages List of [PromptMessage]
+     * @return
+     */
+    override suspend fun doEmbedding(options: AbstractEmbeddingOptions, messages: List<PromptMessage>): Pair<EmbeddingResponseMessage?, String> {
         val response = embeddingService.sendOneTimeEmbeddingTask(
-            options = this.buildEmbeddingOptions(payloads.model),
-            messages = listOf(PromptMessage.Builder().fromUser().addMessage(PromptMessage.Content.fromString("")).build()),
+            options = options,
+            messages = messages,
             ignoreResult = false,
             timeout = 120000
         )
 
-        val result = response.results.firstOrNull()
-        return if (result != null) {
-            EmbeddingApiResponse(
-                "list",
-                result.results.mapIndexed { index, it ->
-                    EmbeddingApiResponse.EmbeddingData(
-                        `object` = "embedding",
-                        index = index,
-                        embedding = it
-                    )
-                },
-                payloads.model,
-                EmbeddingApiResponse.Usage(
-                    totalTokens = result.totalTokens,
-                    promptTokens = result.promptTokens
-                )
-            )
-        } else {
-            Result.badRequest(response.message)
-        }
-    }
-
-    private fun buildChatOptions(model: String): AbstractChatOptions {
-        val (platformName, modelName) = model.split("@")
-
-        val builder = (chatOptionsBuilders + DispatcherPluginManager.registeredPlugins.flatMap { it.chatOptionsBuilders }).find {
-            it.getPlatformName().lowercase() == platformName.lowercase()
-        }
-
-        return builder?.build(modelName) ?: throw PlatformNotSupportException(platformName)
-    }
-
-    private fun buildEmbeddingOptions(model: String): AbstractEmbeddingOptions {
-        val (platformName, modelName) = model.split("@")
-
-        val builder = (embeddingOptionsBuilders + DispatcherPluginManager.registeredPlugins.flatMap { it.embeddingOptionsBuilders }).find {
-            it.getPlatformName().lowercase() == platformName.lowercase()
-        }
-
-        return builder?.build(modelName) ?: throw PlatformNotSupportException(platformName)
-    }
-
-    private fun ModelChatRequestResult.toChatCompletionResponse(payloads: ChatCompletionApiRequest): ChatCompletionResponse {
-        val totalTokens = this.results.sumOf { it.totalTokens }
-        val completionTokens = this.results.sumOf { it.generatedTokens }
-
-        return ChatCompletionResponse(
-            id = this.sessionId!!,
-            created = System.currentTimeMillis() / 1000,
-            model = payloads.model,
-            choices = this.results.mapIndexed { index, it ->
-                ChatCompletionResponse.Choice(
-                    index = index,
-                    message = ChatCompletionMessage(
-                        role = "assistant",
-                        content = it.content ?: ""
-                    ),
-                    finishReason = "stop"
-                )
-            },
-            usage = ChatCompletionResponse.Usage(
-                totalTokens = totalTokens,
-                completionTokens = completionTokens,
-                promptTokens = totalTokens - completionTokens
-            )
-        )
-    }
-
-    private fun ModelChatRequestResult.toStreamChatCompletionResponse(finally: Boolean): StreamChatCompletionResponse {
-        val totalTokens = this.results.sumOf { it.totalTokens }
-        val completionTokens = this.results.sumOf { it.generatedTokens }
-
-        return StreamChatCompletionResponse(
-            id = this.streamId!!,
-            choices = this.results.mapIndexed { index, it ->
-                StreamChatCompletionResponse.Choice(
-                    index = index,
-                    delta = StreamChatCompletionResponse.Choice.Delta(
-                        content = it.content ?: ""
-                    ),
-                    finishReason = if (finally) "stop" else null
-                )
-            },
-            usage = if (finally) StreamChatCompletionResponse.Usage(
-                totalTokens = totalTokens,
-                completionTokens = completionTokens,
-                promptTokens = totalTokens - completionTokens
-            ) else null
-        )
+        return response.results.firstOrNull() to response.message
     }
 
     private fun StreamChatRequestResult.appendResults(vararg result: ModelResponseMessage): StreamChatRequestResult {
