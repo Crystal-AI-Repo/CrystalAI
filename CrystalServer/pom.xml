@@ -166,6 +166,12 @@
                 <artifactId>plugin-loader</artifactId>
                 <version>${plugin.loader.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>3.5.7</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
