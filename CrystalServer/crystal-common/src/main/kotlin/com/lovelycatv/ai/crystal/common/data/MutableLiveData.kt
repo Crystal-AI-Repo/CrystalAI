@@ -5,12 +5,14 @@ package com.lovelycatv.ai.crystal.common.data
  * @since 2025-02-27 01:48
  * @version 1.0
  */
-data class MutableLiveData<T>(var data: T) : LiveData<T> {
+data class MutableLiveData<T>(private var data: T) : LiveData<T>() {
     override fun get(): T {
         return this.data
     }
 
-    fun set(data: T) {
+    fun post(data: T) {
+        val old = this.data
         this.data = data
+        super.publish(old, data)
     }
 }

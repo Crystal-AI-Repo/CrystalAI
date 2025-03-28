@@ -5,6 +5,6 @@ package com.lovelycatv.ai.crystal.common.data
  * @since 2025-02-27 01:50
  * @version 1.0
  */
-interface LiveData<T> {
-    fun get(): T
+abstract class LiveData<T> : Observable<T>() {
+    abstract fun get(): T
 }

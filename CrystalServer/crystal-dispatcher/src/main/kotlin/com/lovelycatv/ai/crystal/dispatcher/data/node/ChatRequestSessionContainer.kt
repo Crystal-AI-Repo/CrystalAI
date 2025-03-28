@@ -55,9 +55,9 @@ data class ChatRequestSessionContainer(
         }
 
         if (message.success) {
-            this._status.set(Status.RECEIVING)
+            this._status.post(Status.RECEIVING)
         } else {
-            this._status.set(Status.FAILED)
+            this._status.post(Status.FAILED)
         }
 
         this.receivedResponses.add(message)
@@ -65,11 +65,11 @@ data class ChatRequestSessionContainer(
     }
 
     fun setFinished() {
-        this._status.set(Status.FINISHED)
+        this._status.post(Status.FINISHED)
     }
 
     fun checkAndSetTimeout() = (timeout > 0 && (System.currentTimeMillis() - this.lastReceivedTimestamp) > timeout).also {
-        if (it) this._status.set(Status.TIMEOUT)
+        if (it) this._status.post(Status.TIMEOUT)
     }
 
 

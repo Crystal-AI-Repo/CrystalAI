@@ -19,7 +19,8 @@ import org.springframework.stereotype.Component
 @Component
 class EmbeddingWorkerManager(
     private val knowledgeBaseService: KnowledgeBaseService,
-    private val crystalRAGConfig: CrystalRAGConfig
+    private val crystalRAGConfig: CrystalRAGConfig,
+    private val nodeAccessKeyManager: NodeAccessKeyManager
 ) : InitializingBean {
     private val logger = logger()
 
@@ -66,7 +67,7 @@ class EmbeddingWorkerManager(
                                 host = embeddingOptions.host ?: crystalRAGConfig.node.host,
                                 port = embeddingOptions.port ?: crystalRAGConfig.node.port,
                                 model = modelName,
-                                apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbm9ueW1vdXMiLCJpYXQiOjE3NDMxNTI4NzUsImV4cCI6MTc0MzIzOTI3NX0.JAzBoKguryArhIaDpk5x903OF9wjj_hkMn9hSegkwz0V-zCOt8P1jZV95E8_YoiUYliIOIKFaTjJC97_RFSIGA"
+                                apiKey = nodeAccessKeyManager.getAccessKey(true)
                             )
                     }
                     EmbeddingModelType.STANDALONE_OLLAMA -> {
