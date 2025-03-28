@@ -1,4 +1,4 @@
-package com.lovelycatv.ai.crystal.common.client
+package com.lovelycatv.ai.crystal.common.client.impl
 
 import com.lovelycatv.ai.crystal.common.response.actuator.NodeHealthResponse
 import com.lovelycatv.ai.crystal.common.client.IFeignClient

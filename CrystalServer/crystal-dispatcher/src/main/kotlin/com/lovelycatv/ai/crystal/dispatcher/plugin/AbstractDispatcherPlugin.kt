@@ -1,7 +1,7 @@
 package com.lovelycatv.ai.crystal.dispatcher.plugin
 
-import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
-import com.lovelycatv.crystal.openapi.plugin.EmbeddingOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.EmbeddingOptionsBuilder
 import com.lovelycatv.crystal.plugin.AbstractPlugin
 import org.springframework.context.ApplicationContext
 import kotlin.reflect.KClass

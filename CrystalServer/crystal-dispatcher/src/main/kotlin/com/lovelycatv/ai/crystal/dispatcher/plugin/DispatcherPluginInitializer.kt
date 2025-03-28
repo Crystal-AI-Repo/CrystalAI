@@ -3,8 +3,8 @@ package com.lovelycatv.ai.crystal.dispatcher.plugin
 import com.lovelycatv.ai.crystal.common.data.message.AbstractMessageTypeRegistry
 import com.lovelycatv.ai.crystal.common.plugin.CrystalPluginMetadata
 import com.lovelycatv.ai.crystal.common.util.logger
-import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
-import com.lovelycatv.crystal.openapi.plugin.EmbeddingOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.EmbeddingOptionsBuilder
 import com.lovelycatv.crystal.plugin.PluginManager
 import com.lovelycatv.crystal.plugin.api.PluginLoaderHook
 import org.springframework.boot.CommandLineRunner

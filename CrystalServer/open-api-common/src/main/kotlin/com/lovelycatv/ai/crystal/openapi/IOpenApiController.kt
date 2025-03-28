@@ -1,7 +1,7 @@
-package com.lovelycatv.crystal.openapi
+package com.lovelycatv.ai.crystal.openapi
 
-import com.lovelycatv.crystal.openapi.dto.ChatCompletionApiRequest
-import com.lovelycatv.crystal.openapi.dto.EmbeddingApiRequest
+import com.lovelycatv.ai.crystal.openapi.dto.ChatCompletionApiRequest
+import com.lovelycatv.ai.crystal.openapi.dto.EmbeddingApiRequest
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.RequestBody
 

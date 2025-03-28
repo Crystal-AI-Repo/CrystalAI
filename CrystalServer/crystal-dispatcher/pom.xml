@@ -23,7 +23,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.lovelycatv.crystal.openaiapi</groupId>
+            <groupId>com.lovelycatv.ai.crystal.openaiapi</groupId>
             <artifactId>open-api-common</artifactId>
         </dependency>
     </dependencies>

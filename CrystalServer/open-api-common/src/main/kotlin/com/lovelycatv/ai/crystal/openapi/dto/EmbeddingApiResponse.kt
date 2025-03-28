@@ -1,4 +1,4 @@
-package com.lovelycatv.crystal.openapi.dto
+package com.lovelycatv.ai.crystal.openapi.dto
 
 import com.alibaba.fastjson2.annotation.JSONCreator
 import com.fasterxml.jackson.annotation.JsonCreator
@@ -10,13 +10,13 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @version 1.0
  */
 data class EmbeddingApiResponse @JSONCreator constructor(
-    @JsonProperty("object")
+        @JsonProperty("object")
     val `object`: String,
-    @JsonProperty("data")
+        @JsonProperty("data")
     val data: List<EmbeddingData>,
-    @JsonProperty("model")
+        @JsonProperty("model")
     val model: String,
-    @JsonProperty("usage")
+        @JsonProperty("usage")
     val usage: Usage
 ) {
     data class EmbeddingData @JSONCreator constructor(

@@ -20,13 +20,13 @@ import com.lovelycatv.ai.crystal.dispatcher.service.DefaultChatService
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultEmbeddingService
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.ListenableTaskManager
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
-import com.lovelycatv.crystal.openapi.AbstractOpenApiController
-import com.lovelycatv.crystal.openapi.dto.ChatCompletionApiRequest
-import com.lovelycatv.crystal.openapi.dto.EmbeddingApiRequest
-import com.lovelycatv.crystal.openapi.dto.StreamChatCompletionResponse
-import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
-import com.lovelycatv.crystal.openapi.plugin.EmbeddingOptionsBuilder
-import com.lovelycatv.crystal.openapi.toStreamChatCompletionResponse
+import com.lovelycatv.ai.crystal.openapi.AbstractOpenApiController
+import com.lovelycatv.ai.crystal.openapi.dto.ChatCompletionApiRequest
+import com.lovelycatv.ai.crystal.openapi.dto.EmbeddingApiRequest
+import com.lovelycatv.ai.crystal.openapi.dto.StreamChatCompletionResponse
+import com.lovelycatv.ai.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.EmbeddingOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.toStreamChatCompletionResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,11 +43,11 @@ import reactor.core.publisher.Flux
  */
 @RestController
 class OpenApiControllerV1(
-    private val chatService: DefaultChatService,
-    private val embeddingService: DefaultEmbeddingService,
-    private val taskManager: TaskManager,
-    chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
-    embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
+        private val chatService: DefaultChatService,
+        private val embeddingService: DefaultEmbeddingService,
+        private val taskManager: TaskManager,
+        chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
+        embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
 ) : AbstractOpenApiController(chatOptionsBuilders, embeddingOptionsBuilders) {
     private val objectMapper = jacksonObjectMapper().apply {
         this.setSerializationInclusion(JsonInclude.Include.NON_NULL)

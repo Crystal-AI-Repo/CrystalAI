@@ -1,4 +1,4 @@
-package com.lovelycatv.crystal.openapi.exception
+package com.lovelycatv.ai.crystal.openapi.exception
 
 /**
  * @author lovelycat

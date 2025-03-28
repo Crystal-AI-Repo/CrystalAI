@@ -1,22 +1,18 @@
-package com.lovelycatv.crystal.openapi
+package com.lovelycatv.ai.crystal.openapi
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
-import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.EmbeddingResponseMessage
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.util.toJSONString
-import com.lovelycatv.crystal.openapi.dto.*
-import com.lovelycatv.crystal.openapi.exception.PlatformNotSupportException
-import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
-import com.lovelycatv.crystal.openapi.plugin.EmbeddingOptionsBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.lovelycatv.ai.crystal.openapi.dto.*
+import com.lovelycatv.ai.crystal.openapi.exception.PlatformNotSupportException
+import com.lovelycatv.ai.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.EmbeddingOptionsBuilder
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -26,8 +22,8 @@ import reactor.core.publisher.Mono
  * @version 1.0
  */
 abstract class AbstractOpenApiController(
-    private val chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
-    private val embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
+        private val chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
+        private val embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
 ) : IOpenApiController {
     private val objectMapper = jacksonObjectMapper().apply {
         this.setSerializationInclusion(JsonInclude.Include.NON_NULL)

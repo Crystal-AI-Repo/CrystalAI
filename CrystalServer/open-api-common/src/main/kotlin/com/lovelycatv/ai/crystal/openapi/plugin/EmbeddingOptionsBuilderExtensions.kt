@@ -1,4 +1,4 @@
-package com.lovelycatv.crystal.openapi.plugin
+package com.lovelycatv.ai.crystal.openapi.plugin
 
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
 

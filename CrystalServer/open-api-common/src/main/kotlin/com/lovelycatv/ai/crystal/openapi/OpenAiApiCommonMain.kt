@@ -1,4 +1,4 @@
-package com.lovelycatv.crystal.openapi
+package com.lovelycatv.ai.crystal.openapi
 
 object OpenAiApiCommonMain
 

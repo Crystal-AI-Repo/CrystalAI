@@ -1,4 +1,4 @@
-package com.lovelycatv.crystal.openapi.dto
+package com.lovelycatv.ai.crystal.openapi.dto
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -9,10 +9,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @version 1.0
  */
 data class ChatCompletionApiRequest @JsonCreator constructor(
-    @JsonProperty("model")
+        @JsonProperty("model")
     val model: String,
-    @JsonProperty("messages")
+        @JsonProperty("messages")
     val messages: List<ChatCompletionMessage>,
-    @JsonProperty("stream")
+        @JsonProperty("stream")
     val stream: Boolean
 )

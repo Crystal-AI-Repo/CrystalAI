@@ -1,7 +1,7 @@
-package com.lovelycatv.crystal.openapi
+package com.lovelycatv.ai.crystal.openapi
 
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
-import com.lovelycatv.crystal.openapi.dto.StreamChatCompletionResponse
+import com.lovelycatv.ai.crystal.openapi.dto.StreamChatCompletionResponse
 
 /**
  * @author lovelycat

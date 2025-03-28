@@ -19,12 +19,12 @@ import com.lovelycatv.ai.crystal.node.service.ServiceDispatcher
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCallback
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCompletedCallback
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamRequestFailedCallback
-import com.lovelycatv.crystal.openapi.AbstractOpenApiController
-import com.lovelycatv.crystal.openapi.dto.ChatCompletionApiRequest
-import com.lovelycatv.crystal.openapi.dto.EmbeddingApiRequest
-import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
-import com.lovelycatv.crystal.openapi.plugin.EmbeddingOptionsBuilder
-import com.lovelycatv.crystal.openapi.toStreamChatCompletionResponse
+import com.lovelycatv.ai.crystal.openapi.AbstractOpenApiController
+import com.lovelycatv.ai.crystal.openapi.dto.ChatCompletionApiRequest
+import com.lovelycatv.ai.crystal.openapi.dto.EmbeddingApiRequest
+import com.lovelycatv.ai.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.EmbeddingOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.toStreamChatCompletionResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,9 +49,9 @@ import java.util.concurrent.atomic.AtomicLong
 @RequestMapping
 @ConditionalOnProperty(name = ["crystal.mode"], havingValue = "standalone", matchIfMissing = false)
 class OpenApiControllerV1(
-    private val serviceDispatcher: ServiceDispatcher,
-    chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
-    embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
+        private val serviceDispatcher: ServiceDispatcher,
+        chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
+        embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
 ) : AbstractOpenApiController(chatOptionsBuilders, embeddingOptionsBuilders), InitializingBean {
     private val logger = logger()
 

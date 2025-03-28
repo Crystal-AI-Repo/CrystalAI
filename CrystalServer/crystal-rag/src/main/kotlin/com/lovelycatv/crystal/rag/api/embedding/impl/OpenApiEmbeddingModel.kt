@@ -11,7 +11,7 @@ import org.springframework.ai.openai.api.OpenAiApi
  * @since 2025-03-27 20:54
  * @version 1.0
  */
-class OpenAiEmbeddingModel(
+class OpenApiEmbeddingModel(
     host: String,
     port: Int,
     model: String,

@@ -5,8 +5,8 @@ import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.NODE_INFO
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Node.ProbeController.NODE_TASKS
 import com.lovelycatv.ai.crystal.common.GlobalConstants.ApiVersionControl.API_PREFIX_VERSION_1
-import com.lovelycatv.ai.crystal.common.client.DeepSeekClient
-import com.lovelycatv.ai.crystal.common.client.OllamaClient
+import com.lovelycatv.ai.crystal.common.client.impl.DeepSeekClient
+import com.lovelycatv.ai.crystal.common.client.impl.OllamaClient
 import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.response.node.probe.NodeProbeResult
@@ -31,13 +31,13 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(API_PREFIX_VERSION_1 + MAPPING)
 class ProbeControllerV1(
-    @Value("\${spring.application.name}")
+        @Value("\${spring.application.name}")
     private val applicationName: String,
-    private val networkConfig: NetworkConfig,
-    private val nodeConfiguration: NodeConfiguration,
-    private val ollamaFeignClient: OllamaClient,
-    private val deepSeekFeignClient: DeepSeekClient,
-    private val taskQueue: TaskQueue<AbstractTask>
+        private val networkConfig: NetworkConfig,
+        private val nodeConfiguration: NodeConfiguration,
+        private val ollamaFeignClient: OllamaClient,
+        private val deepSeekFeignClient: DeepSeekClient,
+        private val taskQueue: TaskQueue<AbstractTask>
 ) : IProbeControllerV1 {
     @GetMapping(NODE_INFO)
     override fun getNodeInfo(): Result<NodeProbeResult> {

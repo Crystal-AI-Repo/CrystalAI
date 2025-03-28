@@ -1,4 +1,4 @@
-package com.lovelycatv.crystal.openapi.dto
+package com.lovelycatv.ai.crystal.openapi.dto
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -9,23 +9,23 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @version 1.0
  */
 data class StreamChatCompletionResponse @JsonCreator constructor(
-    @JsonProperty("id")
+        @JsonProperty("id")
     val id: String,
-    @JsonProperty("created")
+        @JsonProperty("created")
     val created: Long? = null,
-    @JsonProperty("model")
+        @JsonProperty("model")
     val model: String? = null,
-    @JsonProperty("choices")
+        @JsonProperty("choices")
     val choices: List<Choice>,
-    @JsonProperty("usage")
+        @JsonProperty("usage")
     val usage: Usage? = null
 ) {
     data class Choice @JsonCreator constructor(
-        @JsonProperty("index")
+            @JsonProperty("index")
         val index: Int,
-        @JsonProperty("delta")
+            @JsonProperty("delta")
         val delta: Delta,
-        @JsonProperty("finish_reason")
+            @JsonProperty("finish_reason")
         val finishReason: String? = null
     ) {
         data class Delta @JsonCreator constructor(

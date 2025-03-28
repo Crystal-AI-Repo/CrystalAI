@@ -1,13 +1,11 @@
 package com.lovelycatv.ai.crystal.dispatcher.manager
 
-import com.lovelycatv.ai.crystal.common.client.NodeActuatorClient
+import com.lovelycatv.ai.crystal.common.client.impl.NodeActuatorClient
 import com.lovelycatv.ai.crystal.common.client.getFeignClient
 import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.common.util.runInIO
 import com.lovelycatv.ai.crystal.dispatcher.client.NodeProbeClient
 import com.lovelycatv.ai.crystal.dispatcher.config.DispatcherConfiguration
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 
 /**

@@ -19,8 +19,8 @@ import com.lovelycatv.ai.crystal.node.service.chat.base.AbstractChatService
 import com.lovelycatv.ai.crystal.node.service.embedding.OllamaEmbeddingService
 import com.lovelycatv.ai.crystal.node.service.embedding.base.AbstractEmbeddingService
 import com.lovelycatv.ai.crystal.node.task.*
-import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
-import com.lovelycatv.crystal.openapi.plugin.EmbeddingOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.EmbeddingOptionsBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import kotlin.reflect.KClass

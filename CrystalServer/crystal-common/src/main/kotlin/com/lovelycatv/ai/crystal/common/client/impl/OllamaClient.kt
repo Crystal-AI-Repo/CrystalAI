@@ -1,5 +1,6 @@
-package com.lovelycatv.ai.crystal.common.client
+package com.lovelycatv.ai.crystal.common.client.impl
 
+import com.lovelycatv.ai.crystal.common.client.IFeignClient
 import com.lovelycatv.ai.crystal.common.response.ollama.OllamaModelsResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping

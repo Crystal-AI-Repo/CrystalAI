@@ -1,4 +1,4 @@
-package com.lovelycatv.crystal.openapi.dto
+package com.lovelycatv.ai.crystal.openapi.dto
 
 import com.alibaba.fastjson2.annotation.JSONCreator
 import com.fasterxml.jackson.annotation.JsonProperty

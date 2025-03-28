@@ -3,10 +3,8 @@ package com.lovelycatv.crystal.rag.manager
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.crystal.rag.api.embedding.EmbeddingModel
 import com.lovelycatv.crystal.rag.api.embedding.EmbeddingModelType
-import com.lovelycatv.crystal.rag.api.embedding.impl.CrystalDispatcherEmbeddingModel
-import com.lovelycatv.crystal.rag.api.embedding.impl.CrystalNodeEmbeddingModel
 import com.lovelycatv.crystal.rag.api.embedding.impl.OllamaEmbeddingModel
-import com.lovelycatv.crystal.rag.api.embedding.impl.OpenAiEmbeddingModel
+import com.lovelycatv.crystal.rag.api.embedding.impl.OpenApiEmbeddingModel
 import com.lovelycatv.crystal.rag.config.CrystalRAGConfig
 import com.lovelycatv.crystal.rag.entity.KnowledgeBase
 import com.lovelycatv.crystal.rag.service.KnowledgeBaseService
@@ -55,18 +53,20 @@ class EmbeddingWorkerManager(
                 when (embeddingOptions.type) {
                     EmbeddingModelType.CRYSTAL_DISPATCHER -> {
                         _embeddingModels[EmbeddingModelType.CRYSTAL_DISPATCHER]!![modelName] =
-                            CrystalDispatcherEmbeddingModel(
+                            OpenApiEmbeddingModel(
                                 host = embeddingOptions.host ?: crystalRAGConfig.dispatcher.host,
                                 port = embeddingOptions.port ?: crystalRAGConfig.dispatcher.port,
-                                model = modelName
+                                model = modelName,
+                                apiKey = ""
                             )
                     }
                     EmbeddingModelType.CRYSTAL_NODE -> {
                         _embeddingModels[EmbeddingModelType.CRYSTAL_NODE]!![modelName] =
-                            CrystalNodeEmbeddingModel(
+                            OpenApiEmbeddingModel(
                                 host = embeddingOptions.host ?: crystalRAGConfig.node.host,
                                 port = embeddingOptions.port ?: crystalRAGConfig.node.port,
-                                model = modelName
+                                model = modelName,
+                                apiKey = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbm9ueW1vdXMiLCJpYXQiOjE3NDMxNTI4NzUsImV4cCI6MTc0MzIzOTI3NX0.JAzBoKguryArhIaDpk5x903OF9wjj_hkMn9hSegkwz0V-zCOt8P1jZV95E8_YoiUYliIOIKFaTjJC97_RFSIGA"
                             )
                     }
                     EmbeddingModelType.STANDALONE_OLLAMA -> {
@@ -85,7 +85,7 @@ class EmbeddingWorkerManager(
                             logger.warn("Knowledge base ${it.baseName} is using OpenAi Model but provides null or empty API Key.")
                         }
                         _embeddingModels[EmbeddingModelType.STANDALONE_OPENAI]!![modelName] =
-                            OpenAiEmbeddingModel(embeddingOptions.host, embeddingOptions.port, modelName, embeddingOptions.apiKey ?: "")
+                            OpenApiEmbeddingModel(embeddingOptions.host, embeddingOptions.port, modelName, embeddingOptions.apiKey ?: "")
                     }
                 }
                 logger.info("Embedding Model created, type: ${embeddingOptions.type}, modelName: ${embeddingOptions.modelName}")

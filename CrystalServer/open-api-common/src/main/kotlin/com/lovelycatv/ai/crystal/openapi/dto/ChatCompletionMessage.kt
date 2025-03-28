@@ -1,4 +1,4 @@
-package com.lovelycatv.crystal.openapi.dto
+package com.lovelycatv.ai.crystal.openapi.dto
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty

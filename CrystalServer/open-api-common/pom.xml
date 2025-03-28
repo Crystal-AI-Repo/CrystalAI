@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.lovelycatv.crystal.openaiapi</groupId>
+    <groupId>com.lovelycatv.ai.crystal.openaiapi</groupId>
     <artifactId>open-api-common</artifactId>
 
     <properties>

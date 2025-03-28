@@ -1,6 +1,6 @@
 package com.lovelycatv.ai.crystal.node.config
 
-import com.lovelycatv.ai.crystal.common.client.OllamaClient
+import com.lovelycatv.ai.crystal.common.client.impl.OllamaClient
 import com.lovelycatv.ai.crystal.common.client.getFeignClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
