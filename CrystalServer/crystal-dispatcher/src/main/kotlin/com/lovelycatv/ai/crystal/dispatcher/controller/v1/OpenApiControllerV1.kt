@@ -84,7 +84,11 @@ class OpenApiControllerV1(
             timeout = 600000
         )
 
-        return Triple(result.results, result.sessionId ?: "", result.message)
+        return if (result.isSuccess) {
+            Triple(result.results, result.sessionId ?: "", result.message)
+        } else {
+            Triple(null, result.sessionId ?: "", result.message)
+        }
     }
 
     /**
