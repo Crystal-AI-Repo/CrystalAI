@@ -38,3 +38,4 @@ build/
 .DS_Store
 
 /elasticsearch-8.12.0
+/kibana-8.12.0
