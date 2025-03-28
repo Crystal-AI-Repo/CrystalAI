@@ -5,4 +5,4 @@ package com.lovelycatv.ai.crystal.node.data
  * @since 2025-03-02 17:59
  * @version 1.0
  */
-class SpringAIEmbeddingResult(results: List<DoubleArray>) : AbstractEmbeddingResult(results)
+class SpringAIEmbeddingResult(metadata: Metadata, results: List<DoubleArray>) : AbstractEmbeddingResult(metadata, results)

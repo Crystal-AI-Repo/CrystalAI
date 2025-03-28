@@ -5,6 +5,7 @@ import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.node.Global
+import com.lovelycatv.ai.crystal.node.NodeRunningMode
 import com.lovelycatv.ai.crystal.node.client.NodeDispatcherClient
 import com.lovelycatv.ai.crystal.node.config.NetworkConfig
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
@@ -27,6 +28,10 @@ class NodeRegisterCronJob(
 
     @Scheduled(cron = "0/3 * * * * ?")
     fun checkRegisterStatus() {
+        if (nodeConfiguration._mode == NodeRunningMode.STANDALONE) {
+            return
+        }
+
         val dispatcherClient = getFeignClient<NodeDispatcherClient>(nodeConfiguration.dispatcher.baseUrl)
         if (Global.isNodeRegistered()) {
             // Check registration status

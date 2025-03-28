@@ -1,6 +1,7 @@
 package com.lovelycatv.ai.crystal.node.cron
 
 import com.lovelycatv.ai.crystal.node.Global
+import com.lovelycatv.ai.crystal.node.NodeRunningMode
 import com.lovelycatv.ai.crystal.node.config.NodeConfiguration
 import com.lovelycatv.ai.crystal.node.netty.NodeNettyClient
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -20,6 +21,9 @@ class NettyConnectionCheckCronJob(
 ) {
     @Scheduled(cron = "0/3 * * * * ?")
     fun checkNettyConnection() {
+        if (nodeConfiguration._mode == NodeRunningMode.STANDALONE) {
+            return
+        }
         // Check if the node is registered to the dispatcher.
         if (Global.isNodeRegistered()) {
             if (!nodeNettyClient.isConnected) {

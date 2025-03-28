@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lovelycatv.ai.crystal.common.client.FeignClientExtensionsKt;
 import com.lovelycatv.ai.crystal.common.client.codec.JacksonFeignDecoder;
 import com.lovelycatv.ai.crystal.common.client.codec.JacksonFeignEncoder;
+import com.lovelycatv.ai.crystal.node.NodeRunningMode;
 import com.lovelycatv.ai.crystal.node.client.NodeDispatcherClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "crystal")
 public class NodeConfiguration {
+    public NodeRunningMode _mode;
+    private String mode;
     private NodeDispatcherConfiguration dispatcher = new NodeDispatcherConfiguration();
     private NodeOllamaConfiguration ollama = new NodeOllamaConfiguration();
     private NodeDeepSeekConfiguration deepseek = new NodeDeepSeekConfiguration();
@@ -39,6 +42,20 @@ public class NodeConfiguration {
         );
     }
 
+    public NodeRunningMode getModeEnum() {
+        if (NodeRunningMode.STANDALONE.getMode().equalsIgnoreCase(this.mode)) {
+            return NodeRunningMode.STANDALONE;
+        } else if (NodeRunningMode.CLUSTER.getMode().equalsIgnoreCase(this.mode)) {
+            return NodeRunningMode.CLUSTER;
+        } else {
+            throw new IllegalStateException("Unknown mode " + this.mode);
+        }
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
     public NodeDispatcherConfiguration getDispatcher() {
         return dispatcher;
     }
@@ -49,6 +66,11 @@ public class NodeConfiguration {
 
     public NodeDeepSeekConfiguration getDeepseek() {
         return deepseek;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+        this._mode = this.getModeEnum();
     }
 
     public boolean isSsl() {

@@ -119,7 +119,9 @@ class TaskQueueConsumerCronJob(
                 messageTemplate.safeSendAsynchronously(
                     EmbeddingResponseMessage.success(
                         GlobalConstants.Flags.MESSAGE_FINISHED,
-                        results = result.results
+                        results = result.results,
+                        promptTokens = result.metadata.promptTokens,
+                        totalTokens = result.metadata.totalTokens
                     )
                 )
             },

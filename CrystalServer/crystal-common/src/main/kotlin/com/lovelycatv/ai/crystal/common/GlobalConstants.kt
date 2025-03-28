@@ -45,6 +45,11 @@ object GlobalConstants {
                 const val NODE_TASKS = "/tasks"
                 const val NODE_AVAILABLE = "/available"
             }
+
+            object AuthController {
+                const val MAPPING = "/auth"
+                const val LOGIN = "/login"
+            }
         }
     }
 

@@ -19,6 +19,14 @@ management:
         include: health, info
 
 crystal:
+  # standalone:
+  #   In standalone mode, the RestAPI will be enabled.
+  #   To access this instance, you need to call login api with secret-key to get the accessKey.
+  # cluster:
+  #   In cluster mode, all necessary properties in crystal.dispatcher should be completed.
+  #   Also, the RestAPI will be disabled.
+  mode: cluster
+
   # Only when the dispatcher is given the same secretKey will the node will respond properly.
   secret-key: Q3J5c3RhbEFJTm9kZQ==
   # Enable SSL
