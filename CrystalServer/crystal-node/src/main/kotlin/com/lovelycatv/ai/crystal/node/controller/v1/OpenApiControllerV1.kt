@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicLong
  */
 @RestController
 @RequestMapping
-@ConditionalOnProperty(name = ["crystal.mode"], havingValue = "cluster", matchIfMissing = false)
+@ConditionalOnProperty(name = ["crystal.mode"], havingValue = "standalone", matchIfMissing = false)
 class OpenApiControllerV1(
     private val serviceDispatcher: ServiceDispatcher,
     chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
