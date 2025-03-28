@@ -5,6 +5,7 @@ import com.lovelycatv.ai.crystal.common.plugin.CrystalPluginMetadata
 import com.lovelycatv.ai.crystal.common.util.forEachAndThen
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.dispatcher.api.options.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.dispatcher.api.options.EmbeddingOptionsBuilder
 import com.lovelycatv.crystal.plugin.PluginManager
 import com.lovelycatv.crystal.plugin.api.PluginLoaderHook
 import org.springframework.boot.CommandLineRunner
@@ -43,6 +44,7 @@ class DispatcherPluginInitializer : CommandLineRunner {
             nodePlugin.setPluginContext(pluginContext)
 
             nodePlugin.chatOptionsBuilders.addAll(nodePlugin.getBeans(ChatOptionsBuilder::class))
+            nodePlugin.embeddingOptionsBuilders.addAll(nodePlugin.getBeans(EmbeddingOptionsBuilder::class))
 
             DispatcherPluginManager.addRegisteredPlugin(nodePlugin)
 

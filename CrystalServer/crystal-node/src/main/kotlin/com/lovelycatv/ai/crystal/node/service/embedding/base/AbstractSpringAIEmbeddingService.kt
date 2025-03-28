@@ -4,6 +4,7 @@ import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
 import com.lovelycatv.ai.crystal.common.util.logger
 import com.lovelycatv.ai.crystal.node.api.interfaces.model.EmbeddingOptions2SpringAIOptionsTranslator
+import com.lovelycatv.ai.crystal.node.data.AbstractEmbeddingResult
 import com.lovelycatv.ai.crystal.node.data.SpringAIEmbeddingResult
 import org.springframework.ai.embedding.EmbeddingModel
 import org.springframework.ai.embedding.EmbeddingOptions
@@ -40,6 +41,12 @@ abstract class AbstractSpringAIEmbeddingService<EMBEDDING_MODEL: EmbeddingModel,
             )
         )
 
-        return SpringAIEmbeddingResult(response.results.map { it.output.map { it.toDouble() }.toDoubleArray() })
+        return SpringAIEmbeddingResult(
+            metadata = AbstractEmbeddingResult.Metadata(
+                promptTokens = response.metadata.usage.promptTokens,
+                totalTokens = response.metadata.usage.totalTokens
+            ),
+            response.results.map { it.output.map { it.toDouble() }.toDoubleArray() }
+        )
     }
 }

@@ -2,7 +2,9 @@ package com.lovelycatv.ai.crystal.dispatcher.config
 
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.DeepSeekChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.OllamaChatOptions
+import com.lovelycatv.ai.crystal.common.data.message.model.embedding.OllamaEmbeddingOptions
 import com.lovelycatv.ai.crystal.dispatcher.api.options.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.dispatcher.api.options.EmbeddingOptionsBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -21,6 +23,15 @@ class DispatcherConfig {
             },
             ChatOptionsBuilder<DeepSeekChatOptions>("deepseek") { modelName ->
                 DeepSeekChatOptions(modelName = modelName, temperature = null)
+            }
+        )
+    }
+
+    @Bean
+    fun defaultEmbeddingOptionsBuilders(): List<EmbeddingOptionsBuilder<*>> {
+        return listOf(
+            EmbeddingOptionsBuilder<OllamaEmbeddingOptions>("ollama") { modelName ->
+                OllamaEmbeddingOptions(modelName = modelName)
             }
         )
     }

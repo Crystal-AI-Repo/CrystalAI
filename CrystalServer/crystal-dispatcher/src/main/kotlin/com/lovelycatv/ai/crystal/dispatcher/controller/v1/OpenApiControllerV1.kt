@@ -3,23 +3,24 @@ package com.lovelycatv.ai.crystal.dispatcher.controller.v1
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.OpenApiController.CHAT_COMPLETION
+import com.lovelycatv.ai.crystal.common.GlobalConstants.Api.Dispatcher.OpenApiController.EMBEDDINGS
 import com.lovelycatv.ai.crystal.common.data.message.PromptMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.ModelResponseMessage
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.AbstractChatOptions
 import com.lovelycatv.ai.crystal.common.data.message.model.chat.ChatResponseMessage
+import com.lovelycatv.ai.crystal.common.data.message.model.embedding.AbstractEmbeddingOptions
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.util.toJSONString
 import com.lovelycatv.ai.crystal.dispatcher.api.options.ChatOptionsBuilder
-import com.lovelycatv.ai.crystal.dispatcher.data.ChatCompletionMessage
-import com.lovelycatv.ai.crystal.dispatcher.data.ChatCompletionPayloads
-import com.lovelycatv.ai.crystal.dispatcher.data.ChatCompletionResponse
-import com.lovelycatv.ai.crystal.dispatcher.data.StreamChatCompletionResponse
+import com.lovelycatv.ai.crystal.dispatcher.api.options.EmbeddingOptionsBuilder
+import com.lovelycatv.ai.crystal.dispatcher.data.*
 import com.lovelycatv.ai.crystal.dispatcher.data.node.ChatRequestSessionContainer
 import com.lovelycatv.ai.crystal.dispatcher.exception.PlatformNotSupportException
 import com.lovelycatv.ai.crystal.dispatcher.plugin.DispatcherPluginManager
 import com.lovelycatv.ai.crystal.dispatcher.response.model.base.ModelChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.response.model.chat.StreamChatRequestResult
 import com.lovelycatv.ai.crystal.dispatcher.service.DefaultChatService
+import com.lovelycatv.ai.crystal.dispatcher.service.DefaultEmbeddingService
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.ListenableTaskManager
 import com.lovelycatv.ai.crystal.dispatcher.task.manager.TaskManager
 import kotlinx.coroutines.CoroutineScope
@@ -41,8 +42,10 @@ import reactor.core.publisher.Mono
 @RestController
 class OpenApiControllerV1(
     private val chatService: DefaultChatService,
+    private val embeddingService: DefaultEmbeddingService,
     private val taskManager: TaskManager,
-    private val chatOptionsBuilders: List<ChatOptionsBuilder<*>>
+    private val chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
+    private val embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
 ) : IOpenApiControllerV1 {
     private val objectMapper = jacksonObjectMapper().apply {
         this.setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -53,7 +56,7 @@ class OpenApiControllerV1(
     @Async
     @PostMapping(CHAT_COMPLETION, produces = [MediaType.TEXT_EVENT_STREAM_VALUE, MediaType.APPLICATION_JSON_VALUE])
     override suspend fun chatCompletion(
-        @RequestBody payloads: ChatCompletionPayloads
+        @RequestBody payloads: ChatCompletionApiRequest
     ): Any {
         val options = buildChatOptions(payloads.model)
         val messages = payloads.messages.map {
@@ -135,6 +138,38 @@ class OpenApiControllerV1(
         }
     }
 
+    @Async
+    @PostMapping(EMBEDDINGS)
+    override suspend fun embedding(payloads: EmbeddingApiRequest): Any {
+        val response = embeddingService.sendOneTimeEmbeddingTask(
+            options = this.buildEmbeddingOptions(payloads.model),
+            messages = listOf(PromptMessage.Builder().fromUser().addMessage(PromptMessage.Content.fromString("")).build()),
+            ignoreResult = false,
+            timeout = 120000
+        )
+
+        val result = response.results.firstOrNull()
+        return if (result != null) {
+            EmbeddingApiResponse(
+                "list",
+                result.results.mapIndexed { index, it ->
+                    EmbeddingApiResponse.EmbeddingData(
+                        `object` = "embedding",
+                        index = index,
+                        embedding = it
+                    )
+                },
+                payloads.model,
+                EmbeddingApiResponse.Usage(
+                    totalTokens = result.totalTokens,
+                    promptTokens = result.promptTokens
+                )
+            )
+        } else {
+            Result.badRequest(response.message)
+        }
+    }
+
     private fun buildChatOptions(model: String): AbstractChatOptions {
         val (platformName, modelName) = model.split("@")
 
@@ -145,7 +180,17 @@ class OpenApiControllerV1(
         return builder?.build(modelName) ?: throw PlatformNotSupportException(platformName)
     }
 
-    private fun ModelChatRequestResult.toChatCompletionResponse(payloads: ChatCompletionPayloads): ChatCompletionResponse {
+    private fun buildEmbeddingOptions(model: String): AbstractEmbeddingOptions {
+        val (platformName, modelName) = model.split("@")
+
+        val builder = (embeddingOptionsBuilders + DispatcherPluginManager.registeredPlugins.flatMap { it.embeddingOptionsBuilders }).find {
+            it.getPlatformName().lowercase() == platformName.lowercase()
+        }
+
+        return builder?.build(modelName) ?: throw PlatformNotSupportException(platformName)
+    }
+
+    private fun ModelChatRequestResult.toChatCompletionResponse(payloads: ChatCompletionApiRequest): ChatCompletionResponse {
         val totalTokens = this.results.sumOf { it.totalTokens }
         val completionTokens = this.results.sumOf { it.generatedTokens }
 

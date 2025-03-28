@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @since 2025-03-03 01:27
  * @version 1.0
  */
-data class ChatCompletionPayloads @JsonCreator constructor(
+data class ChatCompletionApiRequest @JsonCreator constructor(
     @JsonProperty("model")
     val model: String,
     @JsonProperty("messages")

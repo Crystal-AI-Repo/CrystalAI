@@ -15,11 +15,15 @@ class EmbeddingResponseMessage @JsonCreator constructor(
     success: Boolean,
     message: String?,
     @JsonProperty("results")
-    val results: List<DoubleArray> = listOf()
+    val results: List<DoubleArray> = listOf(),
+    @JsonProperty("promptTokens")
+    val promptTokens: Long = 0L,
+    @JsonProperty("totalTokens")
+    val totalTokens: Long = 0L
 ) : ModelResponseMessage(success, message, Type.EMBEDDING_RESPONSE) {
     companion object {
-        fun success(message: String?, results: List<DoubleArray>): EmbeddingResponseMessage {
-            return EmbeddingResponseMessage(true, message, results)
+        fun success(message: String?, results: List<DoubleArray>, promptTokens: Long, totalTokens: Long): EmbeddingResponseMessage {
+            return EmbeddingResponseMessage(true, message, results, promptTokens, totalTokens)
         }
 
         fun failed(message: String): EmbeddingResponseMessage {
