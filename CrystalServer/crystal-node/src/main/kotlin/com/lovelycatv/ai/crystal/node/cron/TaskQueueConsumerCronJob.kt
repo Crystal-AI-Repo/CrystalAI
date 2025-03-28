@@ -20,6 +20,7 @@ import com.lovelycatv.ai.crystal.node.exception.UnsupportedTaskTypeException
 import com.lovelycatv.ai.crystal.node.netty.AbstractNodeNettyClient
 import com.lovelycatv.ai.crystal.node.plugin.NodePluginManager
 import com.lovelycatv.ai.crystal.node.queue.InMemoryTaskQueue
+import com.lovelycatv.ai.crystal.node.service.ServiceDispatcher
 import com.lovelycatv.ai.crystal.node.service.chat.base.AbstractChatService
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCallback
 import com.lovelycatv.ai.crystal.node.service.chat.base.ChatStreamCompletedCallback
@@ -38,6 +39,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.reflect.KClass
 
 /**
  * @author lovelycat
@@ -49,37 +51,12 @@ import java.util.concurrent.atomic.AtomicLong
 class TaskQueueConsumerCronJob(
     private val chatTaskQueue: InMemoryTaskQueue<AbstractTask>,
     private val nodeNettyClient: AbstractNodeNettyClient,
-    private val chatServiceDispatchers: List<ChatServiceDispatcher>,
-    private val embeddingServiceDispatchers: List<EmbeddingServiceDispatcher>
+    private val serviceDispatcher: ServiceDispatcher
 ) {
     private val logger = logger()
 
     private val taskPerformanceJob = Job()
     private val taskPerformanceCoroutineScope = CoroutineScope(Dispatchers.IO + taskPerformanceJob)
-
-    private fun determineEmbeddingService(task: EmbeddingTask<*>) = null.run {
-        var service: AbstractEmbeddingService<AbstractEmbeddingOptions, AbstractEmbeddingResult>? = null
-        (embeddingServiceDispatchers + NodePluginManager.registeredPlugins.flatMap { it.embeddingServiceDispatchers }).forEach {
-            if (service == null) {
-                service = it.getService(task.embeddingOptionsClazz)
-            } else {
-                return@forEach
-            }
-        }
-        service
-    }
-
-    private fun determineChatService(task: ChatTask<*>) = null.run {
-        var service: AbstractChatService<AbstractChatOptions, AbstractChatResult, Any>? = null
-        (chatServiceDispatchers + NodePluginManager.registeredPlugins.flatMap { it.chatServiceDispatchers }).forEach {
-            if (service == null) {
-                service = it.getService(task.chatOptionsClazz)
-            } else {
-                return@forEach
-            }
-        }
-        service
-    }
 
     /**
      * As the message might be sent simultaneously, leading to incorrect data, the lock must be acquired when the message is being sent.
@@ -109,7 +86,7 @@ class TaskQueueConsumerCronJob(
         task.performInWrapper(
             doSuspend = { _, messageTemplate, unlock ->
                 // Blocking response
-                val service = determineEmbeddingService(task)
+                val service = serviceDispatcher.determineEmbeddingService(task.embeddingOptionsClazz)
 
                 val result = service?.embedding(task.chatOptions, task.prompts)
                     ?: throw UnsupportedModelOptionsType(task.embeddingOptionsClazz.qualifiedName)
@@ -137,10 +114,10 @@ class TaskQueueConsumerCronJob(
         task.performInWrapper(
             doSuspend = { _, messageTemplate, unlock ->
                 // Blocking response
-                val service = determineChatService(task)
-
-                val result = service?.blockingGenerate(task.prompts, task.chatOptions)
+                val service = serviceDispatcher.determineChatService(task.chatOptionsClazz)
                     ?: throw UnsupportedModelOptionsType(task.chatOptionsClazz.qualifiedName)
+
+                val result = service.blockingGenerate(task.prompts, task.chatOptions)
 
                 unlock.invoke()
 
@@ -197,9 +174,9 @@ class TaskQueueConsumerCronJob(
                     )
                 }
 
-                val service = determineChatService(task)
-                service?.streamGenerate(task.prompts, task.chatOptions, onNewTokenReceived, onFailed, onCompleted)
+                val service = serviceDispatcher.determineChatService(task.chatOptionsClazz)
                     ?: throw UnsupportedModelOptionsType(task.chatOptionsClazz.qualifiedName)
+                service.streamGenerate(task.prompts, task.chatOptions, onNewTokenReceived, onFailed, onCompleted)
             }
         )
     }

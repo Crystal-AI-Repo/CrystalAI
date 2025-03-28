@@ -50,6 +50,11 @@ object GlobalConstants {
                 const val MAPPING = "/auth"
                 const val LOGIN = "/login"
             }
+
+            object OpenApiController {
+                const val CHAT_COMPLETION = "/v1/chat/completions"
+                const val EMBEDDINGS = "/v1/embeddings"
+            }
         }
     }
 
