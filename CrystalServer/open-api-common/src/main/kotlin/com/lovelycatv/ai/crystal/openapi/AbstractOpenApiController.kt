@@ -58,12 +58,12 @@ abstract class AbstractOpenApiController(
 
     override suspend fun embedding(payloads: EmbeddingApiRequest): Any {
         val options = this.buildEmbeddingOptions(payloads.model)
-        val messages = listOf(
+        val messages = payloads.input.map {
             PromptMessage.Builder()
                 .fromUser()
-                .addMessage(PromptMessage.Content.fromString(payloads.input))
+                .addMessage(PromptMessage.Content.fromString(it))
                 .build()
-        )
+        }
 
         val (result, message) = this.doEmbedding(options, messages)
         return if (result != null) {

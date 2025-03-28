@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 data class EmbeddingApiRequest @JSONCreator constructor(
     @JsonProperty("input")
-    val input: String,
+    val input: List<String>,
     @JsonProperty("model")
     val model: String
 )
