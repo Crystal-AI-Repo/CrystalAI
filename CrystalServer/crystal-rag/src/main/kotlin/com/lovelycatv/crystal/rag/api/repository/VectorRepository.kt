@@ -1,7 +1,7 @@
 package com.lovelycatv.crystal.rag.api.repository
 
 import com.lovelycatv.crystal.rag.data.VectorDocument
-import com.lovelycatv.crystal.rag.data.VectorDocumentQuery
+import com.lovelycatv.crystal.rag.data.VectorDocumentSimilarQuery
 import com.lovelycatv.crystal.rag.api.query.condition.AbstractQueryCondition
 
 /**
@@ -16,14 +16,7 @@ interface VectorRepository {
 
     fun remove(vararg documentIds: String): Boolean
 
-    fun similaritySearch(query: VectorDocumentQuery): List<VectorDocument>
-
-    fun similaritySearch(queryContent: String, topK: Int = 4): List<VectorDocument> {
-        return this.similaritySearch(VectorDocumentQuery(
-            queryContent = queryContent,
-            topK = topK
-        ))
-    }
+    fun similaritySearch(query: VectorDocumentSimilarQuery): List<VectorDocument>
 
     fun search(queryConditions: List<AbstractQueryCondition>): List<VectorDocument>
 

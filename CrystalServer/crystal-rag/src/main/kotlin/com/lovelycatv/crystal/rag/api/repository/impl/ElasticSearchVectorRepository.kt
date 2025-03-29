@@ -16,7 +16,7 @@ import com.lovelycatv.crystal.rag.api.embedding.EmbeddingModel
 import com.lovelycatv.crystal.rag.api.document.VectorDocumentShardingStrategy
 import com.lovelycatv.crystal.rag.api.repository.AbstractVectorRepository
 import com.lovelycatv.crystal.rag.data.VectorDocument
-import com.lovelycatv.crystal.rag.data.VectorDocumentQuery
+import com.lovelycatv.crystal.rag.data.VectorDocumentSimilarQuery
 import com.lovelycatv.crystal.rag.data.VectorRepositoryOptions
 import com.lovelycatv.crystal.rag.enums.SimilarityFunction
 import com.lovelycatv.crystal.rag.api.query.ElasticSearchQueryConditionTranslator
@@ -178,7 +178,7 @@ class ElasticSearchVectorRepository(
         return this.elasticsearchClient.bulk(bulkRequestBuilder.build()).errors()
     }
 
-    override fun similaritySearch(query: VectorDocumentQuery): List<VectorDocument> {
+    override fun similaritySearch(query: VectorDocumentSimilarQuery): List<VectorDocument> {
         require(this.isRepositoryExists()) { "Index ${this.getRepositoryName()} not found" }
 
         var threshold: Float = query.similarityThreshold
@@ -200,6 +200,9 @@ class ElasticSearchVectorRepository(
                             .field("embedding")
                             .numCandidates((1.5 * query.topK).toLong())
                     }
+                    .apply {
+                       this@ElasticSearchVectorRepository.queryConditionTranslator.translate(query.queryConditions, this)
+                    }
             },
             VectorDocument::class.java)
 
@@ -212,7 +215,7 @@ class ElasticSearchVectorRepository(
         val response = this.elasticsearchClient.search(
             SearchRequest.of { searchRequestBuilder ->
                 searchRequestBuilder.index(this.getRepositoryName()).apply {
-                    queryConditionTranslator.translate(queryConditions, this)
+                    this@ElasticSearchVectorRepository.queryConditionTranslator.translate(queryConditions, this)
                 }
             },
             VectorDocument::class.java

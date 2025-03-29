@@ -3,11 +3,10 @@ package com.lovelycatv.crystal.rag.controller
 import com.lovelycatv.ai.crystal.common.response.Result
 import com.lovelycatv.ai.crystal.common.util.catchException
 import com.lovelycatv.crystal.rag.data.VectorDocument
-import com.lovelycatv.crystal.rag.data.VectorDocumentQuery
+import com.lovelycatv.crystal.rag.data.VectorDocumentSimilarQuery
 import com.lovelycatv.crystal.rag.dto.AddVectorDocumentDTO
-import com.lovelycatv.crystal.rag.dto.KnowledgeBaseQueryDTO
+import com.lovelycatv.crystal.rag.data.VectorDocumentQuery
 import com.lovelycatv.crystal.rag.manager.KnowledgeBaseRepositoryManager
-import com.lovelycatv.crystal.rag.api.query.condition.AbstractQueryCondition
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -51,31 +50,26 @@ class KnowledgeBaseController(
     }
 
     @Async
-    @GetMapping("/similarQuery")
-    fun similarQuery(
-        baseName: String,
-        query: String,
-        @RequestParam("topK", required = false, defaultValue = "4")
-        topK: Int,
-        @RequestParam("similarityThreshold", required = false, defaultValue = "0.0")
-        similarityThreshold: Double
-    ): Result<*> {
-        if (query.isBlank()) {
+    @PostMapping("/similarQuery")
+    fun similarQuery(@RequestBody query: VectorDocumentSimilarQuery): Result<*> {
+        if (query.queryContent.isBlank()) {
             return Result.badRequest("Query content could not be null or empty")
         }
 
-        if (topK <= 0) {
+        if (query.topK <= 0) {
             return Result.badRequest("TopK should be great than or equals 1")
         }
 
-        val repo = knowledgeBaseRepositoryManager.getRepository(baseName)
-            ?: return Result.badRequest("Knowledge base: $baseName does not exist")
+        val repo = knowledgeBaseRepositoryManager.getRepository(query.baseName)
+            ?: return Result.badRequest("Knowledge base: ${query.baseName} does not exist")
 
         return catchException {
-            val result = repo.similaritySearch(VectorDocumentQuery(
-                queryContent = query,
-                topK = topK,
-                similarityThreshold = similarityThreshold.toFloat()
+            val result = repo.similaritySearch(VectorDocumentSimilarQuery(
+                baseName = query.baseName,
+                queryContent = query.queryContent,
+                topK = query.topK,
+                similarityThreshold = query.similarityThreshold,
+                queryConditions = query.queryConditions
             ))
 
             Result.success("${result.size} result(s) in total", result)
@@ -84,7 +78,7 @@ class KnowledgeBaseController(
 
     @Async
     @PostMapping("/query")
-    fun query(@RequestBody dto: KnowledgeBaseQueryDTO): Result<*> {
+    fun query(@RequestBody dto: VectorDocumentQuery): Result<*> {
         val repo = knowledgeBaseRepositoryManager.getRepository(dto.baseName)
             ?: return Result.badRequest("Knowledge base: ${dto.baseName} does not exist")
 
