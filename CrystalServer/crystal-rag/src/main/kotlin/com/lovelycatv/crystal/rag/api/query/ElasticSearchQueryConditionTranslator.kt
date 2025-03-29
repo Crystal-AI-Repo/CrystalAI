@@ -26,101 +26,8 @@ import com.lovelycatv.crystal.rag.api.query.condition.func.SortCondition
  * @since 2025-03-29 21:19
  * @version 1.0
  */
-class ElasticSearchQueryConditionTranslator : QueryConditionTranslator<SearchRequest.Builder, SearchRequest.Builder> {
-    override fun translate(queryConditions: List<AbstractQueryCondition>, `in`: SearchRequest.Builder): SearchRequest.Builder {
-        val (normalQueryConditions, functionalConditions) = queryConditions.divide { it !is FunctionalQueryCondition }
-
-        `in`.query { queryBuilder ->
-            for (queryCondition in normalQueryConditions) {
-                when (queryCondition) {
-                    is BoolCondition -> {
-                        queryBuilder.bool {
-                            it.applyConditions(queryCondition)
-                        }
-                    }
-
-                    is BasicQueryCondition -> {
-                        queryBuilder.applyBasicCondition(queryCondition)
-                    }
-
-                    else -> {
-                        throw IllegalStateException("Unsupported query condition type: ${queryCondition::class.qualifiedName}")
-                    }
-                }
-            }
-            queryBuilder
-        }
-
-        for (functionalCondition in functionalConditions) {
-            when (functionalCondition) {
-                is SortCondition -> {
-                    `in`.sort { sortBuilder ->
-                        sortBuilder.field {
-                            it.field(functionalCondition.field)
-                                .order(
-                                    if (functionalCondition.decrease)
-                                        SortOrder.Desc
-                                    else
-                                        SortOrder.Asc
-                                )
-                        }
-                    }
-                }
-
-                is SizeCondition -> {
-                    `in`.size(functionalCondition.size)
-                }
-
-                else -> {
-                    throw IllegalStateException("Unsupported query condition type: ${functionalCondition::class.qualifiedName} in FunctionalQueryCondition")
-                }
-            }
-        }
-
-        return `in`
-    }
-
-    private fun BoolQuery.Builder.applyConditions(boolCondition: BoolCondition): BoolQuery.Builder {
-        boolCondition.conditions.forEach { sub ->
-            when (sub) {
-                is MustCondition -> {
-                    sub.conditions.forEach {
-                        this.must { mustQueryBuilder ->
-                            mustQueryBuilder.applyBasicCondition(it)
-                            mustQueryBuilder
-                        }
-                    }
-                }
-
-
-                is ShouldCondition -> {
-                    sub.conditions.forEach {
-                        this.should { shouldQueryBuilder ->
-                            shouldQueryBuilder.applyBasicCondition(it)
-                            shouldQueryBuilder
-                        }
-                    }
-                    this.minimumShouldMatch(sub.getMinimumShouldMatch().toString())
-                }
-
-                is FilterCondition -> {
-                    sub.conditions.forEach {
-                        this.filter { filterQueryBuilder ->
-                            filterQueryBuilder.applyBasicCondition(it)
-                            filterQueryBuilder
-                        }
-                    }
-
-                }
-
-                else -> {
-                    throw IllegalStateException("Unsupported query condition type: ${sub::class.qualifiedName} in BoolCondition")
-                }
-            }
-        }
-
-        return this
-    }
+class ElasticSearchQueryConditionTranslator : AbstractQueryConditionTranslator<SearchRequest.Builder, SearchRequest.Builder>() {
+    override fun produceOutput(`in`: SearchRequest.Builder) = `in`
 
     private fun Query.Builder.applyBasicCondition(sub: BasicQueryCondition): Query.Builder {
         when (sub) {
@@ -174,5 +81,79 @@ class ElasticSearchQueryConditionTranslator : QueryConditionTranslator<SearchReq
         }
 
         return this
+    }
+
+    private fun BoolQuery.Builder.applyConditions(boolCondition: BoolCondition): BoolQuery.Builder {
+        boolCondition.conditions.forEach { sub ->
+            when (sub) {
+                is MustCondition -> {
+                    sub.conditions.forEach {
+                        this.must { mustQueryBuilder ->
+                            mustQueryBuilder.applyBasicCondition(it)
+                            mustQueryBuilder
+                        }
+                    }
+                }
+
+
+                is ShouldCondition -> {
+                    sub.conditions.forEach {
+                        this.should { shouldQueryBuilder ->
+                            shouldQueryBuilder.applyBasicCondition(it)
+                            shouldQueryBuilder
+                        }
+                    }
+                    this.minimumShouldMatch(sub.getMinimumShouldMatch().toString())
+                }
+
+                is FilterCondition -> {
+                    sub.conditions.forEach {
+                        this.filter { filterQueryBuilder ->
+                            filterQueryBuilder.applyBasicCondition(it)
+                            filterQueryBuilder
+                        }
+                    }
+
+                }
+
+                else -> {
+                    throw IllegalStateException("Unsupported query condition type: ${sub::class.qualifiedName} in BoolCondition")
+                }
+            }
+        }
+
+        return this
+    }
+
+    override fun applyBoolCondition(`in`: SearchRequest.Builder, condition: BoolCondition) {
+        `in`.query { queryBuilder ->
+            queryBuilder.bool {
+                it.applyConditions(condition)
+            }
+        }
+    }
+
+    override fun applyBasicQueryCondition(`in`: SearchRequest.Builder, condition: BasicQueryCondition) {
+        `in`.query { queryBuilder ->
+            queryBuilder.applyBasicCondition(condition)
+        }
+    }
+
+    override fun applySortCondition(`in`: SearchRequest.Builder, condition: SortCondition) {
+        `in`.sort { sortBuilder ->
+            sortBuilder.field {
+                it.field(condition.field)
+                    .order(
+                        if (condition.decrease)
+                            SortOrder.Desc
+                        else
+                            SortOrder.Asc
+                    )
+            }
+        }
+    }
+
+    override fun applySizeCondition(`in`: SearchRequest.Builder, condition: SizeCondition) {
+        `in`.size(condition.size)
     }
 }
