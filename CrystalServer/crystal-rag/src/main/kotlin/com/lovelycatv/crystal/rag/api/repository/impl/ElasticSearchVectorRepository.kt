@@ -3,6 +3,7 @@ package com.lovelycatv.crystal.rag.api.repository.impl
 import co.elastic.clients.elasticsearch.ElasticsearchClient
 import co.elastic.clients.elasticsearch.core.BulkRequest
 import co.elastic.clients.elasticsearch.core.BulkResponse
+import co.elastic.clients.elasticsearch.core.SearchRequest
 import co.elastic.clients.elasticsearch.core.search.Hit
 import co.elastic.clients.json.jackson.JacksonJsonpMapper
 import co.elastic.clients.transport.TransportOptions
@@ -18,6 +19,8 @@ import com.lovelycatv.crystal.rag.data.VectorDocument
 import com.lovelycatv.crystal.rag.data.VectorDocumentQuery
 import com.lovelycatv.crystal.rag.data.VectorRepositoryOptions
 import com.lovelycatv.crystal.rag.enums.SimilarityFunction
+import com.lovelycatv.crystal.rag.api.query.ElasticSearchQueryConditionTranslator
+import com.lovelycatv.crystal.rag.api.query.condition.AbstractQueryCondition
 import org.apache.http.HttpHost
 import org.apache.http.message.BasicHeader
 import org.elasticsearch.client.RestClient
@@ -45,6 +48,8 @@ class ElasticSearchVectorRepository(
     private val logger = logger()
 
     private val elasticsearchClient: ElasticsearchClient
+
+    private val queryConditionTranslator: ElasticSearchQueryConditionTranslator = ElasticSearchQueryConditionTranslator()
 
     init {
         val httpHost = HttpHost(host, port, if (ssl) "https" else "http")
@@ -201,6 +206,19 @@ class ElasticSearchVectorRepository(
         return res.hits().hits().map {
             it.toDocument()
         }
+    }
+
+    override fun search(queryConditions: List<AbstractQueryCondition>): List<VectorDocument> {
+        val response = this.elasticsearchClient.search(
+            SearchRequest.of { searchRequestBuilder ->
+                searchRequestBuilder.index(this.getRepositoryName()).apply {
+                    queryConditionTranslator.translate(queryConditions, this)
+                }
+            },
+            VectorDocument::class.java
+        )
+
+        return response.hits().hits().map { it.toDocument() }
     }
 
     override fun isRepositoryExists(): Boolean {

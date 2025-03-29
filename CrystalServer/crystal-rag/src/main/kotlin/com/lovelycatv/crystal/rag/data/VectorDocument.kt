@@ -1,6 +1,7 @@
 package com.lovelycatv.crystal.rag.data
 
 import com.alibaba.fastjson2.annotation.JSONCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
@@ -31,7 +32,9 @@ data class VectorDocument @JSONCreator constructor(
         const val ORDER = "_order"
     }
 
+    @JsonIgnore
     fun getIdentityOrNull() = this.metadata[IDENTITY] as? String
 
+    @JsonIgnore
     fun getOrderOrNull() = this.metadata[ORDER] as? Int
 }

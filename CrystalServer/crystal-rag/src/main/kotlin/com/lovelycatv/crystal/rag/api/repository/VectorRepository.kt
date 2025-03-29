@@ -2,6 +2,7 @@ package com.lovelycatv.crystal.rag.api.repository
 
 import com.lovelycatv.crystal.rag.data.VectorDocument
 import com.lovelycatv.crystal.rag.data.VectorDocumentQuery
+import com.lovelycatv.crystal.rag.api.query.condition.AbstractQueryCondition
 
 /**
  * @author lovelycat
@@ -17,12 +18,14 @@ interface VectorRepository {
 
     fun similaritySearch(query: VectorDocumentQuery): List<VectorDocument>
 
-    fun similaritySearch(queryContent: String, topK: Int = 5): List<VectorDocument> {
+    fun similaritySearch(queryContent: String, topK: Int = 4): List<VectorDocument> {
         return this.similaritySearch(VectorDocumentQuery(
             queryContent = queryContent,
             topK = topK
         ))
     }
+
+    fun search(queryConditions: List<AbstractQueryCondition>): List<VectorDocument>
 
     fun isRepositoryExists(): Boolean
 }

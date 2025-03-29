@@ -5,7 +5,9 @@ import com.lovelycatv.ai.crystal.common.util.catchException
 import com.lovelycatv.crystal.rag.data.VectorDocument
 import com.lovelycatv.crystal.rag.data.VectorDocumentQuery
 import com.lovelycatv.crystal.rag.dto.AddVectorDocumentDTO
+import com.lovelycatv.crystal.rag.dto.KnowledgeBaseQueryDTO
 import com.lovelycatv.crystal.rag.manager.KnowledgeBaseRepositoryManager
+import com.lovelycatv.crystal.rag.api.query.condition.AbstractQueryCondition
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -49,8 +51,8 @@ class KnowledgeBaseController(
     }
 
     @Async
-    @GetMapping("/query")
-    fun query(
+    @GetMapping("/similarQuery")
+    fun similarQuery(
         baseName: String,
         query: String,
         @RequestParam("topK", required = false, defaultValue = "4")
@@ -77,6 +79,19 @@ class KnowledgeBaseController(
             ))
 
             Result.success("${result.size} result(s) in total", result)
+        }
+    }
+
+    @Async
+    @PostMapping("/query")
+    fun query(@RequestBody dto: KnowledgeBaseQueryDTO): Result<*> {
+        val repo = knowledgeBaseRepositoryManager.getRepository(dto.baseName)
+            ?: return Result.badRequest("Knowledge base: ${dto.baseName} does not exist")
+
+        return catchException {
+            val result = repo.search(dto.conditions)
+
+            Result.success("", result)
         }
     }
 }
