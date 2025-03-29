@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.lovelycatv.crystal.rag.api.query.condition.AbstractQueryCondition
 import com.lovelycatv.crystal.rag.api.query.condition.FilterCondition
+import com.lovelycatv.crystal.rag.api.query.condition.basic.BasicQueryCondition
 
 /**
  * @author lovelycat
  * @since 2025-03-29 21:02
  * @version 1.0
  */
-class BoolCondition : AbstractQueryCondition(Type.BOOL) {
+class BoolCondition : BasicQueryCondition(Type.BOOL) {
     private val _conditions: MutableList<SubCondition> = mutableListOf()
     val conditions: List<SubCondition> get() = this._conditions
 

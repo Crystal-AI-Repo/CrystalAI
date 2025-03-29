@@ -124,6 +124,13 @@ class ElasticSearchQueryConditionTranslator : QueryConditionTranslator<SearchReq
 
     private fun Query.Builder.applyBasicCondition(sub: BasicQueryCondition): Query.Builder {
         when (sub) {
+            // Nested condition
+            is BoolCondition -> {
+                this.bool {
+                    it.applyConditions(sub)
+                }
+            }
+
             is MatchCondition -> {
                 this.match(MatchQuery.of { it.field(sub.field).query(sub.query) })
             }
