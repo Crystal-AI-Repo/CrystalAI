@@ -77,15 +77,15 @@ data class KnowledgeBase(
     )
 
     data class EmbeddingOptions @JSONCreator constructor(
-            @JsonProperty("type")
+        @JsonProperty("type")
         val type: EmbeddingModelType,
-            @JsonProperty("modelName")
+        @JsonProperty("modelName")
         val modelName: String,
-            @JsonProperty("host")
+        @JsonProperty("host")
         val host: String?,
-            @JsonProperty("port")
+        @JsonProperty("port")
         val port: Int?,
-            @JsonProperty("apiKey")
+        @JsonProperty("apiKey")
         val apiKey: String?
     )
 }

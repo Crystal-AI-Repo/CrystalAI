@@ -6,6 +6,7 @@ import com.lovelycatv.crystal.rag.data.VectorDocument
 import com.lovelycatv.crystal.rag.data.VectorDocumentSimilarQuery
 import com.lovelycatv.crystal.rag.dto.AddVectorDocumentDTO
 import com.lovelycatv.crystal.rag.data.VectorDocumentQuery
+import com.lovelycatv.crystal.rag.dto.DocumentDeletionDTO
 import com.lovelycatv.crystal.rag.manager.KnowledgeBaseRepositoryManager
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.*
@@ -47,6 +48,21 @@ class KnowledgeBaseController(
                 Result.badRequest("Document add failed")
             }
         }
+    }
+
+    @PostMapping("/remove")
+    fun removeDocuments(@RequestBody dto: DocumentDeletionDTO): Result<*> {
+        if (dto.ids.isEmpty()) {
+            return Result.badRequest("Ids could not be null or empty")
+        }
+
+        val repo = knowledgeBaseRepositoryManager.getRepository(dto.baseName)
+            ?: return Result.badRequest("Knowledge base: ${dto.baseName} does not exist")
+
+        return if (repo.remove(dto.ids))
+            Result.success("Documents deleted successfully")
+        else
+            Result.badRequest("Could not remove documents")
     }
 
     @Async

@@ -166,16 +166,21 @@ class ElasticSearchVectorRepository(
     override fun remove(vararg documentIds: String): Boolean {
         require(this.isRepositoryExists()) { "Index ${this.getRepositoryName()} not found" }
 
-        val bulkRequestBuilder = BulkRequest.Builder()
-        documentIds.forEach {
-            bulkRequestBuilder.operations { op ->
-                op.delete { idx ->
-                    idx.index(this.getRepositoryName()).id(it)
+        return try {
+            val bulkRequestBuilder = BulkRequest.Builder()
+            documentIds.forEach {
+                bulkRequestBuilder.operations { op ->
+                    op.delete { idx ->
+                        idx.index(this.getRepositoryName()).id(it)
+                    }
                 }
             }
+            this.elasticsearchClient.bulk(bulkRequestBuilder.build())
+            true
+        } catch (e: Exception) {
+            logger.error("Error removing documents: $documentIds, exception: ${e.message}", e)
+            false
         }
-
-        return this.elasticsearchClient.bulk(bulkRequestBuilder.build()).errors()
     }
 
     override fun similaritySearch(query: VectorDocumentSimilarQuery): List<VectorDocument> {

@@ -16,6 +16,10 @@ interface VectorRepository {
 
     fun remove(vararg documentIds: String): Boolean
 
+    fun remove(documentIds: List<String>): Boolean {
+        return this.remove(*documentIds.toTypedArray())
+    }
+
     fun similaritySearch(query: VectorDocumentSimilarQuery): List<VectorDocument>
 
     fun search(queryConditions: List<AbstractQueryCondition>): List<VectorDocument>
