@@ -40,9 +40,14 @@ public class CrystalRAGConfig {
     }
 
     public static class DispatcherConfig {
+        private Boolean enabled;
         private String host;
         private Integer port;
         private String accessKey;
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
 
         public String getHost() {
             return host;
@@ -54,6 +59,10 @@ public class CrystalRAGConfig {
 
         public String getAccessKey() {
             return accessKey;
+        }
+
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
         }
 
         public void setPort(Integer port) {
@@ -70,9 +79,14 @@ public class CrystalRAGConfig {
     }
 
     public static class NodeConfig {
+        private Boolean enabled;
         private String host;
         private Integer port;
         private String secretKey;
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
 
         public String getHost() {
             return host;
@@ -84,6 +98,10 @@ public class CrystalRAGConfig {
 
         public String getSecretKey() {
             return secretKey;
+        }
+
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
         }
 
         public void setPort(Integer port) {

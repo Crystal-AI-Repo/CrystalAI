@@ -5,6 +5,7 @@ import com.lovelycatv.ai.crystal.common.client.safeRequest
 import com.lovelycatv.ai.crystal.common.data.MutableLiveData
 import com.lovelycatv.crystal.rag.config.CrystalRAGConfig
 import com.lovelycatv.crystal.rag.rpc.NodeAuthClient
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 @EnableScheduling
+@ConditionalOnProperty(name = ["crystal.node.enabled"], havingValue = "true", matchIfMissing = false)
 class NodeAccessKeyManager(
     private val crystalRAGConfig: CrystalRAGConfig
 ) {

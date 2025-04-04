@@ -32,10 +32,12 @@ management:
 
 crystal:
   dispatcher:
+    enabled: false
     host: http://127.0.0.1
     port: 5210
     access-key: Q3J5c3RhbEFJRGlzcGF0Y2hlcg==
   node:
+    enabled: true
     host: http://127.0.0.1
     port: 5310
     secret-key: Q3J5c3RhbEFJTm9kZQ==
