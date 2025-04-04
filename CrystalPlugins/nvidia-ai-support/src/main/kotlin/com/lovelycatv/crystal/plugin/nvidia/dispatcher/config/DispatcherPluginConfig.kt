@@ -1,6 +1,6 @@
 package com.lovelycatv.crystal.plugin.nvidia.dispatcher.config
 
-import com.lovelycatv.crystal.openapi.plugin.ChatOptionsBuilder
+import com.lovelycatv.ai.crystal.openapi.plugin.ChatOptionsBuilder
 import com.lovelycatv.crystal.plugin.nvidia.common.message.NvidiaChatOptions
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
