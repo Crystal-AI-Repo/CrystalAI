@@ -1,0 +1,59 @@
+server:
+  port: 5410
+
+spring:
+  application:
+    name: CrystalRAG
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration
+      - org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration
+      - org.springframework.ai.autoconfigure.vectorstore.elasticsearch.ElasticsearchVectorStoreAutoConfiguration
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:crystal-tag.db
+    username:
+    password:
+  ai:
+    openai:
+      api-key: OpenAI-Api-Key
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health, info
+
+crystal:
+  dispatcher:
+    enabled: true
+    host: http://127.0.0.1
+    port: 5210
+    access-key: Q3J5c3RhbEFJRGlzcGF0Y2hlcg==
+  node:
+    enabled: true
+    host: http://127.0.0.1
+    port: 5310
+    secret-key: Q3J5c3RhbEFJTm9kZQ==
+  ollama:
+    host: http://127.0.0.1
+    port: 11434
+
+logging:
+  file:
+    name: logs/${spring.application.name}
+  logback:
+    rollingpolicy:
+      max-history: 31
+      max-file-size: 4GB
+      file-name-pattern: ${LOG_FILE}_%d{yyyy-MM-dd}_%i.gz
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
