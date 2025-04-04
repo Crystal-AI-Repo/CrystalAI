@@ -25,7 +25,7 @@ crystal:
   # cluster:
   #   In cluster mode, all necessary properties in crystal.dispatcher should be completed.
   #   Also, the RestAPI will be disabled.
-  mode: standalone
+  mode: cluster
 
   # Only when the dispatcher is given the same secretKey will the node will respond properly.
   secret-key: Q3J5c3RhbEFJTm9kZQ==

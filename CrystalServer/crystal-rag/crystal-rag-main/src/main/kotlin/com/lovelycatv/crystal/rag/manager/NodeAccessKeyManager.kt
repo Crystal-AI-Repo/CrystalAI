@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component
  */
 @Component
 @EnableScheduling
-@ConditionalOnProperty(name = ["crystal.node.enabled"], havingValue = "true", matchIfMissing = false)
 class NodeAccessKeyManager(
     private val crystalRAGConfig: CrystalRAGConfig
 ) {
@@ -32,6 +31,10 @@ class NodeAccessKeyManager(
 
     @Scheduled(cron = "* 0/30 * * * ?")
     fun updateKey() {
+        if (!crystalRAGConfig.node.enabled) {
+            return
+        }
+
         val url = "${crystalRAGConfig.node.host}:${crystalRAGConfig.node.port}"
         val client = getFeignClient<NodeAuthClient>(url)
         val result = client.safeRequest { loginWithSecretKey(crystalRAGConfig.node.secretKey) }
