@@ -22,15 +22,20 @@ import reactor.core.publisher.Mono
  * @version 1.0
  */
 abstract class AbstractOpenApiController(
-        private val chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
-        private val embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
+    private val chatOptionsBuilders: List<ChatOptionsBuilder<*>>,
+    private val embeddingOptionsBuilders: List<EmbeddingOptionsBuilder<*>>
 ) : IOpenApiController {
     private val objectMapper = jacksonObjectMapper().apply {
         this.setSerializationInclusion(JsonInclude.Include.NON_NULL)
     }
 
     override suspend fun chatCompletion(payloads: ChatCompletionApiRequest): Any {
-        val options = buildChatOptions(payloads.model)
+        val options = try {
+            buildChatOptions(payloads.model)
+        } catch (e: Exception) {
+            return Result.badRequest("Invalid request, exception: ${e.message}").toJSONString()
+        }
+
         val messages = payloads.messages.map {
             PromptMessage(
                 role = if (it.role.lowercase() == "system") {
@@ -57,7 +62,12 @@ abstract class AbstractOpenApiController(
     }
 
     override suspend fun embedding(payloads: EmbeddingApiRequest): Any {
-        val options = this.buildEmbeddingOptions(payloads.model)
+        val options = try {
+            this.buildEmbeddingOptions(payloads.model)
+        } catch (e: Exception) {
+            return Result.badRequest("Invalid request, exception: ${e.message}")
+        }
+
         val messages = payloads.input.map {
             PromptMessage.Builder()
                 .fromUser()
@@ -114,7 +124,15 @@ abstract class AbstractOpenApiController(
      */
     abstract suspend fun doEmbedding(options: AbstractEmbeddingOptions, messages: List<PromptMessage>): Pair<EmbeddingResponseMessage?, String>
 
+    private fun checkModelName(modelName: String) {
+        if (!modelName.contains("@")) {
+            throw IllegalArgumentException("Invalid model name, platform not specified.")
+        }
+    }
+
     private fun buildChatOptions(model: String): AbstractChatOptions {
+        this.checkModelName(model)
+
         val (platformName, modelName) = model.split("@")
 
         val builder = chatOptionsBuilders.find {
@@ -125,6 +143,8 @@ abstract class AbstractOpenApiController(
     }
 
     private fun buildEmbeddingOptions(model: String): AbstractEmbeddingOptions {
+        this.checkModelName(model)
+
         val (platformName, modelName) = model.split("@")
 
         val builder = embeddingOptionsBuilders.find {

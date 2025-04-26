@@ -127,6 +127,9 @@ abstract class AbstractSpringAIChatService<CHAT_MODEL: ChatModel, MODEL_OPTIONS:
         } catch (e: TransientAiException) {
             logger.warn("Could not send chat request, message: [${e.message}], options: ${options.toJSONString()}, stream: $stream", e)
             PackagedChatServiceResult.failed("Request failed, message: " + e.message, e)
+        } catch (e: Exception) {
+            logger.warn("Could not send chat request, message: [${e.message}], options: ${options.toJSONString()}, stream: $stream", e)
+            PackagedChatServiceResult.failed("Request failed, message: " + e.message, e)
         }
 
     }
